@@ -38,7 +38,7 @@ Addons are cluster-level features that use standard Kubernetes objects (like Dep
 
 ---
 
-### 4. 
+### 4. Architecture variations
 
 While the core components remain the same, Kubernetes is highly flexible in how they are deployed:
 
