@@ -14,7 +14,7 @@ The document covers the fundamental concepts of what a container is and how it f
 |**Container Environment**|This describes the various settings a container receives, including its **environment variables**, **command line arguments**, and **resource limits** (CPU, memory) defined in the Pod specification.|
 |**Container Lifecycle Hooks**|These are actions that are triggered at specific points in a container's life, such as **postStart** (immediately after creation) and **preStop** (before the container is terminated).|
 
-#### Container Environaments
+### Container Environments
 - **The Filesystem:** A combination of the container **image** (read-only) and one or more **volumes** (for read/write data, which we'll cover later).
     
 - **Container-Specific Information:** The container's **hostname** is set to the Pod name, and the Pod's name and namespace are exposed as environment variables using the **Downward API**.
