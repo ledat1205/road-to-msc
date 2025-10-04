@@ -24,3 +24,34 @@ These are the machines (VMs or physical servers) that run your actual applicatio
 - **kube-proxy:** A network proxy that maintains network rules on Nodes. This allows for network communication to and from your Pods, both internal and external.
     
 - **Container Runtime:** The software responsible for running containers (like Docker, containerd, or CRI-O).
+
+### 3. Addons
+
+Addons are cluster-level features that use standard Kubernetes objects (like Deployments and DaemonSets) and typically run within the **`kube-system`** namespace.
+
+- **DNS (Crucial):** Every Kubernetes cluster should have **Cluster DNS**, which serves DNS records specifically for Kubernetes Services, enabling service discovery for containers.
+    
+- **Networking:** **Network Plugins** implement the Container Network Interface (CNI), responsible for allocating IP addresses to Pods and allowing them to communicate.
+    
+- **Management:** Includes the **Web UI (Dashboard)** for managing the cluster, as well as tools for **Container resource monitoring** and **Cluster-level logging**.
+    
+
+---
+
+### 4. 
+
+While the core components remain the same, Kubernetes is highly flexible in how they are deployed:
+
+- **Control Plane Deployment Options:**
+    
+    - **Traditional:** Components run as standard services (e.g., systemd) on dedicated machines.
+        
+    - **Static Pods:** Components are managed directly by the Kubelet on a Node (common setup for tools like Kubeadm).
+        
+    - **Self-hosted:** The control plane itself runs as regular Pods managed by Deployments within the cluster.
+        
+    - **Managed Services:** Cloud providers abstract and manage the control plane completely.
+        
+- **Workload Placement:** In production, Control Plane components are often placed on **dedicated Nodes**, separate from user workloads, for stability and security.
+    
+- **Customization:** Kubernetes allows for high extensibility, including deploying **Custom Schedulers** and extending the API using **CustomResourceDefinitions (CRDs)**.
