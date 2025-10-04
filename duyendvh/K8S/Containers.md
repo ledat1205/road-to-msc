@@ -13,3 +13,4 @@ The document covers the fundamental concepts of what a container is and how it f
 |**Container Runtimes**|The software responsible for **managing the execution and lifecycle** of the containers on a Node. Kubernetes supports any runtime that adheres to the **Container Runtime Interface (CRI)**, such as containerd or CRI-O.|
 |**Container Environment**|This describes the various settings a container receives, including its **environment variables**, **command line arguments**, and **resource limits** (CPU, memory) defined in the Pod specification.|
 |**Container Lifecycle Hooks**|These are actions that are triggered at specific points in a container's life, such as **postStart** (immediately after creation) and **preStop** (before the container is terminated).|
+
