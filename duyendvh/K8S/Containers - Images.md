@@ -8,7 +8,7 @@ The core concept is that a container image is a **read-only template** (or bluep
     
 - **Tags:** Images are identified by a **tag**, which usually points to a specific version of the application. If no tag is specified, Kubernetes defaults to the `:latest` tag.
     
-If you don't specify a registry hostname, Kubernetes assumes that you mean the [Docker public registry](https://hub.docker.com/)
+If you don't specify a registry hostname, Kubernetes assumes that you mean the Docker public registry
 ### 2. Image Pull Policy
 
 This is a critical setting that tells the Kubelet when it should try to download the image from the registry. The three main policies are:
