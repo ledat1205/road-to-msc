@@ -1,5 +1,5 @@
 The architecture is split into two main roles:
-![[Pasted image 20251004205934.png]]
+![[Pasted image 20251004210006.png]]
 ### 1. The Control Plane (The Brain)
 
 These components make global decisions about the cluster (like scheduling) and maintain the desired state of the cluster.
