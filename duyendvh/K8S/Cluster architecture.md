@@ -1,5 +1,5 @@
 The architecture is split into two main roles:
-
+![[Pasted image 20251004205732.png]]
 
 ### 1. The Control Plane (The Brain)
 
