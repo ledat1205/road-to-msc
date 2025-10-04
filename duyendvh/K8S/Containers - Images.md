@@ -1,24 +1,57 @@
-The core concept is that a container image is a **read-only template** (or blueprint) containing everything needed to run your application.
+## Container Images: Concepts & Naming
+
+- **Definition:** An image is a binary, executable software bundle containing an application and all its dependencies. It is the core unit deployed by Kubernetes.
+    
+- **Registries:** Images are stored in **Container Registries** (like Docker Hub). If no registry hostname is specified in the image name, Kubernetes defaults to the Docker public registry.
+    
+- **Image Names:** The full name can include the registry hostname and port (e.g., `fictional.registry.example:10443/imagename`).
+    
+- **Tags vs. Digests:**
+    
+    - **Tag** (`:v1.0`): Identifies different versions of an image, but the tag can be **moved** to point to different binary content over time. The `:latest` tag is discouraged for production use for this reason.
+        
+    - **Digest** (`@sha256:...`): A unique, immutable hash of the image content. Specifying an image by digest guarantees you always pull the exact same binary.
+        
 
 ---
 
-### 1. Image Sources and Naming
+## Private Registry Access
 
-- **Images and Registries:** Images are stored in **Container Registries** (like Docker Hub or a private registry). The **Kubelet** uses the full image name, which includes the registry and repository, to locate and download the image.
+Accessing images in private, authenticated registries is handled using several methods:
+
+1. **`imagePullSecrets` (Recommended):** You create a Kubernetes **Secret** of type `kubernetes.io/dockerconfigjson` containing the registry credentials. This Secret is then referenced in the Pod's `imagePullSecrets` field. This is configured per-Pod and per-Namespace.
     
-- **Tags:** Images are identified by a **tag**, which usually points to a specific version of the application. If no tag is specified, Kubernetes defaults to the `:latest` tag.
+2. **Node Configuration:** A cluster administrator can configure credentials directly on the worker Nodes. This allows all Pods on that Node to access the registry.
     
-If you don't specify a registry hostname, Kubernetes assumes that you mean the Docker public registry
-### 2. Image Pull Policy
+3. **Kubelet Credential Provider (Advanced):** A plugin that allows the Kubelet to dynamically fetch credentials for private registries, which is especially useful for **Static Pods** that can't reference external Secrets.
+    
 
-This is a critical setting that tells the Kubelet when it should try to download the image from the registry. The three main policies are:
+---
 
-|Policy|Behavior|
-|---|---|
-|**`IfNotPresent`**|Pulls the image **only if** it is not already present locally on the Node. (This is the default for most non-`:latest` tags).|
-|**`Always`**|The Kubelet **always** checks the registry to ensure it's using the latest version of the image. (This is the default for the `:latest` tag).|
-|**`Never`**|The Kubelet **never** tries to pull the image and expects it to be pre-loaded on the Node.|
+## Image Pull Policies & Defaults
 
-### 3. Private Registry Access
+The `imagePullPolicy` dictates when the **Kubelet** attempts to download an image from the registry.
 
-To use images stored in a **private registry**, the document explains you must provide the necessary credentials (username/password) by creating a special Kubernetes object called a **Secret** of type `kubernetes.io/dockerconfigjson`. This Secret is then referenced in the Pod specification.
+|Policy|Behavior|Default Behavior|
+|---|---|---|
+|**`Always`**|The Kubelet **always** queries the registry to check for a new digest.|Default if the image tag is `:latest` or no tag is specified.|
+|**`IfNotPresent`**|The image is pulled **only if** it is not already present locally on the Node.|Default if the image tag is explicitly set to anything **other than** `:latest`.|
+|**`Never`**|The Kubelet **never** tries to fetch the image and relies on it being pre-loaded.|Only set manually.|
+
+
+### Defaulting and Overrides
+
+- If you omit the `imagePullPolicy`, Kubernetes sets a default based on the tag as noted above.
+    
+- If you change an image tag on an existing resource (like changing from `:v1` to `:latest`), the `imagePullPolicy` **does not automatically change**; you must update it manually.
+    
+- **`ImagePullBackOff`:** This is the error status you see when the Kubelet fails to pull an image (due to wrong name, bad credentials, etc.). It indicates Kubernetes is retrying with an increasing delay (up to a limit of 5 minutes).
+    
+
+---
+
+##  Advanced Image Management
+
+- **Serial vs. Parallel Pulls:** By default, the Kubelet pulls images one at a time (**serially**). You can configure `serializeImagePulls: false` in the Kubelet config to enable parallel pulls.
+    
+- **Multi-Architecture Images:** Registries can serve a **container image index**, allowing a single image name (e.g., `pause`) to automatically resolve to the correct architecture-specific binary (e.g., `pause-amd64` or `pause-arm64`).
