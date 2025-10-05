@@ -29,5 +29,5 @@ How Airflow works:
 * Task refer to a single unit of work in DAG (node in the graph)
 * Operator refer to the work a task does 
 	* Action Operators. Ex. PostgresOperator 
-	* Transfer Operators
-	* Sensor Operators 
+	* Transfer Operators. Ex. S3toSnowflakeOperator 
+	* Sensor Operators. Ex. FileSensor
