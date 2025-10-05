@@ -42,4 +42,4 @@ Airflow core components
 * **Executor**: Defines how tasks are executed
 * **Queue**: Defines the execution task order 
 * **Worker**: The process execute the tasks
-* **Trigger**: Process running 
+* **Trigger**: Process running asyncio to support deferrable operation
