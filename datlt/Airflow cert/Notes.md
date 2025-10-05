@@ -39,4 +39,6 @@ Airflow core components
 * **Scheduler**: Schedule tasks when dependencies are [[Vocabulary#^fulfill|fulfilled]]
 * **DAG File Processor**: [[Vocabulary#^dedicate|dedicated]] process for parsing DAGs
 * **Metadata Database**: A database where all metadata are stored 
-* **Executor**: Defines how tasks
+* **Executor**: Defines how tasks are executed
+* **Queue**: Defines the execution task order 
+* **Worker**: 
