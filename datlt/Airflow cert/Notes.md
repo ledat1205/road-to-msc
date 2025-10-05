@@ -6,4 +6,4 @@ goal: coordinate and automation of data flow across various tools and system to 
 
 * Pre-Unix Era: Manual batch-processing and scheduling 
 * Early Computing: Basic time-based scheduling tools, dedicated ETL tooling 
-* Data & Open-Source Renaissance
+* Data & Open-Source Renaissance: Increase in data complexity and size, complexity of scheduling and ETL workloads
