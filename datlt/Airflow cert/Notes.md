@@ -16,4 +16,5 @@ Why Airflow become very popular?
 * Community driven
 * Observability 
 * Data aware scheduling 
+* Highly extensible 
 * 
