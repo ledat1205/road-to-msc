@@ -36,4 +36,6 @@ How Airflow works:
 
 Airflow core components 
 * **API Server:** FastAPI server serving the UI and handling task execution requests
-* **Scheduler**: Schedule tasks when dependencies are [[Vocabulary]]
+* **Scheduler**: Schedule tasks when dependencies are [[Vocabulary|fulfilled]]
+* 
+* 
