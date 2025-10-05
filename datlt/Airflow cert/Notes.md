@@ -32,3 +32,5 @@ How Airflow works:
 	* Transfer Operators. Ex. S3toSnowflakeOperator 
 	* Sensor Operators. Ex. FileSensor
 
+# Airflow: Basics
+
