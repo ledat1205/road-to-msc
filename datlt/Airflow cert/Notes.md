@@ -18,3 +18,5 @@ Why Airflow become very popular?
 * Data aware scheduling 
 * Highly extensible 
 
+Use cases: 
+* Data powerd 
