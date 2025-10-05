@@ -1,1 +1,1 @@
-fulfill: Hoàn thiện, đáp ứng ^fulfill
+fulfill: Hoàn thiện, đáp ứng 
