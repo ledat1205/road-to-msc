@@ -24,8 +24,6 @@ You typically manage Pods using a higher-level **workload resource**. These reso
 | **Job**                     | **Tasks that run to completion** (once).                                          | Creates one or more Pods that execute a task and terminate successfully.                                             |
 | **CronJob**                 | **Scheduled tasks** (recurring).                                                  | Manages Jobs according to a defined, recurring schedule.                                                             |
 
-Xuất sang Trang tính
-
 ### 3. Extensibility and Management
 
 - **Customization:** The architecture is flexible. You can use **Custom Resource Definitions (CRDs)** to create third-party workload resources with custom behaviors.
