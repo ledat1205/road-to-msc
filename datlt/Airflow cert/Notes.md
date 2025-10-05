@@ -35,7 +35,7 @@ How Airflow works:
 # Airflow: Basics
 
 Airflow core components 
-* **API Server:** FastAPI server serving the UI and handling task execution requests
+* **API Server**: FastAPI server serving the UI and handling task execution requests
 * **Scheduler**: Schedule tasks when dependencies are [[Vocabulary#^fulfill|fulfilled]]
 * **DAG File Processor**: [[Vocabulary#^dedicate|dedicated]] process for parsing DAGs
 * 
