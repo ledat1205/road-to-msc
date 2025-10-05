@@ -1,2 +1,2 @@
 fulfill: Hoàn thiện, đáp ứng ^fulfill
-dedicate
+dedicate: Dâng hiến, dành riêng ^dedi
