@@ -19,4 +19,7 @@ Why Airflow become very popular?
 * Highly extensible 
 
 Use cases: 
-* Data powerd 
+* Data powered Applications: Applic
+* Critical Operational Processes
+* Analytics and Reporting
+* MLOps and AI
