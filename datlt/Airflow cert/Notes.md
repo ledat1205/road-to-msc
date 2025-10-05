@@ -12,4 +12,8 @@ goal: coordinate and automation of data flow across various tools and system to 
 # Introduction to Airflow
 
 Why Airflow become very popular?
+* Pipeline as code using Python
+* Community driven
+* Observability 
+* Data aware scheduling 
 * 
