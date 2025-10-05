@@ -34,3 +34,5 @@ How Airflow works:
 
 # Airflow: Basics
 
+Airflow core components 
+***API Server:
