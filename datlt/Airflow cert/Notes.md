@@ -5,3 +5,4 @@ goal: coordinate and automation of data flow across various tools and system to 
 **The journey to modern data orchestration:
 
 * Pre-Unix Era: Manual batch-processing and scheduling 
+* Early Computing: Basic time-based scheduling tools, 
