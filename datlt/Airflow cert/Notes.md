@@ -41,4 +41,5 @@ Airflow core components
 * **Metadata Database**: A database where all metadata are stored 
 * **Executor**: Defines how tasks are executed
 * **Queue**: Defines the execution task order 
-* **Worker**: 
+* **Worker**: The process execute the tasks
+* **Trigger**: Process running 
