@@ -20,6 +20,6 @@ Why Airflow become very popular?
 
 Use cases: 
 * Data powered Applications: Application rely on data 
-	* Critical Operational Processes: Essential workflows that are
-* Analytics and Reporting
+* Critical Operational Processes: Essential workflows that are crucial for a business to function
+* Analytics and Reporting: 
 * MLOps and AI
