@@ -27,4 +27,4 @@ Use cases:
 How Airflow works:
 * DAG refer to a data pipeline 
 * Task refer to a single unit of work in DAG (node in the graph)
-* Operator refer to the work of a task does 
+* Operator refer to the work a task does 
