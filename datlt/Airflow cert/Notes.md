@@ -40,6 +40,3 @@ Airflow core components
 * **DAG File Processor**: [[Vocabulary#^dedicate|dedicated]] process for parsing DAGs
 * 
 * 
-* 
-* 
-* 
