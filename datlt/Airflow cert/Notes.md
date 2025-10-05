@@ -53,3 +53,4 @@ Note: different between Airflow 2.0 and Airflow 3.0 is API Server
 
 # Airflow: Local Development Environment
 
+local setup with Astro CLI 
