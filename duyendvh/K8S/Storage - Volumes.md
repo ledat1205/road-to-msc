@@ -18,27 +18,7 @@
     - Ephemeral volumes are tied to a pod’s lifetime; persistent volumes persist beyond it.
     - Data is preserved across container restarts but may be deleted for ephemeral volumes when a pod is removed.
     - Volumes cannot mount within other volumes or contain hard links to other volumes.
-4. **Types of Volumes**: The document lists various volume types, including their status (e.g., deprecated, removed) and configuration examples where applicable. Below is a summary of each volume type mentioned:
-    
-    - **awsElasticBlockStore (deprecated)**:
-        - Redirected to ebs.csi.aws.com CSI driver in Kubernetes 1.34.
-        - Deprecated in v1.19, removed in v1.27.
-        - Recommendation: Use the AWS EBS CSI driver.
-    - **azureDisk (deprecated)**:
-        - Redirected to disk.csi.azure.com CSI driver in Kubernetes 1.34.
-        - Deprecated in v1.19, removed in v1.27.
-        - Recommendation: Use the Azure Disk CSI driver.
-    - **azureFile (deprecated)**:
-        - Redirected to file.csi.azure.com CSI driver in Kubernetes 1.34.
-        - Deprecated in v1.21, removed in v1.30.
-        - Recommendation: Use the Azure File CSI driver.
-    - **cephfs (removed)**:
-        - Removed in Kubernetes 1.31, deprecated in v1.28.
-        - No longer supported.
-    - **cinder (deprecated)**:
-        - Redirected to cinder.csi.openstack.org CSI driver in Kubernetes 1.34.
-        - Deprecated in v1.11, removed in v1.26.
-        - Recommendation: Use the OpenStack Cinder CSI driver.
+4. **Types of Volumes**: The document lists various volume types, including their configuration examples where applicable. Below is a summary of each volume type mentioned:
 
 - **configMap**:
     
