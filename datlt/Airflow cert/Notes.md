@@ -35,4 +35,5 @@ How Airflow works:
 # Airflow: Basics
 
 Airflow core components 
-***API Server:
+* **API Server:** FastAPI server serving the UI and handling task execution requests
+* **Scheduler**: Schedule tasks 
