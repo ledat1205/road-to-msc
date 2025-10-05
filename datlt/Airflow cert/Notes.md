@@ -25,3 +25,4 @@ Use cases:
 * MLOps and AI
 
 How Airflow works:
+* DAG refer to a data pipeline 
