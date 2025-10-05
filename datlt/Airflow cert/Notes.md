@@ -49,3 +49,7 @@ How Airflow run the DAG
 ![[Pasted image 20251005222336.png]]
 
 Note: different between Airflow 2.0 and Airflow 3.0 is API Server
+
+
+# Airflow: Local Development Environment
+
