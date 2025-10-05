@@ -45,3 +45,7 @@ Airflow core components
 * **Trigger**: Process running asyncio to support [[Vocabulary#^deferrable|deferrable]] operation
 
 How Airflow run the DAG
+
+![[Pasted image 20251005222336.png]]
+
+Note: different between Airflow 2.0 and Ariflow 
