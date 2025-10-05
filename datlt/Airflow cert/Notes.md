@@ -28,3 +28,6 @@ How Airflow works:
 * DAG refer to a data pipeline 
 * Task refer to a single unit of work in DAG (node in the graph)
 * Operator refer to the work a task does 
+	* Action Operators. Ex. PostgresOperator 
+	* Transfer Operators
+	* Sensor Operators 
