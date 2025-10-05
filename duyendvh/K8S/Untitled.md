@@ -17,7 +17,7 @@ A Pod is the **smallest deployable unit** you can create and manage. It models a
 
 ---
 
-## ⚙️ Management and Lifecycle
+## Management and Lifecycle
 
 Pods are not typically created individually. They are designed to be ephemeral and disposable, managed by higher-level workload resources:
 
