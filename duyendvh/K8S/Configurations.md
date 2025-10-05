@@ -1,4 +1,12 @@
-### 1. ConfigMaps
+- ConfigMaps
+- Secrets
+- Managing Resources for Containers
+- Pod Overhead
+- Assigning Pods to Nodes
+- Taints and Tolerations
+- Pod Topology Spread Constraints
+
+- ### 1. ConfigMaps
 
 - **URL**: [https://kubernetes.io/docs/concepts/configuration/configmap/](https://kubernetes.io/docs/concepts/configuration/configmap/)
 - **Description**: ConfigMaps store non-confidential configuration data in key-value pairs, which can be consumed by pods or other Kubernetes resources.
