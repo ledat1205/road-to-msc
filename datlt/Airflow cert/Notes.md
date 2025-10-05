@@ -43,3 +43,5 @@ Airflow core components
 * **Queue**: Defines the execution task order 
 * **Worker**: The process execute the tasks
 * **Trigger**: Process running asyncio to support [[Vocabulary#^deferrable|deferrable]] operation
+
+How Airflow run the DAG
