@@ -54,3 +54,15 @@ Note: different between Airflow 2.0 and Airflow 3.0 is API Server
 # Airflow: Local Development Environment
 
 local setup with [Astro CLI](https://github.com/astronomer/astro-cli)
+
+# Airflow: DAGs 101
+
+1. A DAG must have a unique identifier
+2. The start date is optional and set to None by default
+3. The schedule interval is optional and defines the trigger frequency of the DAG
+4. Defining a description, and tags to filter is strongly recommended.
+5. To create a task, look at the https://registry.astronomer.io/ first.
+6. A task must have a unique identifier within a DAG
+7. You can specify default parameters to all tasks with default_args that expects a dictionary
+8. Define dependencies with bitshift operators (>> and <<) as well as lists.
+9. chain helps to define dependencies between task lists
