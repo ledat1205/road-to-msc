@@ -1,0 +1,4 @@
+
+Vocab:
+
+starring: đóng vai 
