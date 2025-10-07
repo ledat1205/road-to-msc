@@ -6,7 +6,13 @@ How to run:
 
 The schema describes a `Document` that contains a list of `Emails`, and each `Email` may or may not have an `Address`.
 
-`message Document { required int64 DocId = 1; repeated Email Emails = 2; } message Email { optional string Address = 1; }`
+`message Document {`
+	`required int64 DocId = 1;` 
+	`repeated Email Emails = 2;` 
+	`}`
+`message Email {` 
+	`optional string Address = 1;` 
+	`}`
 
 
 ## 2. Calculating the Levels from the Schema
