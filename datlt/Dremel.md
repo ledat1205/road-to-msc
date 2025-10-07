@@ -40,3 +40,8 @@ The **Max Repetition Level** for a column is the count of all **REPEATED** field
 ### B. Max Definition Level (Max D)
 
 The **Max Definition Level** for a column is the count of all **OPTIONAL** and **REPEATED** fields in its path, starting from the root message (but excluding the root message itself).
+
+| Field Path     | Multiplicity | Is OPTIONAL/REPEATED?        | Max D Calculation                                          | Max D |
+|----------------|--------------|------------------------------|------------------------------------------------------------|-------|
+| DocId          | Required     | No                           | 0                                                          |       |
+| Emails.Address | Optional     | Yes (Emails) + Yes (Address) | Count of OPTIONAL/REPEATED fields in path: Emails, Address | 2     |
