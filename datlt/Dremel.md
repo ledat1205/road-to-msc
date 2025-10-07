@@ -25,3 +25,10 @@ The schema describes a `Document` that contains a list of `Emails`, and each `Em
   `optional string Address = 1;`
 `}`
 
+## 2. Calculating the Levels from the Schema
+
+The process of calculating the Max Repetition and Max Definition for any leaf field follows these simple rules:
+
+### A. Max Repetition Level (Max R)
+
+The **Max Repetition Level** for a column is the count of all **REPEATED** fields in its path, starting from the root message (but excluding the root message itself).
