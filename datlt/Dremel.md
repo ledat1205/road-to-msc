@@ -32,3 +32,4 @@ The process of calculating the Max Repetition and Max Definition for any leaf 
 ### A. Max Repetition Level (Max R)
 
 The **Max Repetition Level** for a column is the count of all **REPEATED** fields in its path, starting from the root message (but excluding the root message itself).
+
