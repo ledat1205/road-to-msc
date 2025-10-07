@@ -33,3 +33,10 @@ The process of calculating the Max Repetition and Max Definition for any leaf 
 
 The **Max Repetition Level** for a column is the count of all **REPEATED** fields in its path, starting from the root message (but excluding the root message itself).
 
+| Field Path     | Multiplicity | Is REPEATED? | Max R Calculation                        | Max R |
+|----------------|--------------|--------------|------------------------------------------|-------|
+| DocId          | Required     | No           | 0                                        | 0     |
+| Emails.Address | Optional     | Yes (Emails) | Count of REPEATED fields in path: Emails | 1     |
+### B. Max Definition Level (Max D)
+
+The **Max Definition Level** for a column is the count of all **OPTIONAL** and **REPEATED** fields in its path, starting from the root message (but excluding the root message itself).
