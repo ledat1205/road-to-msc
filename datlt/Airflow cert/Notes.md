@@ -66,3 +66,4 @@ local setup with [Astro CLI](https://github.com/astronomer/astro-cli)
 7. You can specify default parameters to all tasks with default_args that expects a dictionary
 8. Define dependencies with bitshift operators (>> and <<) as well as lists.
 9. chain helps to define dependencies between task lists
+
