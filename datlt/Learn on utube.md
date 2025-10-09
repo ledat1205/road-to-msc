@@ -8,4 +8,4 @@ suffer (v): chịu đựng, trải qua
 encompass = include: bao gồm 
 acquaintance: người quen 
 enormous = giant: khổng lồ 
-novice: mới vào nghề  =
+novice: mới vào nghề  = fresher 
