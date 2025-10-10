@@ -17,3 +17,4 @@ irony: mỉa mai
 telltale: làm lộ tẩy 
 emerge: xuất hiện
 colony: thuộc địa 
+plenty: dồi dào, phong phú 
