@@ -23,4 +23,4 @@ infection: sự lây nhiễm
 retaliation: sự báo thù = revenge
 defector: kẻ đào tẩu 
 foster: bồi dưỡng 
-clumps: 
+clumps: 1 nhóm = group 
