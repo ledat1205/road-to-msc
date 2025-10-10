@@ -1,4 +1,5 @@
 
+https://www.youtube.com/watch?v=CYlon2tvywA
 Vocab:
 
 starring: đóng vai 
@@ -24,3 +25,4 @@ retaliation: sự báo thù = revenge
 defector: kẻ đào tẩu 
 foster: bồi dưỡng 
 clumps: 1 nhóm = group 
+
