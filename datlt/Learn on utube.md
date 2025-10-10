@@ -22,3 +22,5 @@ inevitable: một thứ chắc chắn sẽ xảy ra không thể nào cản đư
 infection: sự lây nhiễm 
 retaliation: sự báo thù = revenge
 defector: kẻ đào tẩu 
+foster: bồi dưỡng 
+clumps: 
