@@ -13,3 +13,4 @@ organism (n): sinh vật
 wiring: hệ thống dây điện
 payoff: sự đền đáp 
 reckon for (sb): tin rằng nó đúng với bạn
+irony: mỉa mai
