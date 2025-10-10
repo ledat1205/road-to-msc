@@ -9,3 +9,5 @@ encompass = include: bao gồm
 acquaintance: người quen 
 enormous = giant: khổng lồ 
 novice: mới vào nghề  = fresher 
+organism (n): sinh vật
+wiring: hệ thống dây điện
