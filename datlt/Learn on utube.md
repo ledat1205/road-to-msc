@@ -16,3 +16,4 @@ reckon for (sb): tin rằng nó đúng với bạn
 irony: mỉa mai
 telltale: làm lộ tẩy 
 emerge: xuất hiện
+colony: thuộc địa 
