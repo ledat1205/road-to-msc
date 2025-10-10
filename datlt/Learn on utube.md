@@ -18,3 +18,4 @@ telltale: làm lộ tẩy
 emerge: xuất hiện
 colony: thuộc địa 
 plenty: dồi dào, phong phú 
+inevitable: một thứ chắc chắn sẽ xảy ra không thể nào cản được 
