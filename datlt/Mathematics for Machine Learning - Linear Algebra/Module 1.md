@@ -15,3 +15,4 @@ coordinate system
 vector r = 3i + 2j 
 
 ![[Pasted image 20251012190111.png]]
+
