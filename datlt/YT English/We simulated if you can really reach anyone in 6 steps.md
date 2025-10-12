@@ -74,14 +74,6 @@ https://www.youtube.com/watch?v=CYlon2tvywA
 
 ---
 
-### telltale /ˈtel-teɪl/ (adj, n)
-
-**Meaning:** để lộ tẩy, tiết lộ  
-**Example:** The telltale signs of stress were visible on his face.  
-**Noun:** _a telltale_ – A telltale always reveals secrets.
-
----
-
 ### emerge /ɪ-ˈmɜːdʒ/ (v)
 
 **Meaning:** xuất hiện, lộ ra  
@@ -116,22 +108,6 @@ https://www.youtube.com/watch?v=CYlon2tvywA
 **Example:** The wound became serious after an infection.
 
 ---
-
-### retaliation /rɪ-ˌtæ-li-ˈeɪ-ʃən/ (n)
-
-**Meaning:** sự báo thù, trả đũa  
-**Example:** The army launched a retaliation after the attack.  
-**Verb:** _retaliate_ – He retaliated by refusing to cooperate.
-
----
-
-### defector /dɪ-ˈfek-tər/ (n)
-
-**Meaning:** kẻ đào tẩu  
-**Example:** The defector revealed government secrets to another country.
-
----
-
 ### foster /ˈfɒ-stər/ (v)
 
 **Meaning:** bồi dưỡng, nuôi dưỡng (ý tưởng, mối quan hệ, trẻ em)  
