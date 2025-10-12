@@ -10,4 +10,6 @@ Vectors based on 2 rules:
   ![[Pasted image 20251012185654.png]]
 
 coordinate system 
+![[Pasted image 20251012185918.png]]
 
+vector r = 3i + 2j 
