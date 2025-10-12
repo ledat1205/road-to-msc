@@ -8,5 +8,5 @@ Vectors based on 2 rules:
 
 * multiplication by a scalar number
   ![[Pasted image 20251012185654.png]]
-  
-  
+
+coordinator-vector 
