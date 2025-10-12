@@ -67,3 +67,14 @@ local setup with [Astro CLI](https://github.com/astronomer/astro-cli)
 8. Define dependencies with bitshift operators (>> and <<) as well as lists.
 9. chain helps to define dependencies between task lists
 
+
+# Airflow sensor
+The purpose of a Sensor is to wait for an event.
+
+That can be useful for many different use cases, such as:
+
+- Processing files from an S3 bucket as they arrive while waiting for them.
+- Running different tasks at different times but within the same DAG.
+- Triggering a data pipeline when another one completes.
+- Ensuring an API is available to make requests.
+- Transforming data as soon as data are present in a SQL table.
