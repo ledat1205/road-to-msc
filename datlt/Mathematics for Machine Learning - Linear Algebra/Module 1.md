@@ -16,3 +16,5 @@ vector r = 3i + 2j
 
 ![[Pasted image 20251012190111.png]]
 
+associativity: mean a consequence of addition doesn't matter
+r + s + t = (r + s) + t
