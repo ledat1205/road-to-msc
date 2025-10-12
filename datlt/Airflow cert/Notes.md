@@ -78,3 +78,13 @@ That can be useful for many different use cases, such as:
 - Triggering a data pipeline when another one completes.
 - Ensuring an API is available to make requests.
 - Transforming data as soon as data are present in a SQL table.
+
+Key takeaways:
+
+- Sensors wait for an event/condition to be met to complete
+- By default, a Sensor times out after 7 days. You should define a better value with the `timeout` parameter
+- A sensor checks an event/condition at every `poke_interval` (60 seconds by default)
+- While a sensor waits, it continuously takes a work slot
+- If you have many sensors or expect them to take time before complete, use the `reschedule` mode
+- With the reschedule mode, while a sensor is waiting, its status will be `up_for_reschedule`
+- You can create a sensor with `@task.sensor`
