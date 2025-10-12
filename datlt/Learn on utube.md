@@ -2,13 +2,13 @@
 https://www.youtube.com/watch?v=CYlon2tvywA
 Vocab:
 
-starring: đóng vai 
+starring: đóng vai -> ok
 sorority: hội nữ sinh 
 malevolence: ác cảm 
-suffer (v): chịu đựng, trải qua 
-encompass = include: bao gồm 
-acquaintance: người quen 
-enormous = giant: khổng lồ 
+suffer (v): chịu đựng, trải qua -> ok
+encompass = include: bao gồm -> ok
+acquaintance: người quen -> ok
+enormous = giant: khổng lồ -> ok
 novice: mới vào nghề  = fresher 
 organism (n): sinh vật
 wiring: hệ thống dây điện
