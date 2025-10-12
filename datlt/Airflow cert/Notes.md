@@ -88,3 +88,6 @@ Key takeaways:
 - If you have many sensors or expect them to take time before complete, use the `reschedule` mode
 - With the reschedule mode, while a sensor is waiting, its status will be `up_for_reschedule`
 - You can create a sensor with `@task.sensor`
+
+# Airflow CLI 
+
