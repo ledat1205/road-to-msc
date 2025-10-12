@@ -6,4 +6,7 @@ Vectors based on 2 rules:
 	![[Pasted image 20251012185424.png]]
 	u + v = v + u 
 
-* multiplication by a scalar number 
+* multiplication by a scalar number
+  ![[Pasted image 20251012185654.png]]
+  
+  
