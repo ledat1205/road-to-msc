@@ -21,8 +21,8 @@ colony: thuộc địa -> ok
 plenty: dồi dào, phong phú -> ok 
 inevitable: một thứ chắc chắn sẽ xảy ra không thể nào cản được -> ok
 infection: sự lây nhiễm -> ok
-retaliation: sự báo thù = revenge
+retaliation: sự báo thù = revenge ->ok
 defector: kẻ đào tẩu 
-foster: bồi dưỡng 
+foster: bồi dưỡng -> ok
 clumps: 1 nhóm = group 
 
