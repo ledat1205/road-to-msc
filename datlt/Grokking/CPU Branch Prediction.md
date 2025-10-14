@@ -11,3 +11,13 @@ High Level Language -> Assembly code -> Machine code
 These are processors that execute 1 instruction per cycle, each cycle requires some constant amount of time, regardless of how complicated your instruction is
 
 Slowest instruction has to be able to finish what its doing, meaning that the machine has to operate at the speed of the slowest instruction.
+
+So they split the execution of an instruction to some small stages: 
+1) Fetch 
+2) Decode 
+3) Execute 
+4) Memory 
+5) Writeback 
+(The specific stages can vary depending on the design ).
+
+All instructions in this phase are machine code (after compile)
