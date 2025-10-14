@@ -21,3 +21,13 @@ So they split the execution of an instruction to some small stages:
 (The specific stages can vary depending on the design ).
 
 All instructions in this phase are machine code (after compile)
+
+`FETCH` : the instruction code gets loaded into the Instruction Register (IR), Program Counter (PC) will get incremented on the next cycle.
+
+`DECODE`: the instruction code in the IR decodes the source and destination operands to determine the type of instruction it is.
+
+`MEM`: If needed, data loaded onto the register is written to or read from memory.
+
+`EXEC:` the Arithmetic Logic Unit (ALU) is passed appropriate control signals to complete arithmetic operations such as ADD, SUB, MULT etc. The ALU completes the required computation and loads the result to an intermediate register. In this stage, the processor usually resolves the branch condition and knows if a branch is taken or not.
+
+`WRITEBACK:` any result computed by the instruction is written back to the register file (a place where we store all the values for our registers) to reflect the completion of the instruction.
