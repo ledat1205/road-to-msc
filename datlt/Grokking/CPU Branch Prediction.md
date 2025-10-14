@@ -6,3 +6,8 @@ Fundamental types of instructions:
 3. Control flow instructions: instructions that direct the CPU to execute instructions in a different order. `JMP`, `BEQ` (branch). These instructions are usually translated from conditional statements such as `if` or `while` conditionals.
 
 High Level Language -> Assembly code -> Machine code 
+
+**Single Cycle Processors**
+These are processors that execute 1 instruction per cycle, each cycle requires some constant amount of time, regardless of how complicated your instruction is
+
+Slowest instruction has to be able to finish what its doing, meaning that the machine has to operate at the speed of the slowest instruction.
