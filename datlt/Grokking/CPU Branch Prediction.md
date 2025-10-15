@@ -54,3 +54,5 @@ The analogy:
 ![[Pasted image 20251015141522.png]]
 
 Pipelining is a highly effective technique that significantly improves efficiency by allowing multiple instructions to be processed simultaneously at different stages of execution
+
+However, branch instructions in particular introduce complications in pipelining because of how these types of instructions alter the flow of instruction execution.
