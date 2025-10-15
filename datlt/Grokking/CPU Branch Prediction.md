@@ -31,3 +31,8 @@ All instructions in this phase are machine code (after compile)
 `EXEC:` the Arithmetic Logic Unit (ALU) is passed appropriate control signals to complete arithmetic operations such as ADD, SUB, MULT etc. The ALU completes the required computation and loads the result to an intermediate register. In this stage, the processor usually resolves the branch condition and knows if a branch is taken or not.
 
 `WRITEBACK:` any result computed by the instruction is written back to the register file (a place where we store all the values for our registers) to reflect the completion of the instruction.
+
+**Multi Cycle Processors**
+In a multi-cycle processor, each instruction is divided into several stages (e.g. Fetch, Decode, Execute, Memory, Writeback). Instead of the entire instruction being executed in 1 clock cycle, each stage is much shorter and is what determines the cycle duration
+
+![[Pasted image 20251015110333.png]]
