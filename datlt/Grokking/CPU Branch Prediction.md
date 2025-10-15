@@ -37,3 +37,4 @@ In a multi-cycle processor, each instruction is divided into several stages (e.g
 
 ![[Pasted image 20251015110333.png]]
 
+
