@@ -59,11 +59,36 @@ However, branch instructions in particular introduce complications in pipelining
 
 ## Branch Prediction
 
-Idea: microprocessor try to predict branch instruction would evaluate to taken or not taken.
-Taken early on in the pipeline, usually in the `Fetch` stage. Based on this prediction, the microprocessor decides which instructions to load into the pipeline
+- **Purpose:**  
+To predict whether a **branch instruction** (e.g., `if`, `goto`, `loop`) will be **Taken** or **Not Taken** early in the pipeline (usually at the **Fetch stage**).
 
-It will know for sure if it branches or not in the EXE stage. if the prediction is wrong, we would have to flush the pipeline, causing the microprocessor to stall and wait. Otherwise reduce the 
-number of clock cycles waster for stalling and waiting until the branch condition is resolved.
+- **Goal:**  
+Reduce stalls and wasted clock cycles by pre-loading the correct instructions before knowing the actual branch result.
+
+- **Execution stage confirmation:**  
+The processor only knows for sure whether the branch is taken or not in the **Execute (EXE)** stage.
+
+- **Pipeline flush penalty:**
+- If prediction is **wrong** → pipeline must be **flushed** (instructions discarded) → CPU stalls and waits.
+- If prediction is **correct** → pipeline continues smoothly → significant **time saved**.
+
+### **Types of Branch Prediction**
+
+1. **Static Branch Prediction**
+
+- Decision is based **only on the instruction itself**.
+	
+- **No history** of previous branch outcomes is used.
+	
+- Example: always predict “Not Taken” or use simple heuristics (e.g., backward branches are taken for loops).
+	
+1. **Dynamic Branch Prediction**
+
+- Uses **historical information** (past Taken/Not Taken patterns).
+	
+- Adapts to the program’s **runtime behavior**.
+	
+- More accurate than static methods.
 
 
 
