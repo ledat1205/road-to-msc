@@ -48,3 +48,6 @@ Note:
     
 - Therefore, the CPU is **not pipelined** — it cannot fetch the next instruction while executing the current one.
 
+**Pipelined Processors:** The core idea of pipelining is to overlap the execution of multiple instructions. The need of pipelined processors come from the fact that executing 1 instruction at a time severely limits the throughput of the processor.
+
+The analogy 
