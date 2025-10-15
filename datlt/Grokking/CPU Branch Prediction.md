@@ -37,4 +37,6 @@ In a multi-cycle processor, each instruction is divided into several stages (e.g
 
 ![[Pasted image 20251015110333.png]]
 
+each instruction is broken up into 3 stages (Fetch, Decode, Execute). At every clock cycle, we complete 1 stage of an instruction.
 
+Because of the multi-cycle design, shorter instructions can also take less cycles to complete. For example, a MULT instruction may take more instructions than an ADD instruction because of the more complex arithmetic logic in the MULT instruction.
