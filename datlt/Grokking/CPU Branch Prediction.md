@@ -36,3 +36,4 @@ All instructions in this phase are machine code (after compile)
 In a multi-cycle processor, each instruction is divided into several stages (e.g. Fetch, Decode, Execute, Memory, Writeback). Instead of the entire instruction being executed in 1 clock cycle, each stage is much shorter and is what determines the cycle duration
 
 ![[Pasted image 20251015110333.png]]
+
