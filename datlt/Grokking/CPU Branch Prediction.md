@@ -59,36 +59,26 @@ However, branch instructions in particular introduce complications in pipelining
 
 ## Branch Prediction
 
-- **Purpose:**  
-To predict whether a **branch instruction** (e.g., `if`, `goto`, `loop`) will be **Taken** or **Not Taken** early in the pipeline (usually at the **Fetch stage**).
+- **Purpose:**  To predict whether a **branch instruction** (e.g., `if`, `goto`, `loop`) will be **Taken** or **Not Taken** early in the pipeline (usually at the **Fetch stage**).
 
-- **Goal:**  
-Reduce stalls and wasted clock cycles by pre-loading the correct instructions before knowing the actual branch result.
+- **Goal:**  Reduce stalls and wasted clock cycles by pre-loading the correct instructions before knowing the actual branch result.
 
-- **Execution stage confirmation:**  
-The processor only knows for sure whether the branch is taken or not in the **Execute (EXE)** stage.
+- **Execution stage confirmation:**  The processor only knows for sure whether the branch is taken or not in the **Execute (EXE)** stage.
 
 - **Pipeline flush penalty:**
-- If prediction is **wrong** → pipeline must be **flushed** (instructions discarded) → CPU stalls and waits.
-- If prediction is **correct** → pipeline continues smoothly → significant **time saved**.
+	- If prediction is **wrong** → pipeline must be **flushed** (instructions discarded) → CPU stalls and waits.
+	- If prediction is **correct** → pipeline continues smoothly → significant **time saved**.
 
 ### **Types of Branch Prediction**
 
 1. **Static Branch Prediction**
-
-- Decision is based **only on the instruction itself**.
-	
-- **No history** of previous branch outcomes is used.
-	
-- Example: always predict “Not Taken” or use simple heuristics (e.g., backward branches are taken for loops).
-	
-1. **Dynamic Branch Prediction**
-
-- Uses **historical information** (past Taken/Not Taken patterns).
-	
-- Adapts to the program’s **runtime behavior**.
-	
-- More accurate than static methods.
+	- Decision is based **only on the instruction itself**.
+	- **No history** of previous branch outcomes is used.
+	- Example: always predict “Not Taken” or use simple heuristics (e.g., backward branches are taken for loops).
+2. **Dynamic Branch Prediction**
+	- Uses **historical information** (past Taken/Not Taken patterns).
+	- Adapts to the program’s **runtime behavior**.
+	- More accurate than static methods.
 
 
 
