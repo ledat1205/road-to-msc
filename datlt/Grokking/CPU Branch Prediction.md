@@ -59,3 +59,4 @@ However, branch instructions in particular introduce complications in pipelining
 
 ## Branch Prediction
 
+Idea: microprocessor try to predict branch instruction would evaluate to taken or not taken.
