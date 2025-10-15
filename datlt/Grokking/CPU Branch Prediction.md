@@ -40,3 +40,11 @@ In a multi-cycle processor, each instruction is divided into several stages (e.g
 each instruction is broken up into 3 stages (Fetch, Decode, Execute). At every clock cycle, we complete 1 stage of an instruction.
 
 Because of the multi-cycle design, shorter instructions can also take less cycles to complete. For example, a MULT instruction may take more instructions than an ADD instruction because of the more complex arithmetic logic in the MULT instruction.
+
+Note:
+- At any given time, **only one stage of one instruction** is active.
+    
+- Instruction 2 starts **only after** Instruction 1 finishes.
+    
+- Therefore, the CPU is **not pipelined** — it cannot fetch the next instruction while executing the current one.
+
