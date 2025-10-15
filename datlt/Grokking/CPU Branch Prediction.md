@@ -53,3 +53,4 @@ Note:
 The analogy:
 ![[Pasted image 20251015141522.png]]
 
+Pipelining is a highly effective technique that significantly improves efficiency by allowing multiple instructions to be processed simultaneously at different stages of execution
