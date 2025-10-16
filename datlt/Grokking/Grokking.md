@@ -44,3 +44,5 @@ This is why it’s called a **pull-based model** — the data is _pulled up_ one
     The CPU prefers simple, predictable instruction patterns.  
     The Volcano model’s repeated `next()` calls create many small, unpredictable jumps in control flow —  
     leading to **pipeline stalls** and **lower throughput**.
+
+#
