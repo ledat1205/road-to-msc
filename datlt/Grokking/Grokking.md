@@ -45,4 +45,6 @@ This is why it’s called a **pull-based model** — the data is _pulled up_ one
     The Volcano model’s repeated `next()` calls create many small, unpredictable jumps in control flow —  
     leading to **pipeline stalls** and **lower throughput**.
 
-#
+# Materialization Model
+
+Same idea with Volcano Model, but instead of return each row operator. Each operator return all tuple (materialize result) for upper oper
