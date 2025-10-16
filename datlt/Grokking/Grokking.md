@@ -39,6 +39,7 @@ This is why it’s called a **pull-based model** — the data is _pulled up_ one
     - Prevent the compiler from **inlining** (i.e., optimizing away) the calls.
     - Introduce **branch instructions**, which can be **hard for the CPU to predict**.
     - When prediction fails, the CPU pipeline has to reset → **performance drops**.
+
 2. **Deeply nested calls = poor CPU cache and branch prediction**  
     The CPU prefers simple, predictable instruction patterns.  
     The Volcano model’s repeated `next()` calls create many small, unpredictable jumps in control flow —  
