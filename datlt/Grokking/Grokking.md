@@ -50,3 +50,5 @@ This is why it’s called a **pull-based model** — the data is _pulled up_ one
 Same idea with Volcano Model, but instead of return each row operator. Each operator return all tuple (materialize result) for upper operator.
 
 This approach is better for OLTP workloads because queries typically only access a small number of tuples at a time. Thus, there are fewer function calls to retrieve tuples. The materialization model is not suited for OLAP queries with large intermediate results because the DBMS may have to spill those results to disk between operators.
+
+# Vectorization Model
