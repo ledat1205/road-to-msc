@@ -78,4 +78,27 @@ _ps for floats,
 _pd for doubles
 
 
+## CPU Functional Units
 
+### **ALU (Arithmetic Logic Unit)**
+- Handles **integer arithmetic and logic** (add, subtract, AND, OR, XOR, comparisons, etc.).
+- Operates on **integer registers**.
+
+### **FPU (Floating-Point Unit)**
+- Traditionally handled **floating-point arithmetic** (operations on `float` or `double`).
+- Earlier CPUs had a **separate** FPU hardware block.
+
+### **VPU (Vector Processing Unit)**
+- A **modern evolution** that combines the functionality of both ALU and FPU.
+- Performs operations on **vectors** (groups of values packed into one register).
+- Handles **both integer and floating-point** arithmetic.
+- Replaces the old FPU — modern CPUs don’t have a distinct FPU anymore; floating-point and vector operations are done in the **VPU**.
+
+
+| Instruction Set                      | Bit Width | Introduced By       | Example                   | Notes                                                |
+| ------------------------------------ | --------- | ------------------- | ------------------------- | ---------------------------------------------------- |
+| **SSE** (Streaming SIMD Extensions)  | 128-bit   | Intel (Pentium III) | `_mm_mul_ps`              | Handles 4 floats at once                             |
+| **SSE2, SSE3, SSE4.2**               | 128-bit   | Intel/AMD           | `_mm_add_ps`, `_mm_dp_ps` | Added more features (dot product, string ops)        |
+| **AVX (Advanced Vector Extensions)** | 256-bit   | Intel               | `_mm256_mul_ps`           | Doubles data width → processes 8 floats at once      |
+| **AVX512**                           | 512-bit   | Intel               | `_mm512_add_ps`           | 16 floats at once; mainly in servers & high-end CPUs |
+| **NEON (ARM)**                       | 128-bit   | ARM                 | `vmulq_f32`               | Used in mobile CPUs; syntax differs slightly         |
