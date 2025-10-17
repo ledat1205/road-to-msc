@@ -65,4 +65,15 @@ paddq xmm0, xmm2 ; Add a and b
 ret
 ```
 
-`a` and `b` are 2 
+`a` and `b` are 2 vector registers with 128bit (can be different on other CPU family)
+
+the function _mm_add_epi32 adds two arrays of numbers together  
+_mm_ is a prefix when we call Intel intrinsic functions  
+_add_ is what we want to do (sub, mul, div…)  
+_epi32 is data type that we want to use (32 bit integers).
+
+_epi8 for 8bit integers  
+_epi16 for 16 bit integers  
+_ps for floats,  
+_pd for doubles
+
