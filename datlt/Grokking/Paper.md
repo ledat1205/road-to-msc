@@ -15,4 +15,7 @@ They conclude the CPU time for computation is not greater than 50% in sequential
 
 **Note:** Detailed experimental setup can be found in the original paper. _(Keep in mind that the hardware configuration reflects technology available in 1999.)
 
-Unlike tra
+Unlike traditional volcano model iterate each row, The **vectorized engine** changes the granularity of processing:
+- Instead of fetching **one row at a time**, each operator processes a **batch of rows** — often called a **vector** (e.g., 1024 rows).
+- Data is passed as **column vectors** — arrays of values for a single column — rather than as single tuple objects.
+
