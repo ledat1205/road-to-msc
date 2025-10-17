@@ -52,3 +52,6 @@ Same idea with Volcano Model, but instead of return each row operator. Each oper
 This approach is better for OLTP workloads because queries typically only access a small number of tuples at a time. Thus, there are fewer function calls to retrieve tuples. The materialization model is not suited for OLAP queries with large intermediate results because the DBMS may have to spill those results to disk between operators.
 
 # Vectorization Model
+
+This model was introduced 
+[[Paper]]
