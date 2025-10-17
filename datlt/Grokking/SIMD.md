@@ -28,3 +28,22 @@ c[2] = a[2] + b[2];
 c[3] = a[3] + b[3];  
 }
 ```
+
+convert to assembly:
+```
+Add:  
+mov eax, dword ptr [rdx]  
+add eax, dword ptr [rcx]  
+mov dword ptr [r8], eax  
+mov eax, dword ptr [rdx + 4]  
+add eax, dword ptr [rcx + 4]  
+mov dword ptr [r8 + 4], eax  
+mov eax, dword ptr [rdx + 8]  
+add eax, dword ptr [rcx + 8]  
+mov dword ptr [r8 + 8], eax  
+mov eax, dword ptr [rdx + 12]  
+add eax, dword ptr [rcx + 12]  
+mov dword ptr [r8 + 12], eax  
+ret
+```
+
