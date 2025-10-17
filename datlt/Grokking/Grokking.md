@@ -53,5 +53,5 @@ This approach is better for OLTP workloads because queries typically only access
 
 # Vectorization Model
 
-This model was introduced 
-[[Paper]]
+This model was introduced 2005 in paper titled “MonetDB/X100: Hyper-Pipelining Query Execution”.
+Detail in this page: [[Paper]]
