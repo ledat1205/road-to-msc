@@ -13,4 +13,4 @@ To prove about opinion volcano doesn't use CPU resource efficiently. The paper â
 
 They conclude the CPU time for computation is not greater than 50% in sequential scans, index-based scans, and JOIN queries. On the contrary, the CPU spends quite an amount of time (50% on average) waiting for resources, due to memory or resource stalls. Plus the cost of branch mispredictions, the percentage of CPU time for computation is often far less than 50%. For example, the minimum percentage of CPU time for computation in index-based scans is less than 20%.
 
-Note: detail experiment setup can see on paper ( remember that hardware is 20 years aog)
+**Note:** Detailed experimental setup can be found in the original paper. _(Keep in mind that the hardware configuration reflects technology available in 1999.)_
