@@ -6,6 +6,6 @@ Prior to the vectorized engine era, the volcano model was widely adopted in indu
 
 [[Grokking#Disadvantages|Some disadvantages of volcano model]]
 
-To prove about opinion volcano doesn't use resource efficiently 
+To prove about opinion volcano doesn't use CPU resource efficiently. The paper “DBMSs On A Modern Processor: Where Does Time Go?”, the authors have minutely dissected the resource consumption of database systems in the framework of modern CPUs. They conclude 
 
 
