@@ -103,3 +103,8 @@ _pd for doubles
 | **AVX (Advanced Vector Extensions)** | 256-bit   | Intel               | `_mm256_mul_ps`           | Doubles data width → processes 8 floats at once      |
 | **AVX512**                           | 512-bit   | Intel               | `_mm512_add_ps`           | 16 floats at once; mainly in servers & high-end CPUs |
 | **NEON (ARM)**                       | 128-bit   | ARM                 | `vmulq_f32`               | Used in mobile CPUs; syntax differs slightly         |
+### Auto Vectorization
+
+Compilers can recognise some patterns and vectorize your code, sometimes it may produce better vectorized code than programmer.
+
+Given this simple code compiler produces much more code than we expected when we compile with optimization flags enabled.
