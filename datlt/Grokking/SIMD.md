@@ -47,3 +47,22 @@ mov dword ptr [r8 + 12], eax
 ret
 ```
 
+ Intel developed a new instruction set, registers, and dedicated hardware for vector processing with the Pentium III
+
+```
+#include <immintrin.h> //< you can include emmintrin.h if you only want sse  
+__m128i Add(__m128i a, __m128i b)  
+{  
+return _mm_add_epi32(a, b);  
+}
+```
+
+convert to assembly:
+```
+Add:  
+movaps xmm0, xmm1 ; Move b to xmm0  
+paddq xmm0, xmm2 ; Add a and b  
+ret
+```
+
+`a` and `b` are 2 
