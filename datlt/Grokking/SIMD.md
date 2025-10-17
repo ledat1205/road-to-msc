@@ -94,6 +94,7 @@ _pd for doubles
 - Handles **both integer and floating-point** arithmetic.
 - Replaces the old FPU — modern CPUs don’t have a distinct FPU anymore; floating-point and vector operations are done in the **VPU**.
 
+### SIMD Instruction Sets Evolution
 
 | Instruction Set                      | Bit Width | Introduced By       | Example                   | Notes                                                |
 | ------------------------------------ | --------- | ------------------- | ------------------------- | ---------------------------------------------------- |
