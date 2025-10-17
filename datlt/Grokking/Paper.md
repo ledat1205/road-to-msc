@@ -15,4 +15,4 @@ They conclude the CPU time for computation is not greater than 50% in sequential
 
 **Note:** Detailed experimental setup can be found in the original paper. _(Keep in mind that the hardware configuration reflects technology available in 1999.)
 
-	
+Unlike tra
