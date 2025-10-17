@@ -6,6 +6,6 @@ Prior to the vectorized engine era, the volcano model was widely adopted in indu
 
 [[Grokking#Disadvantages|Some disadvantages of volcano model]]
 
-
+To p
 
 
