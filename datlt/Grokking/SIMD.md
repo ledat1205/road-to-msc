@@ -3,4 +3,28 @@ by ‘Process’ I mean performing operations like adding, subtracting, multiply
 
 problem describe in program:
 ```
+int Add(int a, int b)  
+{  
+int c = a + b;  
+return c;  
+}
+```
+
+convert to assembly:
+```
+Add:  
+add eax, ebx  
+ret
+```
+
+
+
+```
+void Add(int a[4], int b[4], int c[4])  
+{  
+c[0] = a[0] + b[0];  
+c[1] = a[1] + b[1];  
+c[2] = a[2] + b[2];  
+c[3] = a[3] + b[3];  
+}
 ```
