@@ -2,7 +2,7 @@
 
 | Thời gian     | Địa điểm                                                                                                             | Hoạt động                                            | Chi phí (ước tính) | Lộ trình |
 | ------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------ | -------- |
-| **Sáng muộn** | **Tianzifang** (Lane 210, Taikang Road, Huangpu District)                                                            | Dạo phố nghệ thuật, chụp hình, tham quan khu Pháp cũ | Miễn phí           |          |
+| **Sáng muộn** | **Tianzifang** (Lane 210, Taikang Road, Huangpu District)<br>![[Pasted image 20251018222537.png]]                    | Dạo phố nghệ thuật, chụp hình, tham quan khu Pháp cũ | Miễn phí           |          |
 |               | **He Xing Ji Dumplings** (No. 186, Taikang Road, Huangpu District) or **Shui Feng Rd Egg Pancake** (near Tianzifang) | Ăn sáng                                              | ~15¥               |          |
 | **Trưa**      | **French Concession** (area around Sinan Road, Huangpu District)                                                     | Tham quan khu Pháp cũ, cà phê bánh ngọt              | Miễn phí           |          |
 |               | **La Boulangerie** or **Conniehe Laughing House** (inside **French Concession** )                                    | Ăn trưa bánh ngọt, cà phê                            | ~60¥               |          |
