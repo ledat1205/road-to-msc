@@ -1,34 +1,35 @@
 ### 🧭 **Ngày 1 – French Concession – Yuyuan – Lujiazui**
 
-| Thời gian     | Địa điểm                                                                                                                                       | Hoạt động                                    | Chi phí (ước tính) | Lộ trình |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------ | -------- |
-| **Sáng muộn** | **Tianzifang** (Lane 210, Taikang Road, Huangpu District)<br>![[Pasted image 20251018222537.png]]<br>![[Pasted image 20251018222615.png]]      | Dạo phố nghệ thuật, chụp hình.               | Miễn phí           |          |
-|               | **He Xing Ji Dumplings** (679-1 Xujiahui Road, https://www.dianping.com/shop/k3ZmTDgrSSooboPT)  <br>![[Screenshot 2025-10-18 at 22.46.41.png]] | Ăn sáng                                      | ~15¥               |          |
-| **Trưa**      | **French Concession** (area around Sinan Road, Huangpu District)                                                                               | Tham quan khu Pháp cũ, cà phê bánh ngọt      | Miễn phí           |          |
-|               | **La Boulangerie** or **Conniehe Laughing House** (inside **French Concession** )                                                              | Ăn trưa bánh ngọt, cà phê                    | ~60¥               |          |
-|               | **Về khách sạn**                                                                                                                               | Nghỉ trưa                                    | Miễn phí           |          |
-| **Chiều**     | **Shanghai Ocean Aquarium** (1388 Lujiazui Ring Road, Pudong District)                                                                         | Tham quan thủy cung                          | ~140¥              |          |
-| **Tối**       | **Dr. Curry** (No. 100, South Maoming Road, near Shanghai Library Station)                                                                     | Ăn tối                                       | ~50¥               |          |
-|               | **Xintiandi** (Lane 181, Taicang Road, Huangpu District)                                                                                       | Dạo khu phố hiện đại, check-in               | Miễn phí           |          |
-|               | **Lujiazui** (IFC Mall, Oriental Pearl Tower, Shanghai Tower, Pudong District)                                                                 | Mua sắm, coi siêu xe, uống Lady M, chụp hình | ~30¥ (Lady M)      |          |
+| Thời gian     | Địa điểm                                                                                                                                       | Hoạt động                                    | Chi phí (ước tính) | Di chuyeern | Lộ trình |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------ | ----------- | -------- |
+| **Sáng muộn** | **Tianzifang** (Lane 210, Taikang Road, Huangpu District)<br>![[Pasted image 20251018222537.png]]<br>![[Pasted image 20251018222615.png]]      | Dạo phố nghệ thuật, chụp hình.               | Miễn phí           |             |          |
+|               | **He Xing Ji Dumplings** (679-1 Xujiahui Road, https://www.dianping.com/shop/k3ZmTDgrSSooboPT)  <br>![[Screenshot 2025-10-18 at 22.46.41.png]] | Ăn sáng                                      | ~15¥               |             |          |
+|               | **Sinan Road** (No. 45–51, Sinan Road, Huangpu District)                                                                                       | Dạo phố, tham quan Sinan Mansions            | Miễn phí           |             |          |
+| **Trưa**      | **French Concession** (area around Sinan Road, Huangpu District)                                                                               | Tham quan khu Pháp cũ, cà phê bánh ngọt      | Miễn phí           |             |          |
+|               | **La Boulangerie** or **Conniehe Laughing House** (inside **French Concession** )                                                              | Ăn trưa bánh ngọt, cà phê                    | ~60¥               |             |          |
+|               | **Về khách sạn**                                                                                                                               | Nghỉ trưa                                    | Miễn phí           |             |          |
+| **Chiều**     | **Shanghai Ocean Aquarium** (1388 Lujiazui Ring Road, Pudong District)                                                                         | Tham quan thủy cung                          | ~140¥              |             |          |
+| **Tối**       | **Dr. Curry** (No. 100, South Maoming Road, near Shanghai Library Station)                                                                     | Ăn tối                                       | ~50¥               |             |          |
+|               | **Xintiandi** (Lane 181, Taicang Road, Huangpu District)                                                                                       | Dạo khu phố hiện đại, check-in               | Miễn phí           |             |          |
+|               | **Lujiazui** (IFC Mall, Oriental Pearl Tower, Shanghai Tower, Pudong District)                                                                 | Mua sắm, coi siêu xe, uống Lady M, chụp hình | ~30¥ (Lady M)      |             |          |
 
 
 ---
 
 ### 🧭 **Ngày 2 – Zhangjiang Hi-Tech & Worlds**
 
-| Thời gian | Địa điểm                                                                   | Hoạt động                         | Chi phí (ước tính)  |
-| --------- | -------------------------------------------------------------------------- | --------------------------------- | ------------------- |
-| **Sáng**  | **Sinan Road** (No. 45–51, Sinan Road, Huangpu District)                   | Dạo phố, tham quan Sinan Mansions | Miễn phí            |
-|           | **Family Mart or LAWSON near by**                                          | Ăn sáng                           | ~30¥                |
-|           | **Shanghai City God Temple** (249 Fangbang Middle Road, Huangpu District)  | Tham quan đền cổ nổi tiếng        | ~10¥                |
-| **Trưa**  | **Huxi Old Alley Noodles** (near World Trade Building, Huangpu District)   | Ăn mì truyền thống                | ~40¥                |
-|           | **Về khách sạn sớm (11:00)**                                               | Nghỉ trưa                         | Miễn phí            |
-|           | **Go Kart** (35 Xueye Road, Pudong District)                               | Đua xe kart                       | ~140¥               |
-| **Chiều** | **Worlds 2025 (Mercedes-Benz Arena)** (1200 Shibo Avenue, Pudong District) | Xem CKTG                          | Đã mua vé           |
-|           | **Circles Circle Mira** (near Mercedes-Benz Arena, Pudong District)        | Mua pudding cake                  | ~40¥                |
-| **Tối**   | **Shouning Road Night Market** (Shouning Road, Huangpu District)           | Ăn hải sản, món đêm               | ~70¥                |
-|           | **Yuyuan Garden (night)** (279 Yuyuan Old Street, Huangpu District)        | Dạo đèn lồng, chụp ảnh            | Miễn phí (exterior) |
+| Thời gian | Địa điểm                                                                   | Hoạt động                  | Chi phí (ước tính)  |
+| --------- | -------------------------------------------------------------------------- | -------------------------- | ------------------- |
+| **Sáng**  |                                                                            |                            |                     |
+|           | **Family Mart or LAWSON near by**                                          | Ăn sáng                    | ~30¥                |
+|           | **Shanghai City God Temple** (249 Fangbang Middle Road, Huangpu District)  | Tham quan đền cổ nổi tiếng | ~10¥                |
+| **Trưa**  | **Huxi Old Alley Noodles** (near World Trade Building, Huangpu District)   | Ăn mì truyền thống         | ~40¥                |
+|           | **Về khách sạn sớm (11:00)**                                               | Nghỉ trưa                  | Miễn phí            |
+|           | **Go Kart** (35 Xueye Road, Pudong District)                               | Đua xe kart                | ~140¥               |
+| **Chiều** | **Worlds 2025 (Mercedes-Benz Arena)** (1200 Shibo Avenue, Pudong District) | Xem CKTG                   | Đã mua vé           |
+|           | **Circles Circle Mira** (near Mercedes-Benz Arena, Pudong District)        | Mua pudding cake           | ~40¥                |
+| **Tối**   | **Shouning Road Night Market** (Shouning Road, Huangpu District)           | Ăn hải sản, món đêm        | ~70¥                |
+|           | **Yuyuan Garden (night)** (279 Yuyuan Old Street, Huangpu District)        | Dạo đèn lồng, chụp ảnh     | Miễn phí (exterior) |
 
 
 ---
