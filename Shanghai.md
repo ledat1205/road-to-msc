@@ -19,19 +19,19 @@ Khách sạn: 548 Xujiahui Road
 
 ### 🧭 **Ngày 2 – Zhangjiang Hi-Tech & Worlds**
 
-| Thời gian | Địa điểm                                                                   | Hoạt động                  | Chi phí (ước tính)  |
-| --------- | -------------------------------------------------------------------------- | -------------------------- | ------------------- |
-| **Sáng**  |                                                                            |                            |                     |
-|           | **Family Mart or LAWSON near by**                                          | Ăn sáng                    | ~30¥                |
-|           | 380 Lingang Avenue, Nanhui New Town, Pudong New Area                       |                            |                     |
-| **Trưa**  | **Huxi Old Alley Noodles** (near World Trade Building, Huangpu District)   | Ăn mì truyền thống         | ~40¥                |
-|           | **Về khách sạn sớm (11:00)**                                               | Nghỉ trưa                  | Miễn phí            |
-|           | **Go Kart** (35 Xueye Road, Pudong District)                               | Đua xe kart                | ~140¥               |
-| **Chiều** | **Worlds 2025 (Mercedes-Benz Arena)** (1200 Shibo Avenue, Pudong District) | Xem CKTG                   | Đã mua vé           |
-|           | **Circles Circle Mira** (near Mercedes-Benz Arena, Pudong District)        | Mua pudding cake           | ~40¥                |
-| **Tối**   | **Shouning Road Night Market** (Shouning Road, Huangpu District)           | Ăn hải sản, món đêm        | ~70¥                |
-|           | **Shanghai City God Temple** (249 Fangbang Middle Road, Huangpu District)  | Tham quan đền cổ nổi tiếng | ~10¥                |
-|           | **Yuyuan Garden (night)** (279 Yuyuan Old Street, Huangpu District)        | Dạo đèn lồng, chụp ảnh     | Miễn phí (exterior) |
+| Thời gian | Địa điểm                                                                             | Hoạt động                  | Chi phí (ước tính)  |
+| --------- | ------------------------------------------------------------------------------------ | -------------------------- | ------------------- |
+| **Sáng**  |                                                                                      |                            |                     |
+|           | **Family Mart or LAWSON near by**                                                    | Ăn sáng                    | ~30¥                |
+|           | **Shanghai Astronomy Museum** (380 Lingang Avenue, Nanhui New Town, Pudong New Area) |                            |                     |
+| **Trưa**  | **Huxi Old Alley Noodles** (near World Trade Building, Huangpu District)             | Ăn mì truyền thống         | ~40¥                |
+|           | **Về khách sạn sớm (11:00)**                                                         | Nghỉ trưa                  | Miễn phí            |
+|           | **Go Kart** (35 Xueye Road, Pudong District)                                         | Đua xe kart                | ~140¥               |
+| **Chiều** | **Worlds 2025 (Mercedes-Benz Arena)** (1200 Shibo Avenue, Pudong District)           | Xem CKTG                   | Đã mua vé           |
+|           | **Circles Circle Mira** (near Mercedes-Benz Arena, Pudong District)                  | Mua pudding cake           | ~40¥                |
+| **Tối**   | **Shouning Road Night Market** (Shouning Road, Huangpu District)                     | Ăn hải sản, món đêm        | ~70¥                |
+|           | **Shanghai City God Temple** (249 Fangbang Middle Road, Huangpu District)            | Tham quan đền cổ nổi tiếng | ~10¥                |
+|           | **Yuyuan Garden (night)** (279 Yuyuan Old Street, Huangpu District)                  | Dạo đèn lồng, chụp ảnh     | Miễn phí (exterior) |
 
 
 ---
