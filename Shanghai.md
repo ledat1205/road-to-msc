@@ -60,7 +60,7 @@ Khách sạn: 548 Xujiahui Road
 
 | Thời gian | Địa điểm                                                                                 | Hoạt động                               | Chi phí (ước tính) |     |     |
 | --------- | ---------------------------------------------------------------------------------------- | --------------------------------------- | ------------------ | --- | --- |
-| **Sáng**  | **French Concession**                                                                    | Tham quan khu Pháp cũ, cà phê bánh ngọt | Miễn phí           |     |     |
+| **Sáng**  |                                                                                          |                                         |                    |     |     |
 |           | **La Boulangerie** or **Conniehe Laughing House** (inside **French Concession** )        | Ăn sáng bánh ngọt, cà phê               | ~60¥               |     |     |
 |           | **Anfu Road** (Anfu Road, Xuhui District)                                                | Dạo phố, chụp ảnh                       | Miễn phí           |     |     |
 | **Trưa**  | **Lailai Xiaogeng Qiao’ai** (No. 2, Jing’an Temple Road, Jing’an District)               | Ăn trưa (Michelin)                      | ~60¥               |     |     |
