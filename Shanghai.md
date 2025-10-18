@@ -5,8 +5,6 @@ Khách sạn: 548 Xujiahui Road
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------ | ---------- | ------------------- |
 | **Sáng muộn** | **He Xing Ji Dumplings** (679-1 Xujiahui Road, https://www.dianping.com/shop/k3ZmTDgrSSooboPT)  <br>![[Screenshot 2025-10-18 at 22.46.41.png]] | Ăn sáng                                      | Miễn phí           | Đi bộ 300m | 6 phút              |
 |               | **Tianzifang** (Lane 210, Taikang Road, Huangpu <br>![[Pasted image 20251018222537.png]]                                                       | Dạo phố nghệ thuật, chụp hình.               | ~15¥               | Đi bộ 600m | 11 phút             |
-|               | **French Concession** (area around Sinan Road, Huangpu District)                                                                               | Tham quan khu Pháp cũ, cà phê bánh ngọt      | Miễn phí           |            |                     |
-| **Trưa**      | **La Boulangerie** or **Conniehe Laughing House** (inside **French Concession** )                                                              | Ăn trưa bánh ngọt, cà phê                    | ~60¥               |            |                     |
 |               | **Về khách sạn**                                                                                                                               | Nghỉ trưa                                    | Miễn phí           |            |                     |
 | **Chiều**     | **Shanghai Ocean Aquarium** (1388 Lujiazui Ring Road, Pudong District)                                                                         | Tham quan thủy cung                          | ~140¥              |            |                     |
 |               | **Sony Pictures Roadshow** (168 Lujiazui Xi Lu, near Lujiazui Huan Lu)                                                                         |                                              |                    |            |                     |
@@ -60,17 +58,17 @@ Khách sạn: 548 Xujiahui Road
 
 ### 🧭 **Ngày 4 – Wukang Road & Worlds**
 
-| Thời gian | Địa điểm                                                                                 | Hoạt động                               | Chi phí (ước tính) |
-| --------- | ---------------------------------------------------------------------------------------- | --------------------------------------- | ------------------ |
-| **Sáng**  | **Wukang Road** (Wukang Road, Xuhui District)                                            | Tham quan Wukang Building, dạo phố      | Miễn phí           |
-|           | **Scallion Pancakes (Congyoubing)** (various stalls, Wukang Road area)                   | Ăn sáng                                 | ~8¥                |
-|           | **Anfu Road** (Anfu Road, Xuhui District)                                                | Dạo phố, chụp ảnh                       | Miễn phí           |
-| **Trưa**  | **Lailai Xiaogeng Qiao’ai** (No. 2, Jing’an Temple Road, Jing’an District)               | Ăn trưa (Michelin)                      | ~60¥               |
-|           | **Little Square Sweetbox Dessert / Lillian Bakery** (No. 322, Anfu Road, Xuhui District) | Mua bánh mang theo chiều ăn             | ~30¥               |
-|           | **Về khách sạn**                                                                         | Nghỉ trưa                               | Miễn phí           |
-| **Chiều** | **Worlds 2025 (Mercedes-Benz Arena)** (1200 Shibo Avenue, Pudong District)               | Xem CKTG                                | Đã mua vé          |
-| **Tối**   | **The Matcha Tokyo** (near Mercedes-Benz Arena, Pudong District)                         | Uống matcha                             | ~35¥               |
-|           | **Wokka** (No. 55, Huaihai Middle Road, Huangpu District)                                | Ăn tối bánh souffle, tổng kết chuyến đi | ~80¥               |
+| Thời gian | Địa điểm                                                                                 | Hoạt động                               | Chi phí (ước tính) |     |     |
+| --------- | ---------------------------------------------------------------------------------------- | --------------------------------------- | ------------------ | --- | --- |
+| **Sáng**  | **French Concession**                                                                    | Tham quan khu Pháp cũ, cà phê bánh ngọt | Miễn phí           |     |     |
+|           | **La Boulangerie** or **Conniehe Laughing House** (inside **French Concession** )        | Ăn trưa bánh ngọt, cà phê               | ~60¥               |     |     |
+|           | **Anfu Road** (Anfu Road, Xuhui District)                                                | Dạo phố, chụp ảnh                       | Miễn phí           |     |     |
+| **Trưa**  | **Lailai Xiaogeng Qiao’ai** (No. 2, Jing’an Temple Road, Jing’an District)               | Ăn trưa (Michelin)                      | ~60¥               |     |     |
+|           | **Little Square Sweetbox Dessert / Lillian Bakery** (No. 322, Anfu Road, Xuhui District) | Mua bánh mang theo chiều ăn             | ~30¥               |     |     |
+|           | **Về khách sạn**                                                                         | Nghỉ trưa                               | Miễn phí           |     |     |
+| **Chiều** | **Worlds 2025 (Mercedes-Benz Arena)** (1200 Shibo Avenue, Pudong District)               | Xem CKTG                                | Đã mua vé          |     |     |
+| **Tối**   | **The Matcha Tokyo** (near Mercedes-Benz Arena, Pudong District)                         | Uống matcha                             | ~35¥               |     |     |
+|           | **Wokka** (No. 55, Huaihai Middle Road, Huangpu District)                                | Ăn tối bánh souffle, tổng kết chuyến đi | ~80¥               |     |     |
 
 **Notes:**
 
