@@ -62,7 +62,7 @@ Khách sạn: 548 Xujiahui Road
 
 | Thời gian | Địa điểm                                                                                 | Hoạt động                               | Chi phí (ước tính) |     |     |
 | --------- | ---------------------------------------------------------------------------------------- | --------------------------------------- | ------------------ | --- | --- |
-| **Sáng**  | 479 Chang Shou Lu, Pu Tuo Qu,                                                            |                                         |                    |     |     |
+| **Sáng**  |                                                                                          |                                         |                    |     |     |
 |           | **Anfu Road** (Anfu Road, Xuhui District)                                                | Dạo phố, chụp ảnh                       | Miễn phí           |     |     |
 | **Trưa**  | **Lailai Xiaogeng Qiao’ai** (No. 2, Jing’an Temple Road, Jing’an District)               | Ăn trưa (Michelin)                      | ~60¥               |     |     |
 |           | **Little Square Sweetbox Dessert / Lillian Bakery** (No. 322, Anfu Road, Xuhui District) | Mua bánh mang theo chiều ăn             | ~30¥               |     |     |
