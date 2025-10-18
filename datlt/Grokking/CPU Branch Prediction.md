@@ -82,3 +82,5 @@ However, branch instructions in particular introduce complications in pipelining
 
 
 
+### Branching in Database Systems
+The Filter Example
