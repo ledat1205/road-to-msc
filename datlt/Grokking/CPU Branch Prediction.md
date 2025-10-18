@@ -84,3 +84,26 @@ However, branch instructions in particular introduce complications in pipelining
 
 ### Branching in Database Systems
 The Filter Example
+In a **DBMS sequential scan**, we often execute code like:
+```
+for (int i = 0; i < n; i++) {
+    if (column[i] < 100) {  // filter condition (branch)
+        // process the tuple
+    }
+}
+```
+
+Here, every row checked triggers a **branch** — whether the tuple passes the predicate or not.
+ 
+Why This Branch Is “Nearly Impossible to Predict Correctly”
+Branch predictors work best when patterns are **regular**:
+- Example: always true, always false, or alternating predictably.
+But in a database filter, the condition result (`column[i] < 100`) is **data-dependent**:
+- Each row may pass or fail **randomly**, depending on data distribution.
+- For example, if ~50% of rows match, the branch outcome flips frequently (True/False/True/False…).
+
+From the CPU’s point of view → it looks _random_.  
+Therefore, **branch prediction accuracy drops drastically** (often below 60%).
+When prediction fails:
+- The CPU must flush the pipeline on every misprediction.
+- This causes **high stall time**, reducing throughput dramatically.
