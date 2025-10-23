@@ -73,3 +73,4 @@ This final stage involves accessing and interacting with the processed and analy
 **Tools:**
 - [**Impala**](https://impala.apache.org/overview.html)**:** A scalable SQL query engine that allows users to perform low-latency, real-time queries on data stored in HDFS without needing advanced programming skills.
 - [**Hue**](https://gethue.com/)**:** An acronym for Hadoop User Experience, Hue is a web-based interface that allows users to interact with the Hadoop ecosystem. It provides tools for browsing, querying, and managing data, including SQL editors for Hive and other query languages.
+
