@@ -11,7 +11,7 @@
 	 - **HDFS is append-only** — files can be written once and read many times, but not updated in place. This design avoids file corruption in distributed systems but makes **random writes or updates impossible**
 	- Hadoop’s **MapReduce** model processes entire datasets in batches — not individual records.
 	- Lacks **transaction coordination** (no commit/rollback or locking mechanisms).
-    
+
 
 - **Sequential Dependencies**: Hadoop is inefficient when tasks cannot be parallelized or when data dependencies exist, such as when one record must be processed before another.
 	- Hadoop’s **MapReduce** framework assumes all map tasks can run **independently in parallel**
@@ -28,6 +28,11 @@
 
 
 - **Small File Processing**: Hadoop is not optimized for handling large numbers of small files, although improvements like IBM’s Adaptive MapReduce are being developed.
+	- In HDFS, the **NameNode** keeps metadata (location, permissions, block mapping) for every file **in memory**.
+	- Each small file still requires a block and a metadata entry, causing **memory pressure** and **metadata lookup overhead**.
+	- MapReduce jobs have to spawn one map task per file, so many small files create **too many small tasks**, wasting resources.
+	- Hadoop’s block size (default 128 MB) is large — small files don’t fill a block, leading to **poor storage efficiency**.
 
 
 - **Intensive Computations with Little Data**: Hadoop is inefficient for tasks involving heavy computations on small datasets.
+- 
