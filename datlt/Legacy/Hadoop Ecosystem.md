@@ -43,3 +43,4 @@
 
 ### MapReduce
 I implemented a MapReduce framework from scratch and deployed it on k8s. Details: https://github.com/ledat1205/mapreduce_from_scratch
+![[Pasted image 20251023141520.png]]
