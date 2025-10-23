@@ -93,3 +93,5 @@ Key Features
 	- Files are immutable after being written, but can be read or appended multiple times.
 	- Ensures data integrity and simplified concurrency control.
 
+![[Pasted image 20251023153114.png]]
+
