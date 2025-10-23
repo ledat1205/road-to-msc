@@ -98,10 +98,15 @@ Key Features
 Nodes: a **node** is a physical or virtual machine that participates in storing or managing data.
 2 main types:
 - NameNode (master / primary node): manages metadata and file system namespace.
-	- - Acts as the **brain** of HDFS.
+	- Acts as the **brain** of HDFS.
 	- Keeps the **metadata** — information about files, directories, block locations, permissions, etc.
 	- Manages **file operations** (open, close, rename) and coordinates how blocks are distributed to DataNodes.
 	- There’s typically **one active NameNode** per cluster (sometimes with a standby for high availability).
-    
-- It **does not store actual data**, only the metadata.
+	- It **does not store actual data**, only the metadata.
 - DataNode (worker / secondary node): stores actual file blocks and executes I/O.
+	- Stores the **actual data blocks**.
+	- Responds to **read/write requests** from clients based on NameNode instructions.
+	- Sends regular **heartbeat and block reports** to the NameNode to confirm health and data status.
+	- A cluster can have **hundreds or thousands** of DataNodes.
+
+Blocks:
