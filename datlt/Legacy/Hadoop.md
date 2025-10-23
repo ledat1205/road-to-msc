@@ -39,3 +39,4 @@
 	- When data is small, this setup cost outweighs actual computation time.
 	- Data is always read/written from HDFS — even temporary intermediate results — causing **unnecessary disk I/O**.
 	- Hadoop doesn’t exploit **in-memory caching** or CPU acceleration (SIMD, vectorization) effectively.
+
