@@ -75,3 +75,4 @@ This final stage involves accessing and interacting with the processed and analy
 - [**Hue**](https://gethue.com/)**:** An acronym for Hadoop User Experience, Hue is a web-based interface that allows users to interact with the Hadoop ecosystem. It provides tools for browsing, querying, and managing data, including SQL editors for Hive and other query languages.
 
 ### HDFS
+Core Con
