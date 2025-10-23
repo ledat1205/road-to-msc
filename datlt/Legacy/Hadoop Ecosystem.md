@@ -51,8 +51,15 @@ I implemented a MapReduce framework from scratch and deployed it on k8s. Details
 
 #### Ingest Stage:
 The ingest stage is the initial phase of Big Data processing, where data from various sources is collected and transferred into the Hadoop system.
-Tools:
+**Tools:**
 - **Flume:** A distributed service that collects, aggregates, and transfers large amounts of data to HDFS. Flume is particularly well-suited for streaming data and is known for its flexible and simple architecture.
 - **Sqoop:** Sqoop is used for transferring bulk data between relational databases and Hadoop. It generates MapReduce code to efficiently import and export data, making it easier to integrate structured data into Hadoop.
 
 #### Storage stage:
+In this stage, the ingested data is stored in the Hadoop system for future processing.
+**Tools:**
+- [**HDFS**](https://hadoop.apache.org/docs/r1.2.1/hdfs_design.html)**:** The primary storage system in Hadoop, where data is distributed across a cluster of nodes.
+- [**HBase**](https://hbase.apache.org/)**:** A column-oriented, non-relational database system that runs on top of HDFS. HBase provides real-time read/write access to large datasets and uses hash tables to store data for faster lookups.
+- [**Cassandra**](https://medium.com/@thisis-Shitanshu/mastering-apache-cassandra-part-1-71257d54d70e)**:** A scalable NoSQL database designed to handle large amounts of data across many commodity servers with no single point of failure.
+
+#### Process and Analyze Stage:
