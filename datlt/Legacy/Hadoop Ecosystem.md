@@ -95,3 +95,7 @@ Key Features
 
 ![[Pasted image 20251023153114.png]]
 
+Nodes: a **node** is a physical or virtual machine that participates in storing or managing data.
+2 main types:
+- NameNode (master / primary node):
+- DataNode (worker / sercondary node)
