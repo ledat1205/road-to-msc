@@ -63,3 +63,7 @@ In this stage, the ingested data is stored in the Hadoop system for future proce
 - [**Cassandra**](https://medium.com/@thisis-Shitanshu/mastering-apache-cassandra-part-1-71257d54d70e)**:** A scalable NoSQL database designed to handle large amounts of data across many commodity servers with no single point of failure.
 
 #### Process and Analyze Stage:
+In this stage, the stored data is processed and analyzed to extract meaningful insights.
+**Tools:**
+- [**Pig**](https://pig.apache.org/)**:** A high-level platform that provides a procedural data flow language for analyzing large datasets. Pig is particularly useful for executing complex data transformations.
+- [**Hive**](https://hive.apache.org/)**:** A data warehousing tool that allows for SQL-like querying of data stored in HDFS. Hive is designed for creating reports and conducting data analysis on large datasets.
