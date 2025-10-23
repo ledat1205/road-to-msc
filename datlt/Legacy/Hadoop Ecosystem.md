@@ -81,21 +81,15 @@ Core Concepts:
 
 Key Features
 - Cost Efficiency: Runs on commodity (low-cost) hardware, reducing overall storage expenses.
-* Scalability
+* Scalability:
 	- Large Data Handling: Can manage petabytes to exabytes of data.
 	- Cluster Scalability: Supports hundreds to thousands of nodes, allowing seamless expansion.
-Fault Tolerance
+- Fault Tolerance:
+	- Data Replication: Multiple replicas ensure data availability even during node failures.
+	- Rack Awareness: Replicas stored on different racks to survive rack-level failures.
+- Portability:
+	- Easily portable across platforms, integrates with different environments without major reconfiguration.
+- Write Once, Read Many (WORM):
+	- Files are immutable after being written, but can be read or appended multiple times.
+	- Ensures data integrity and simplified concurrency control.
 
-Data Replication: Multiple replicas ensure data availability even during node failures.
-
-Rack Awareness: Replicas stored on different racks to survive rack-level failures.
-
-Portability
-
-Easily portable across platforms, integrates with different environments without major reconfiguration.
-
-Write Once, Read Many (WORM)
-
-Files are immutable after being written, but can be read or appended multiple times.
-
-Ensures data integrity and simplified concurrency control.
