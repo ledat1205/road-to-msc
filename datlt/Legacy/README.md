@@ -1,0 +1,1 @@
+This repository explores historical legacy systems that laid the groundwork for modern data engineering architectures.
