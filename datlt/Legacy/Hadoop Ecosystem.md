@@ -42,3 +42,4 @@
 
 
 ### MapReduce
+I had a project implemented MapReduce from scratch and run on k8s. Details in here: 
