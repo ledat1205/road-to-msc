@@ -110,3 +110,9 @@ Nodes: a **node** is a physical or virtual machine that participates in storing 
 	- A cluster can have **hundreds or thousands** of DataNodes.
 
 Blocks:
+- In HDFS, data is **split into fixed-size blocks** before storage.
+- The **default block size** is **64 MB or 128 MB**, but it can be configured.
+- Large files are divided into blocks for **parallel storage and processing** across multiple nodes.
+    - Example: A 500 MB file with 128 MB blocks → 4 blocks (3×128MB + 1×116MB).
+- The NameNode keeps track of **which blocks belong to which file** and **where each block is stored**.
+
