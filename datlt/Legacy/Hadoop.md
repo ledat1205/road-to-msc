@@ -14,6 +14,9 @@
     
 
 - **Sequential Dependencies**: Hadoop is inefficient when tasks cannot be parallelized or when data dependencies exist, such as when one record must be processed before another.
+	- - Hadoop’s **MapReduce** framework assumes all map tasks can run **independently in parallel**.
+	- Each task works on a separate chunk of data with **no shared state** between mappers or reducers.
+	- If one record depends on the output of a previous one (e.g., sequential time steps), Hadoop must run multiple jobs in sequence — and each job reads/writes from HDFS, causing **high disk I/O** and latency.
 
 
 - **Low Latency Access**: Hadoop is not suited for applications requiring real-time processing with minimal delays, such as online trading or gaming.
@@ -21,4 +24,6 @@
 
 
 - **Small File Processing**: Hadoop is not optimized for handling large numbers of small files, although improvements like IBM’s Adaptive MapReduce are being developed.
+
+
 - **Intensive Computations with Little Data**: Hadoop is inefficient for tasks involving heavy computations on small datasets.
