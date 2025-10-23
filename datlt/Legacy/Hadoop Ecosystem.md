@@ -116,3 +116,9 @@ Blocks:
     - Example: A 500 MB file with 128 MB blocks → 4 blocks (3×128MB + 1×116MB).
 - The NameNode keeps track of **which blocks belong to which file** and **where each block is stored**.
 
+Rack Awareness:
+- A **rack** is a group of DataNodes connected via the same **network switch** (typically 40–50 nodes).
+- **Rack Awareness** means HDFS knows which nodes belong to which rack.
+- It uses this information to:
+    - **Reduce network traffic:** by placing replicas on the same or nearby racks when possible.
+    - **Improve fault tolerance:** by storing copies of data on **different racks**, so if one rack fails, data remains accessible elsewhere.
