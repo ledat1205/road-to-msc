@@ -42,4 +42,4 @@
 
 
 ### MapReduce
-I had a project implemented MapReduce from scratch and run on k8s. Details in here: 
+I implemented a MapReduce framework from scratch and deployed it on k8s. Details: https://github.com/ledat1205/mapreduce_from_scratch
