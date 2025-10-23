@@ -124,3 +124,10 @@ Rack Awareness:
     - **Improve fault tolerance:** by storing copies of data on **different racks**, so if one rack fails, data remains accessible elsewhere.
 
 Replication: 
+- HDFS ensures **data reliability** by storing multiple copies (replicas) of each block.
+- The **Replication Factor** (usually 3 by default) defines how many copies are made.
+- Replicas are stored on **different DataNodes** and **across racks** to prevent data loss.
+- Even if one node or rack fails, other copies keep the data available
+- **Rack-Aware Replication Policy:**
+	- One replica on the same rack for performance.
+	- Other replicas on different racks for fault tolerance.
