@@ -79,3 +79,23 @@ Core Concepts:
 - HDFS splits large files into **smaller blocks**, **replicates** them, and **distributes** them across multiple machines.
 - Enables **streaming data access** — continuous, high-throughput data transfer instead of bursty reads/writes.
 
+Key Features
+- Cost Efficiency: Runs on commodity (low-cost) hardware, reducing overall storage expenses.
+* Scalability
+	- Large Data Handling: Can manage petabytes to exabytes of data.
+	- Cluster Scalability: Supports hundreds to thousands of nodes, allowing seamless expansion.
+Fault Tolerance
+
+Data Replication: Multiple replicas ensure data availability even during node failures.
+
+Rack Awareness: Replicas stored on different racks to survive rack-level failures.
+
+Portability
+
+Easily portable across platforms, integrates with different environments without major reconfiguration.
+
+Write Once, Read Many (WORM)
+
+Files are immutable after being written, but can be read or appended multiple times.
+
+Ensures data integrity and simplified concurrency control.
