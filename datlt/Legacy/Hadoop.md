@@ -35,4 +35,7 @@
 
 
 - **Intensive Computations with Little Data**: Hadoop is inefficient for tasks involving heavy computations on small datasets.
-- 
+	- Hadoop’s **job orchestration overhead** (starting JVMs, reading configurations, scheduling across the cluster) is significant.
+	- When data is small, this setup cost outweighs actual computation time.
+	- Data is always read/written from HDFS — even temporary intermediate results — causing **unnecessary disk I/O**.
+	- Hadoop doesn’t exploit **in-memory caching** or CPU acceleration (SIMD, vectorization) effectively.
