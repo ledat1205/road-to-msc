@@ -122,3 +122,5 @@ Rack Awareness:
 - It uses this information to:
     - **Reduce network traffic:** by placing replicas on the same or nearby racks when possible.
     - **Improve fault tolerance:** by storing copies of data on **different racks**, so if one rack fails, data remains accessible elsewhere.
+
+Replication: 
