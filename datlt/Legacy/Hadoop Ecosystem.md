@@ -54,3 +54,5 @@ The ingest stage is the initial phase of Big Data processing, where data from va
 Tools:
 - **Flume:** A distributed service that collects, aggregates, and transfers large amounts of data to HDFS. Flume is particularly well-suited for streaming data and is known for its flexible and simple architecture.
 - **Sqoop:** Sqoop is used for transferring bulk data between relational databases and Hadoop. It generates MapReduce code to efficiently import and export data, making it easier to integrate structured data into Hadoop.
+
+#### Storage stage:
