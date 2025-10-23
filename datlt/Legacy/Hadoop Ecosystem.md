@@ -67,3 +67,9 @@ In this stage, the stored data is processed and analyzed to extract meaningful i
 **Tools:**
 - [**Pig**](https://pig.apache.org/)**:** A high-level platform that provides a procedural data flow language for analyzing large datasets. Pig is particularly useful for executing complex data transformations.
 - [**Hive**](https://hive.apache.org/)**:** A data warehousing tool that allows for SQL-like querying of data stored in HDFS. Hive is designed for creating reports and conducting data analysis on large datasets.
+
+#### Access Stage:
+This final stage involves accessing and interacting with the processed and analyzed data.
+**Tools:**
+- [**Impala**](https://impala.apache.org/overview.html)**:** A scalable SQL query engine that allows users to perform low-latency, real-time queries on data stored in HDFS without needing advanced programming skills.
+- [**Hue**](https://gethue.com/)**:** An acronym for Hadoop User Experience, Hue is a web-based interface that allows users to interact with the Hadoop ecosystem. It provides tools for browsing, querying, and managing data, including SQL editors for Hive and other query languages.
