@@ -168,16 +168,11 @@ Hive translates these SQL queries into **MapReduce**, **Tez**, or **Spark** jobs
 	- Executes compiled query plans using Hadoop YARN, Tez, or Spark.
 6. **HDFS (Storage Layer)**
 	- Stores actual table data in distributed file blocks.
-## 🔄 **Workflow (Query Execution Flow)**
 
+**Workflow (Query Execution Flow)**
 1. **User submits** a HiveQL query (e.g., `SELECT * FROM sales WHERE region='APAC';`)
-    
 2. **Driver** receives the query → sends it to the **Compiler**.
-    
 3. **Compiler** parses and validates syntax → interacts with **Metastore** to get schema.
-    
 4. **Query plan** is generated and optimized → converted to **MapReduce/Tez/Spark jobs**.
-    
 5. **Execution Engine** runs the jobs across the Hadoop cluster.
-    
 6. **Results** are collected and returned to the client.
