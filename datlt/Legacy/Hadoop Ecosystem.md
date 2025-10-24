@@ -155,19 +155,22 @@ Hive translates these SQL queries into **MapReduce**, **Tez**, or **Spark** jobs
 
 
 **Architecture Overview**
-1. **Hive Client**
-	- User interface for running HiveQL queries (CLI, Beeline, JDBC/ODBC).
-2. **Driver**
-	- Manages query lifecycle: parsing, compiling, optimizing, and executing.
-3. **Compiler**
-	- Converts HiveQL into execution plans (DAG of MapReduce/Tez/Spark jobs).
-4. **Metastore**
-	- Central metadata repository (tables, partitions, schemas, column types, etc.).
-	- Usually stored in an RDBMS like MySQL or PostgreSQL.
-5. **Execution Engine**
-	- Executes compiled query plans using Hadoop YARN, Tez, or Spark.
-6. **HDFS (Storage Layer)**
-	- Stores actual table data in distributed file blocks.
+![[Pasted image 20251024112958.png]]
+**1. Hive Client**:
+Provides drivers like JDBC and ODBC for communication with different types of applications. These clients interact with Hive services to execute queries.
+- **JDBC and ODBC Clients**: These allow different applications (Java-based or ODBC-compliant) to connect to Hive.
+
+**2. Hive Services**:
+Includes the command-line interface and the server that handles query execution. The driver within Hive services processes query statements and manages the session lifecycle. The meta store in this section stores metadata related to tables, such as schema and data location.
+
+- **Hive Server**: Manages query execution and supports multiple clients submitting requests simultaneously.
+- **Driver**: Receives queries, initiates sessions, and sends queries to the compiler.
+- **Optimizer**: Performs transformations on the execution plan to improve efficiency and speed.
+- **Executor**: Carries out the tasks after optimization.
+- **Meta Store**: Central storage for metadata, maintaining information about tables, schemas, and data locations.
+
+**3. Hive Storage and Computing**:
+This component handles the actual storage of data in the Hadoop cluster or HDFS and the metadata in a dedicated database. The processing of tasks is done through MapReduce or similar frameworks.
 
 **Workflow (Query Execution Flow)**
 1. **User submits** a HiveQL query (e.g., `SELECT * FROM sales WHERE region='APAC';`)
@@ -189,10 +192,13 @@ Advantages of Apache Hive
 
 Limitations of Apache Hive
 
-|Limitation|Description|
-|---|---|
-|**High Latency**|Designed for batch processing — **not real-time** queries.|
-|**No Transactional Consistency (earlier versions)**|Limited ACID support; suitable for analytical workloads only.|
-|**Schema on Read**|Flexible but can lead to performance issues if poorly designed.|
-|**Limited Indexing**|Not as efficient as traditional RDBMS indexing.|
+| Limitation                                          | Description                                                     |
+| --------------------------------------------------- | --------------------------------------------------------------- |
+| **High Latency**                                    | Designed for batch processing — **not real-time** queries.      |
+| **No Transactional Consistency (earlier versions)** | Limited ACID support; suitable for analytical workloads only.   |
+| **Schema on Read**                                  | Flexible but can lead to performance issues if poorly designed. |
+| **Limited Indexing**                                | Not as efficient as traditional RDBMS indexing.                 |
+|                                                     |                                                                 |
 Note: about schema on read and schema on write.
+
+![[Pasted image 20251024113037.png]]
