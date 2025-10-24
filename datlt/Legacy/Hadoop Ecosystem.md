@@ -131,3 +131,17 @@ Replication:
 - **Rack-Aware Replication Policy:**
 	- One replica on the same rack for performance.
 	- Other replicas on different racks for fault tolerance.
+
+Read Operation in HDFS
+1. The client sends a request to the Name Node to get the location of the Data Nodes that contain the required data blocks.
+2. The Name Node verifies the client’s permissions and provides the locations.
+3. The client then reads the data from the closest Data Nodes, ensuring efficient data retrieval.
+
+ Write Operation in HDFS
+1. The client sends a request to the Name Node to check if the file already exists. If it does, the client receives an IO exception.
+2. If the file does not exist, the Name Node grants write permission and provides the locations of the Data Nodes where the data will be stored.
+3. The Data Nodes then create replicas of the data and confirm the successful write operation back to the client.
+. 
+ Note
+- **Metadata Operations**: When a client needs to access data, it first interacts with the Name Node to get metadata information, such as where the data blocks are located.
+- **Block Operations**: The Name Node manages the distribution of data blocks across the Data Nodes. These operations involve the placement and movement of data blocks.
