@@ -195,3 +195,4 @@ Limitations of Apache Hive
 |**No Transactional Consistency (earlier versions)**|Limited ACID support; suitable for analytical workloads only.|
 |**Schema on Read**|Flexible but can lead to performance issues if poorly designed.|
 |**Limited Indexing**|Not as efficient as traditional RDBMS indexing.|
+Note: about schema on read and schema on write.
