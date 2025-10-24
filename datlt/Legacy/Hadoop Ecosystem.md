@@ -145,3 +145,5 @@ Read Operation in HDFS
  Note
 - **Metadata Operations**: When a client needs to access data, it first interacts with the Name Node to get metadata information, such as where the data blocks are located.
 - **Block Operations**: The Name Node manages the distribution of data blocks across the Data Nodes. These operations involve the placement and movement of data blocks.
+
+### Hive
