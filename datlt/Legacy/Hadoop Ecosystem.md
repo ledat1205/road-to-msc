@@ -147,3 +147,37 @@ Read Operation in HDFS
 - **Block Operations**: The Name Node manages the distribution of data blocks across the Data Nodes. These operations involve the placement and movement of data blocks.
 
 ### Hive
+
+**Apache Hive** is a **data warehouse system** built on top of **Hadoop**.  
+It allows users to **query and analyze large datasets** stored in **HDFS** (Hadoop Distributed File System) using a **SQL-like language** called **HiveQL**.
+
+Hive translates these SQL queries into **MapReduce**, **Tez**, or **Spark** jobs for distributed execution — making it ideal for **batch processing** of big data.
+
+
+**Architecture Overview**
+1. **Hive Client**
+	- User interface for running HiveQL queries (CLI, Beeline, JDBC/ODBC).
+2. **Driver**
+	- Manages query lifecycle: parsing, compiling, optimizing, and executing.
+3. **Compiler**
+	- Converts HiveQL into execution plans (DAG of MapReduce/Tez/Spark jobs).
+4. **Metastore**
+	- Central metadata repository (tables, partitions, schemas, column types, etc.).
+	- Usually stored in an RDBMS like MySQL or PostgreSQL.
+5. **Execution Engine**
+	- Executes compiled query plans using Hadoop YARN, Tez, or Spark.
+6. **HDFS (Storage Layer)**
+	- Stores actual table data in distributed file blocks.
+## 🔄 **Workflow (Query Execution Flow)**
+
+1. **User submits** a HiveQL query (e.g., `SELECT * FROM sales WHERE region='APAC';`)
+    
+2. **Driver** receives the query → sends it to the **Compiler**.
+    
+3. **Compiler** parses and validates syntax → interacts with **Metastore** to get schema.
+    
+4. **Query plan** is generated and optimized → converted to **MapReduce/Tez/Spark jobs**.
+    
+5. **Execution Engine** runs the jobs across the Hadoop cluster.
+    
+6. **Results** are collected and returned to the client.
