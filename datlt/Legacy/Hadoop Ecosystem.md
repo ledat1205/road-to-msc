@@ -176,3 +176,22 @@ Hive translates these SQL queries into **MapReduce**, **Tez**, or **Spark** jobs
 4. **Query plan** is generated and optimized → converted to **MapReduce/Tez/Spark jobs**.
 5. **Execution Engine** runs the jobs across the Hadoop cluster.
 6. **Results** are collected and returned to the client.
+
+Advantages of Apache Hive
+
+| Advantage                     | Description                                                            |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| **SQL-like Interface**        | Familiar HiveQL syntax for users from SQL background.                  |
+| **Handles Huge Data**         | Efficiently queries terabytes or petabytes in HDFS.                    |
+| **Scalable & Fault-tolerant** | Built on top of Hadoop’s distributed framework.                        |
+| **Extensible**                | Supports UDFs (User-Defined Functions) and integration with Tez/Spark. |
+| **Data Warehouse Capability** | Supports partitioning, bucketing, and schema evolution.                |
+
+Limitations of Apache Hive
+
+|Limitation|Description|
+|---|---|
+|**High Latency**|Designed for batch processing — **not real-time** queries.|
+|**No Transactional Consistency (earlier versions)**|Limited ACID support; suitable for analytical workloads only.|
+|**Schema on Read**|Flexible but can lead to performance issues if poorly designed.|
+|**Limited Indexing**|Not as efficient as traditional RDBMS indexing.|
