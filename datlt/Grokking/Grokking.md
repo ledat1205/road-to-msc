@@ -55,3 +55,8 @@ This approach is better for OLTP workloads because queries typically only access
 
 This model was introduced 2005 in paper titled “MonetDB/X100: Hyper-Pipelining Query Execution”.
 Detail in this page: [[Paper]]
+
+
+# Techniques
+
+##
