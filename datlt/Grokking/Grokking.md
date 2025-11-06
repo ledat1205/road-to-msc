@@ -64,7 +64,7 @@ Terminology:
 Tight loop execution: Instructions without branching. CPU can execute sequentially.
 CPU Cache:
 - To avoid waiting hundreds of cycles every time CPU needs data (load from DRAM to register), CPU will copy small chunks of memory (cache lines) into its caches (L1, L2, L3)
-- Latter access will check data already in cache or
+- Latter access will check data already in cache (cache hit), otherwise fetch from DRAM (cache miss)
 
 
 ## RowSet Iteration
