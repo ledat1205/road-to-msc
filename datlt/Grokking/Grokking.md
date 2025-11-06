@@ -59,6 +59,8 @@ Detail in this page: [[Paper]]
 
 # Techniques
 
-Termilogy 
+Terminology:
+
+CPU Cache: 
 
 ## RowSet Iteration
