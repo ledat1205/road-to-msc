@@ -63,7 +63,7 @@ Terminology:
 
 Tight loop execution: Instructions without branching. CPU can execute sequentially.
 CPU Cache:
-- To avoud 
+- To avoid waiting hundreds of cycles every time CPU needs data (load from DRAM to register), CPU will prefe
 
 
 ## RowSet Iteration
