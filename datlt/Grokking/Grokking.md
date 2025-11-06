@@ -61,6 +61,8 @@ Detail in this page: [[Paper]]
 
 Terminology:
 
+Tight loop execution: Instructions without branching. CPU can execute 
 CPU Cache: 
+
 
 ## RowSet Iteration
