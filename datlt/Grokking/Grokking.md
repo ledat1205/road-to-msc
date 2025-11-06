@@ -61,7 +61,7 @@ Detail in this page: [[Paper]]
 
 Terminology:
 
-Tight loop execution: Instructions without branching. CPU can execute 
+Tight loop execution: Instructions without branching. CPU can execute sequentially.
 CPU Cache: 
 
 
