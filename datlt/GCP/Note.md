@@ -20,3 +20,12 @@ SELECT * FROM `ecommerce.sales_by_sku_2017*`
 The query still processes 1.74 GB even though it returns 0 results. The query engine needs to scan all records in the dataset to see if they satisfy the date matching condition in the WHERE clause.
 
 Additionally, the LIMIT does not reduce the total amount of data processed, which is a common misconception.
+
+use partition to reduce data scan
+
+```
+PARTITION BY field_name
+OPTIONS (
+	partition_expiration_days=60
+)
+```
