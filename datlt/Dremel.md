@@ -35,3 +35,34 @@ The **Max Definition Level** for a column is the count of all **OPTIONAL** and *
 |----------------|--------------|------------------------------|------------------------------------------------------------|-------|
 | DocId          | Required     | No                           | 0                                                          |       |
 | Emails.Address | Optional     | Yes (Emails) + Yes (Address) | Count of OPTIONAL/REPEATED fields in path: Emails, Address | 2     |
+
+
+
+```
+message UploadCartInformation {  
+required string cartId = 1;  
+repeated Item items = 2;  
+optional string discountCode = 3;  
+}
+
+
+message Item {  
+required string id = 1;  
+required string name = 2;  
+repeated string tags = 3;  
+repeated string images = 4;  
+repeated ItemCustomization customizations = 5;  
+}
+
+
+message ItemCustomization {  
+required string note = 1;  
+optional string countryCode = 2;  
+}
+
+message Image {  
+required string url = 1;  
+optional string altText = 2;  
+}
+```
+
