@@ -30,3 +30,11 @@ OPTIONS (
 	description=''
 )
 ```
+
+
+
+**Working with JSON, Arrays, and Structs in BigQuery**
+- finding the number of elements with `ARRAY_LENGTH(<array>)`
+- deduplicating elements with `ARRAY_AGG(DISTINCT <field>)`
+- ordering elements with `ARRAY_AGG(<field> ORDER BY <field>)`
+- limiting `ARRAY_AGG(<field> LIMIT 5)`
