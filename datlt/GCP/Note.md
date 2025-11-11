@@ -1,6 +1,6 @@
 Week 1:
 
-Creating a Data Warehouse Through Joins and Unions
+**Creating a Data Warehouse Through Joins and Unions**
 
 Instead of using `UNION or UNION ALL`, we can use wildcard filter with `_TABLE_SUFFIX` filter
 example:
@@ -14,3 +14,6 @@ can use:
 SELECT * FROM `ecommerce.sales_by_sku_2017*`
 (WHERE _TABLE_SUFFIX = '0802')
 ```
+
+**Creating Date-Partitioned Tables in BigQuery**
+
