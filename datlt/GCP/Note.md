@@ -26,6 +26,7 @@ use partition to reduce data scan
 ```
 PARTITION BY field_name
 OPTIONS (
-	partition_expiration_days=60
+	partition_expiration_days=60,
+	description=''
 )
 ```
