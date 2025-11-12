@@ -5,3 +5,4 @@ acknowledge: thừa nhận
 disparity = difference: sự khác biệt
 presumably: phỏng đoán
 oblivious: quên 
+prosperous = successfull: thành công, phát đạt
