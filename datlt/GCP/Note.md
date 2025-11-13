@@ -38,3 +38,22 @@ OPTIONS (
 - deduplicating elements with `ARRAY_AGG(DISTINCT <field>)`
 - ordering elements with `ARRAY_AGG(<field> ORDER BY <field>)`
 - limiting `ARRAY_AGG(<field> LIMIT 5)`
+
+
+create table `qwiklabs-gcp-03-16f22665e58b.covid.oxford_policy_tracker`
+
+partition by (date)
+
+OPTIONS (
+
+  partition_expiration_days = 2175
+
+)
+
+AS
+
+SELECT *
+
+FROM `qwiklabs-gcp-03-16f22665e58b.covid_data.oxford_policy_tracker_by_countries`
+
+where alpha_3_code not in ('GBR', 'BRA', 'CAN', 'USA')
