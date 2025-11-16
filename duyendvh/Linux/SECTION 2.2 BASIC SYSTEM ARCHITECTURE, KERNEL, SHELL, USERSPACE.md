@@ -100,3 +100,4 @@ A Page Fault is the Kernel's main method for dynamically managing memory access.
 - **Thrashing:** This occurs when the system spends more time **swapping pages in and out** (disk I/O) than doing actual work, indicating the system is critically low on physical memory.
 ![[Screenshot 2025-11-16 at 17.32.38.png]]
 ![[Screenshot 2025-11-16 at 17.34.03.png]]
+![[Screenshot 2025-11-16 at 17.35.12.png]]
