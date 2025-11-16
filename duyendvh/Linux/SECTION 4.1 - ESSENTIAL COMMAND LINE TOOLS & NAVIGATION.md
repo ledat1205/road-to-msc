@@ -1,1 +1,1 @@
-![[Screenshot 2025-11-16 at 19.32.24.png]]
+https://www.kea.nu/files/textbooks/humblesec/thelinuxcommandline.pdf
