@@ -15,4 +15,5 @@ perseverance: sự kiên trì
 moral: đạo đức 
 designate: chỉ định
 aptitude: năng khiếu
-anecdote: giai thoau
+anecdote: giai thoại 
+entitle: = cho phép
