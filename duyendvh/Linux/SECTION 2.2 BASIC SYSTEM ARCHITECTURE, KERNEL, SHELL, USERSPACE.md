@@ -106,3 +106,5 @@ A Page Fault is the Kernel's main method for dynamically managing memory access.
 ![[Screenshot 2025-11-16 at 17.37.29.png]]
 ![[Screenshot 2025-11-16 at 17.37.57.png]]
 ![[Screenshot 2025-11-16 at 17.38.17.png]]
+![[Screenshot 2025-11-16 at 17.39.09.png]]
+![[Screenshot 2025-11-16 at 17.39.43.png]]
