@@ -16,4 +16,5 @@ moral: đạo đức
 designate: chỉ định
 aptitude: năng khiếu
 anecdote: giai thoại 
-entitle: = cho phép
+entitle = allow: cho phép
+uncourteous = rude: bất lịch sự
