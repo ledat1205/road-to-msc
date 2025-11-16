@@ -18,3 +18,4 @@ aptitude: năng khiếu
 anecdote: giai thoại 
 entitle = allow: cho phép
 uncourteous = rude: bất lịch sự
+distorted: bị bóp méo 
