@@ -12,3 +12,7 @@
 
 ![[Screenshot 2025-11-16 at 19.47.08.png]]
 
+![[Screenshot 2025-11-16 at 19.47.39.png]]
+
+![[Screenshot 2025-11-16 at 19.48.08.png]]
+
