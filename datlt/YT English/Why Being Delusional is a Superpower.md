@@ -10,3 +10,5 @@ circumstance: tình thế, tình huống
 fierce: mãnh liệt
 catch a break = have some luck: có một chút may mắn
 justify: biện minh
+chalk (it up to): phủ nó lên (bằng thứ gì đó)
+perseverence: 
