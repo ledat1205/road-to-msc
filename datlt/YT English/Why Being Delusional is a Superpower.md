@@ -23,3 +23,4 @@ malice: ác ý
 ingenuity: ngây thơ
 in line with: phù hợp với 
 gratitude: lòng biết ơn
+conspire: âm mưu
