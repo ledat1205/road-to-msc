@@ -26,3 +26,4 @@ gratitude: lòng biết ơn
 conspire: âm mưu
 discrimination: phân biệt
 prejudice: định kiến
+factor (in): đánh giá cái gì đó 
