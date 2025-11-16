@@ -1,3 +1,5 @@
+https://www.youtube.com/watch?v=3LopI4YeC4I&t=339s
+
 vividly: một cách sống động
 determination: sự quyết tâm
 willingness: sự sẵn lòng
