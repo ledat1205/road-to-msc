@@ -8,6 +8,7 @@
 
 ![[Screenshot 2025-11-16 at 16.27.37.png]]
 ![[Screenshot 2025-11-16 at 16.28.17.png]]
+![[Screenshot 2025-11-16 at 16.29.12.png]]
 
 ![[Screenshot 2025-11-16 at 16.26.44.png]]
 
