@@ -22,3 +22,4 @@ distorted: bị bóp méo
 malice: ác ý
 ingenuity: ngây thơ
 in line with: phù hợp với 
+gratitude: lòng biết ơn
