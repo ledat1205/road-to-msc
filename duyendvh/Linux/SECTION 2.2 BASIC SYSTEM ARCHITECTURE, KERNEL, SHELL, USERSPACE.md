@@ -98,17 +98,3 @@ A Page Fault is the Kernel's main method for dynamically managing memory access.
     3. **Free RAM:** The physical RAM frame is now marked as **free** and can be reused by an active process.
         
 - **Thrashing:** This occurs when the system spends more time **swapping pages in and out** (disk I/O) than doing actual work, indicating the system is critically low on physical memory.
-![[Screenshot 2025-11-16 at 17.32.38.png]]
-![[Screenshot 2025-11-16 at 17.34.03.png]]
-![[Screenshot 2025-11-16 at 17.35.12.png]]
-![[Screenshot 2025-11-16 at 17.35.59.png]]
-![[Screenshot 2025-11-16 at 17.36.52.png]]
-![[Screenshot 2025-11-16 at 17.37.29.png]]
-![[Screenshot 2025-11-16 at 17.37.57.png]]
-![[Screenshot 2025-11-16 at 17.38.17.png]]
-![[Screenshot 2025-11-16 at 17.39.09.png]]
-![[Screenshot 2025-11-16 at 17.39.43.png]]
-![[Screenshot 2025-11-16 at 17.42.17.png]]
-![[Screenshot 2025-11-16 at 17.42.54.png]]
-![[Screenshot 2025-11-16 at 17.43.06.png]]
-![[Screenshot 2025-11-16 at 17.43.34.png]]
