@@ -10,3 +10,7 @@
 
 ![[Screenshot 2025-11-16 at 19.42.54.png]]
 
+![[Screenshot 2025-11-16 at 19.43.11.png]]
+
+![[Screenshot 2025-11-16 at 19.43.42.png]]
+
