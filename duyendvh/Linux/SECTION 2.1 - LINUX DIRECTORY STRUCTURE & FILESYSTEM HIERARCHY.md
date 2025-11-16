@@ -26,3 +26,4 @@
 ![[Screenshot 2025-11-16 at 16.40.23.png]]
 ![[Screenshot 2025-11-16 at 16.40.47.png]]
 ![[Screenshot 2025-11-16 at 16.41.14.png]]
+![[Screenshot 2025-11-16 at 16.43.30.png]]
