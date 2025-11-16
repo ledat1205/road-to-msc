@@ -7,3 +7,4 @@ presumably: phỏng đoán
 oblivious: quên 
 prosperous = successfull: thành công, phát đạt
 circumstance: tình thế, tình huống
+fierce: mãnh liệt
