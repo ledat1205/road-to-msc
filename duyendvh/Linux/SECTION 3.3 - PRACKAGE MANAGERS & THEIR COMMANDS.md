@@ -6,3 +6,6 @@
 ![[Screenshot 2025-11-16 at 19.22.41.png]]
 ![[Screenshot 2025-11-16 at 19.28.22.png]]
 
+![[Screenshot 2025-11-16 at 19.28.37.png]]
+
+![[Pasted image 20251116192932.png]]
