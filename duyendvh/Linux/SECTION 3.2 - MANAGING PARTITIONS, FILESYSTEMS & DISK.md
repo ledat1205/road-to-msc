@@ -56,4 +56,90 @@
 ### 6. Multi-Booting
 
 - If you want to run multiple operating systems (like two different Linux distributions or Linux and Windows) on the same physical machine, each operating system **requires its own dedicated primary partition** to install its core files.
-- 
+
+## 🛠️ Essential Partitioning Utilities
+
+### 1. `fdisk` (Partitioning Tool for MBR)
+
+- **Purpose:** The traditional, command-line utility used for managing partition tables, especially those based on the older **MBR (Master Boot Record)** scheme. It's interactive and menu-driven.
+    
+- **Key Use Case:** Creating, deleting, resizing, and changing the type of MBR partitions (Primary, Extended, Logical).
+    
+- **Example Usage:**
+    
+    - `sudo fdisk /dev/sda` (Starts the interactive utility on the first hard drive).
+        
+    - Once inside, you use single-letter commands like **`p`** (print), **`n`** (new), **`d`** (delete), and **`w`** (write changes).
+        
+
+### 2. `parted` (Advanced Partitioning Tool for GPT/MBR)
+
+- **Purpose:** A modern and more powerful utility used for both MBR and the newer **GPT (GUID Partition Table)** scheme. It can handle larger disks ($>2$TB) that `fdisk` cannot.
+    
+- **Key Use Case:** Creating and managing GPT partitions, making file systems directly, and resizing partitions non-interactively (though interactive mode is also available).
+    
+- **Example Usage:**
+    
+    - `sudo parted /dev/sdb` (Starts the utility on the second hard drive).
+        
+    - `(parted) mklabel gpt` (Sets the partition table type to GPT).
+        
+    - `(parted) mkpart primary ext4 1MiB 50GiB` (Creates a 50GB primary partition).
+        
+
+---
+
+## 🔍 Essential Viewing/Reporting Utilities
+
+These tools are crucial for listing existing partitions and their details **before** you attempt to modify them.
+
+### 3. `lsblk` (List Block Devices)
+
+- **Purpose:** A utility to list all available **block devices** (hard drives, partitions, CDs, etc.) in a tree-like format.
+    
+- **Key Use Case:** Quickly visualizing the disk layout, including which partitions belong to which disks, and their mount points.
+    
+- **Example Usage:**
+    
+    - `lsblk` (Prints the entire block device hierarchy, showing sizes and mount points).
+        
+
+### 4. `df` (Disk Filesystem Usage)
+
+- **Purpose:** Used to report file system disk space usage.
+    
+- **Key Use Case:** Checking how much space is left on mounted partitions (i.e., the partitions the system is actively using).
+    
+- **Example Usage:**
+    
+    - `df -h` (Reports disk usage in a human-readable format, e.g., $10$G instead of bytes).
+        
+
+---
+
+## ⚙️ Post-Partitioning Utilities
+
+After creating a partition with `fdisk` or `parted`, you must perform these steps:
+
+### 5. `mkfs` (Make File System)
+
+- **Purpose:** To format the new, empty partition with a file system structure.
+    
+- **Key Use Case:** Preparing the partition to hold data.
+    
+- **Example Usage:**
+    
+    - `sudo mkfs.ext4 /dev/sda1` (Formats partition `/dev/sda1` with the `ext4` file system).
+        
+    - `sudo mkfs.xfs /dev/sdb1` (Formats partition `/dev/sdb1` with the `XFS` file system).
+        
+
+### 6. `mount`
+
+- **Purpose:** To make the file system on the partition accessible to the running Linux system by attaching it to a directory (a **mount point**).
+    
+- **Key Use Case:** Activating a new or existing partition so it can be used for reading and writing data.
+    
+- **Example Usage:**
+    
+    - `sudo mount /dev/sda1 /mnt/data` (Mounts the partition `/dev/sda1` at the directory `/mnt/data`).
