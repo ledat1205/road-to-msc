@@ -13,4 +13,6 @@ justify: biện minh
 chalk (it up to): phủ nó lên (bằng thứ gì đó)
 perseverance: sự kiên trì 
 moral: đạo đức 
-des
+designate: chỉ định
+aptitude: năng khiếu
+anecdote: giai thoau
