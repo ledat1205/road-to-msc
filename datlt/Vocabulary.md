@@ -7,3 +7,5 @@ deferrable: Có thể thực hiện sau ^deferrable
 essence: bản chất ^essence
 
 intuitive: trực quan
+
+anticipate
