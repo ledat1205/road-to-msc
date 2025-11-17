@@ -8,4 +8,4 @@ essence: bản chất ^essence
 
 intuitive: trực quan
 
-anticipate
+anticipate: đoán trước 
