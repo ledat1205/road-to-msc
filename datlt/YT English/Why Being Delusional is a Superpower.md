@@ -22,7 +22,7 @@ entitle = allow: cho phép
 uncourteous = rude: bất lịch sự
 distorted: bị bóp méo 
 malice: ác ý
-ingenuity: ngây thơ
+ingenuity: sự khéo léo, sáng tạo
 in line with: phù hợp với 
 gratitude: lòng biết ơn
 conspire: âm mưu
@@ -208,10 +208,9 @@ factor (in): đánh giá cái gì đó
 
 ### **ingenuity /ˌɪn.dʒəˈnjuː.ə.ti/** (n)
 
-**Meaning:** sự khéo léo, sáng tạo (không phải “ngây thơ”)  
+**Meaning:** sự khéo léo, sáng tạo
 **Example:** They solved the problem with great ingenuity.  
 **Related:** _ingenious (adj)_  
-_(If you meant “ngây thơ”, that word is “ingenuous” /ɪnˈdʒen.ju.əs/)_
 
 ---
 
