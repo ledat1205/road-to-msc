@@ -31,11 +31,3 @@ The most common scenarios that cause file system errors include:
 ![[Screenshot 2025-11-19 at 00.31.11.png]]![[Screenshot 2025-11-19 at 00.33.07.png]]
 ![[Screenshot 2025-11-19 at 00.33.23.png]]
 ![[Screenshot 2025-11-19 at 00.33.52.png]]
-![[Screenshot 2025-11-19 at 00.34.11.png]]
-![[Screenshot 2025-11-19 at 00.34.34.png]]
-![[Screenshot 2025-11-19 at 00.34.53.png]]
-![[Screenshot 2025-11-19 at 00.35.08.png]]
-![[Screenshot 2025-11-19 at 00.35.25.png]]
-![[Screenshot 2025-11-19 at 00.35.53.png]]
-
-![[Screenshot 2025-11-19 at 00.36.11.png]]
