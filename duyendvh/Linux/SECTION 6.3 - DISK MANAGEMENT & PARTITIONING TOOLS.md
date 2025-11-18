@@ -13,7 +13,7 @@ Need to backup before formatting if fs has data.
 ![[Screenshot 2025-11-19 at 00.29.00.png]]
 ![[Screenshot 2025-11-19 at 00.29.45.png]]
 
-## When File System Errors Happen
+## When File System Errors Happen?
 
 File system errors typically occur when a process that is modifying the file system's metadata is **interrupted** before it can complete its full transaction and write the final "clean" state to the disk.
 
@@ -26,3 +26,6 @@ The most common scenarios that cause file system errors include:
 | **Software/Driver Bugs**         | Errors within the OS kernel, device drivers, or sometimes even complex applications can lead to incorrect data being written to the file system's structure.                                                                                    | Corruption of specific file system structures, sometimes localized.                       |
 | **Improper Device Ejection**     | Removing an external drive (USB, etc.) without safely ejecting it prevents the OS from flushing its write **cache** and completing pending file system operations.                                                                              | Incomplete writes, leading to corruption of the last-modified files.                      |
 | **RAM Failure**                  | Faulty **RAM** can cause data corruption _before_ it is even written to the disk, leading to corrupted file system metadata or file contents being written by the OS.                                                                           | Random or widespread file/metadata corruption.                                            |
+
+
+![[Screenshot 2025-11-19 at 00.31.11.png]]
