@@ -3,6 +3,8 @@
 ![[Screenshot 2025-11-19 at 00.24.35.png]]
 
 ![[Screenshot 2025-11-19 at 00.23.06.png]]
+![[Screenshot 2025-11-19 at 00.27.19.png]]
+![[Screenshot 2025-11-19 at 00.27.36.png]]
 
 
 ## When File System Errors Happen
