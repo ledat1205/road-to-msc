@@ -1,5 +1,7 @@
 ![[Screenshot 2025-11-19 at 00.18.55.png]]
 ![[Screenshot 2025-11-19 at 00.19.58.png]]
+![[Screenshot 2025-11-19 at 00.24.35.png]]
+
 ![[Screenshot 2025-11-19 at 00.23.06.png]]
 
 
