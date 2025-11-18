@@ -5,10 +5,13 @@
 ![[Screenshot 2025-11-19 at 00.23.06.png]]
 ![[Screenshot 2025-11-19 at 00.27.19.png]]
 ![[Screenshot 2025-11-19 at 00.27.36.png]]
+
+Need to backup before formatting if fs has data.
 ![[Screenshot 2025-11-19 at 00.28.15.png]]
 ![[Screenshot 2025-11-19 at 00.28.42.png]]
 
 ![[Screenshot 2025-11-19 at 00.29.00.png]]
+![[Screenshot 2025-11-19 at 00.29.45.png]]
 
 ## When File System Errors Happen
 
