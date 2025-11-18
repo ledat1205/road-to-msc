@@ -28,5 +28,5 @@ The most common scenarios that cause file system errors include:
 | **RAM Failure**                  | Faulty **RAM** can cause data corruption _before_ it is even written to the disk, leading to corrupted file system metadata or file contents being written by the OS.                                                                           | Random or widespread file/metadata corruption.                                            |
 ![[Screenshot 2025-11-19 at 00.32.07.png]]
 
-
-![[Screenshot 2025-11-19 at 00.31.11.png]]
+![[Screenshot 2025-11-19 at 00.31.11.png]]![[Screenshot 2025-11-19 at 00.33.07.png]]
+![[Screenshot 2025-11-19 at 00.33.23.png]]
