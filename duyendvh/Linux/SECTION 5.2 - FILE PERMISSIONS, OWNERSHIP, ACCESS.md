@@ -25,3 +25,4 @@ In the context of k8s config (e.g: druid historical):
     
 - **`initContainer` Command:** The command `chown 1000:1000 /tiki/druid_var` explicitly sets the ownership of the segment cache directory to the numeric user ID 1000 and group ID 1000, ensuring the Historical process has the necessary **read/write** access to its own data directory.
 ![[Screenshot 2025-11-18 at 23.44.55.png]]
+![[Screenshot 2025-11-18 at 23.45.32.png]]
