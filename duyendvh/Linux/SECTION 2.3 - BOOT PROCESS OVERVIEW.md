@@ -41,13 +41,13 @@ While the exact steps vary slightly between systems (e.g., BIOS vs. UEFI), the s
 
 Rebooting (or restarting) a computer forces the entire system to go through the complete initialization process again. It is necessary for several reasons:
 
-|**Reason**|**Explanation**|
-|---|---|
-|**Applying Kernel Updates**|The **kernel** is the core of the OS; it cannot be replaced while the system is running. A reboot is the only way to load the newly installed kernel into memory and start running the updated OS foundation.|
-|**Fixing Deep Errors (Corruption/Memory Leaks)**|A clean restart clears all current system state, including kernel data structures, memory leaks, service faults, and cached hardware configurations. This is often the simplest fix for unexplained performance issues or transient errors.|
-|**Hardware Configuration Changes**|When adding new hardware (like a hard drive or GPU) or changing BIOS/UEFI settings, the firmware and kernel need to **re-enumerate and re-initialize** the hardware from scratch. This requires a full power cycle.|
-|**Installing Core System Libraries**|Some critical libraries that are in constant use by almost all running processes (like the **C runtime library**) cannot be safely replaced or updated while running. A reboot ensures the new library is loaded cleanly into memory.|
-|**Security Patches**|Security updates often target vulnerabilities in the kernel or core components. A reboot ensures the vulnerable code is completely removed from memory and replaced with the patched version.|
+| **Reason**                                       | **Explanation**                                                                                                                                                                                                                             |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Applying Kernel Updates**                      | The **kernel** is the core of the OS; it cannot be replaced while the system is running. A reboot is the only way to load the newly installed kernel into memory and start running the updated OS foundation.                               |
+| **Fixing Deep Errors (Corruption/Memory Leaks)** | A clean restart clears all current system state, including kernel data structures, memory leaks, service faults, and cached hardware configurations. This is often the simplest fix for unexplained performance issues or transient errors. |
+| **Hardware Configuration Changes**               | When adding new hardware (like a hard drive or GPU) or changing BIOS/UEFI settings, the firmware and kernel need to **re-enumerate and re-initialize** the hardware from scratch. This requires a full power cycle.                         |
+| **Installing Core System Libraries**             | Some critical libraries that are in constant use by almost all running processes (like the **C runtime library**) cannot be safely replaced or updated while running. A reboot ensures the new library is loaded cleanly into memory.       |
+| **Security Patches**                             | Security updates often target vulnerabilities in the kernel or core components. A reboot ensures the vulnerable code is completely removed from memory and replaced with the patched version.                                               |
 ![[Screenshot 2025-11-16 at 17.32.38.png]]
 ![[Screenshot 2025-11-16 at 17.34.03.png]]
 ![[Screenshot 2025-11-16 at 17.35.12.png]]
