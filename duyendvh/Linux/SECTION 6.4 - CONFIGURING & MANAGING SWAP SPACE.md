@@ -31,5 +31,8 @@ Swap usage reflects how a system is managing its virtual memory relative to its 
 |**Fluctuating Use (Thrashing)**|The system is **constantly moving data pages** in and out of swap. The required data isn't staying in RAM long enough.|**Critical Performance Killer.** The OS spends most of its time swapping (I/O) instead of executing tasks. Requires more RAM.|
 |**Swap is Full**|**Exhausted Memory.** The system has run out of both RAM and swap space.|**System Crash/Freeze.** Triggers the **OOM (Out-Of-Memory) killer** to forcibly terminate processes to free resources.|
 
+![[Screenshot 2025-11-19 at 00.45.12.png]]
+
 ![[Screenshot 2025-11-19 at 00.44.08.png]]
--> unmount ensure 5GB of buff/ xache wont be lost
+-> unmount ensure 5GB of buff/ cache wont be lost 
+![[Screenshot 2025-11-19 at 00.45.47.png]]
