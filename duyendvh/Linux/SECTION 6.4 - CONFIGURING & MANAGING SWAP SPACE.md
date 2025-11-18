@@ -36,3 +36,4 @@ Swap usage reflects how a system is managing its virtual memory relative to its 
 ![[Screenshot 2025-11-19 at 00.44.08.png]]
 -> unmount ensure 5GB of buff/ cache wont be lost 
 ![[Screenshot 2025-11-19 at 00.45.47.png]]![[Screenshot 2025-11-19 at 00.47.00.png]]
+![[Screenshot 2025-11-19 at 00.47.31.png]]
