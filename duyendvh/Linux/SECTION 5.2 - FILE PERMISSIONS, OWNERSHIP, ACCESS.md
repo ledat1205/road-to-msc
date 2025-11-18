@@ -33,3 +33,6 @@ In the context of k8s config (e.g: druid historical):
 ![[Screenshot 2025-11-18 at 23.51.17.png]]
 ![[Screenshot 2025-11-18 at 23.51.43.png]]
 ![[Screenshot 2025-11-18 at 23.51.57.png]]
+![[Screenshot 2025-11-18 at 23.52.25.png]]
+![[Screenshot 2025-11-18 at 23.52.58.png]]
+![[Screenshot 2025-11-18 at 23.53.21.png]]
