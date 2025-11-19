@@ -47,6 +47,7 @@ In this example, the 6$1 \text{s}$ in the mask cover the first three octets (`19
 ![[Screenshot 2025-11-19 at 19.06.12.png]]
 ![[Screenshot 2025-11-19 at 19.07.17.png]]
 ![[Screenshot 2025-11-19 at 19.08.07.png]]
+
 |**Component**|**Value**|**Explanation**|
 |---|---|---|
 |**`eth0`**||This is the name of the network interface. **`eth`** typically stands for Ethernet, and `0` indicates it is the first such interface.|
@@ -56,3 +57,9 @@ In this example, the 6$1 \text{s}$ in the mask cover the first three octets (`19
 ||**`RUNNING`**|The network cable is connected, and the interface is active.|
 ||**`MULTICAST`**|The interface supports multicast traffic (sending data to a defined group of recipients).|
 |**`mtu 1500`**||**Maximum Transmission Unit**. This is the largest packet size (in bytes) that the interface can send without fragmentation. **1500** is the standard MTU for Ethernet networks.|
+
+| **Component**                 | **Value**       | **Explanation**                                                                                                                                                                                                                                                                          |
+| ----------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`inet 192.168.1.100`**      | `192.168.1.100` | This is the **IPv4 address** assigned to the `eth0` interface. This address is used to identify this specific device on its network.                                                                                                                                                     |
+| **`netmask 255.255.255.0`**   | `255.255.255.0` | This is the **subnet mask**. It defines the size of the network. A mask of `255.255.255.0` means the first three octets (`192.168.1`) identify the **network**, and the last octet (`100`) identifies the **host** (the specific device). (In CIDR notation, this is a **/24** network). |
+| **`broadcast 192.168.1.255`** | `192.168.1.255` | This is the **broadcast address** for the local network. Any packet sent to this address will be received by every device within the `192.168.1.0/24` subnet.                                                                                                                            |
