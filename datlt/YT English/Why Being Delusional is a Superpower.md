@@ -214,7 +214,7 @@ factor (in): đánh giá cái gì đó
 
 ---
 
-### **in line with** (phrase)
+### **in line with** (phrase) / align with
 
 **Meaning:** phù hợp với  
 **Example:** Your results are in line with our expectations.
