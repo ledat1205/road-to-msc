@@ -31,3 +31,4 @@ Let's look at a common scenario:
 In this example, the 6$1 \text{s}$ in the mask cover the first three octets (`192.168.1`).7 When a router applies this mask to the IP address, it calculates that the **Network ID** is `192.168.1.0`.
 ![[Screenshot 2025-11-19 at 18.27.43.png]]
 ![[Screenshot 2025-11-19 at 18.37.40.png]]
+![[Screenshot 2025-11-19 at 18.39.41.png]]
