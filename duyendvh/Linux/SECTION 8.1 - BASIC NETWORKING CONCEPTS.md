@@ -44,3 +44,4 @@ In this example, the 6$1 \text{s}$ in the mask cover the first three octets (`19
 ![[Screenshot 2025-11-19 at 19.04.02.png]]
 ![[Screenshot 2025-11-19 at 19.04.22.png]]
 ![[Screenshot 2025-11-19 at 19.05.08.png]]
+![[Screenshot 2025-11-19 at 19.06.12.png]]
