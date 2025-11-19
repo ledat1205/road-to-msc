@@ -107,3 +107,6 @@ In modern computing, a single physical interface hosts many virtual interfaces:
 The server output you saw earlier: `eth0: flags=4163<UP, BROADCAST, RUNNING, MULTICAST> mtu 1500 inet 192.168.1.100`
 
 If that server had a second physical card or a virtualized connection, you would see a second entry, such as: `eth1: flags=4163<UP, BROADCAST, RUNNING, MULTICAST> mtu 1500 inet 10.1.1.50`
+![[Screenshot 2025-11-19 at 19.17.25.png]]
+
+![[Screenshot 2025-11-19 at 19.17.09.png]]
