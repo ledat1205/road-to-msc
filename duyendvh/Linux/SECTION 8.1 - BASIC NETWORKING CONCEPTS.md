@@ -47,3 +47,12 @@ In this example, the 6$1 \text{s}$ in the mask cover the first three octets (`19
 ![[Screenshot 2025-11-19 at 19.06.12.png]]
 ![[Screenshot 2025-11-19 at 19.07.17.png]]
 ![[Screenshot 2025-11-19 at 19.08.07.png]]
+|**Component**|**Value**|**Explanation**|
+|---|---|---|
+|**`eth0`**||This is the name of the network interface. **`eth`** typically stands for Ethernet, and `0` indicates it is the first such interface.|
+|**`flags=4163<UP, BROADCAST, RUNNING, MULTICAST>`**||These flags indicate the current state and capabilities of the interface:|
+||**`UP`**|The interface is ready to accept and send data.|
+||**`BROADCAST`**|The interface supports sending broadcast packets (to all devices on the local network).|
+||**`RUNNING`**|The network cable is connected, and the interface is active.|
+||**`MULTICAST`**|The interface supports multicast traffic (sending data to a defined group of recipients).|
+|**`mtu 1500`**||**Maximum Transmission Unit**. This is the largest packet size (in bytes) that the interface can send without fragmentation. **1500** is the standard MTU for Ethernet networks.|
