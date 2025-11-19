@@ -8,6 +8,7 @@ Each 8-bit octet can represent $2^8 = 256$ different values, ranging from **0** 
 each group of 16 bits comprise of 4 hexadecimal digits (1 hexadecimal digit can be represented by using 4 bit (0-16 in decimal))
 ![[Screenshot 2025-11-19 at 18.25.37.png]]
 ![[Screenshot 2025-11-19 at 18.26.06.png]]
+![[Screenshot 2025-11-19 at 18.35.48.png]]
 ![[Screenshot 2025-11-19 at 18.27.43.png]]
 A **subnet mask** is a 32-bit number used in IPv4 networking to **divide an IP address into two parts**: the **Network ID** and the **Host ID**.1
 
