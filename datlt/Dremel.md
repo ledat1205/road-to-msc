@@ -66,3 +66,4 @@ optional string altText = 2;
 }
 ```
 
+![[Pasted image 20251121135652.png]]
