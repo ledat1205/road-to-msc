@@ -67,3 +67,8 @@ optional string altText = 2;
 ```
 
 ![[Pasted image 20251121135652.png]]
+
+
+
+
+![](https://s3-lc-upload.s3.amazonaws.com/uploads/2018/07/17/question_11.jpg)
