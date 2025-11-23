@@ -85,3 +85,16 @@ What are the **disadvantages** of warehouses?
 - **Long development time:** Can take a long time to design and implement.
 
 # The modern approach: Data lakehouse
+
+A data lakehouse architecture combines the low-cost storage of a data lake with the management features and query performance of a data warehouse. The goal is to create a single, unified platform that can support traditional BI, modern data science, and AI workloads without moving or duplicating data.
+
+A lakehouse achieves this by implementing a metadata and governance layer on top of open-format files stored in low-cost object storage, like Google Cloud Storage. This gives you the best of both worlds.
+
+What are the **key feautures** of a Google Cloud data lakehouse?
+
+- Support for most data formats
+- Flexible schema-on-read or schema-on-write
+- Access for all types of data users
+- Cost flexibility based on needs
+- Unified data governance
+- ACID transaction support
