@@ -64,3 +64,4 @@ If that server had a second physical card or a virtualized connection, you would
 ![[Screenshot 2025-11-19 at 19.17.25.png]]
 
 ![[Screenshot 2025-11-19 at 19.17.09.png]]
+![[Screenshot 2025-11-24 at 00.35.50.png]]
