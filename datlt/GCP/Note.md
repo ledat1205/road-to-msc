@@ -111,3 +111,16 @@ Big query con perform federated query to query on external system
 ## BigQuery fundamentals
 
 BigQuery is Google's enterprise-grade, fully managed, serverless data warehouse.
+
+
+**Fully managed**
+The infrastructure (like the hardware, the networking, the low-level software) is all handled by Google. Your team doesn't need to worry about patches, updates, or hardware failures.
+
+
+**Severless**
+Serverless takes things a step further. You don't have to provision or manage any servers at all. You simply load your data and start querying. BigQuery automatically allocates the necessary resources to run your queries and scales them up or down based on the complexity of your request.
+
+
+The magic behind BigQuery is its architecture. BigQuery separates storage from compute.
+
+![[Pasted image 20251124003844.png]]
