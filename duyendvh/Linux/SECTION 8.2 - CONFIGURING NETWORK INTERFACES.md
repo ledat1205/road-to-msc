@@ -204,3 +204,49 @@ eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
 ```
 
 ![[Screenshot 2025-11-24 at 00.59.24.png]]
+
+##Why Specify ` eth0`?
+
+### 1. Unique Association
+
+Every network interface (whether physical like **`eth0`** or virtual like **`tun0`**) represents a distinct connection point or "port" for the operating system.
+
+- An IP address is not just a number floating in space; it is the **address of that specific connection point**.
+    
+- The system needs to know _which_ piece of hardware or software is responsible for sending and receiving traffic using that IP address.
+    
+
+Example:
+
+If you had both a wired connection (eth0) and a Wi-Fi connection (wlan0), and you assigned an IP address without specifying the device:
+
+Bash
+
+```
+# This command is ambiguous and would fail!
+sudo ip addr add 192.168.1.50/24 
+```
+
+The operating system would not know if $192.168.1.50$ should be used by the wired card or the wireless card. By specifying **`dev eth0`**, you link the IP address directly to the physical NIC.
+
+### 2. Routing Decisions
+
+Routers and the Linux kernel rely on this interface-to-address association to make **routing decisions**.
+
+When the system receives a packet destined for a remote network, the routing table looks at the destination and determines which **interface** to send the packet out of. This interface is associated with a **Gateway IP Address**.
+
+- If the system wants to reach a device on the Internet, it knows to send the data out of `eth0` because that is the device configured with the default gateway.
+    
+
+### 3. Hardware Differences
+
+Different devices require different Layer 2 (Link Layer) protocols:
+
+- **`eth0`** uses **Ethernet** (Layer 2).
+    
+- **`wlan0`** uses **$802.11$ (Wi-Fi)** (Layer 2).
+    
+- **`tun0`** uses **none** (Layer 2 for tunneling).
+    
+
+The IP address configuration must be placed on the device that handles the correct lower-layer protocol, making the **device specification mandatory**.
