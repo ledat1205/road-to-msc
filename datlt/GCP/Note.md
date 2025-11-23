@@ -124,3 +124,9 @@ Serverless takes things a step further. You don't have to provision or manage an
 The magic behind BigQuery is its architecture. BigQuery separates storage from compute.
 
 ![[Pasted image 20251124003844.png]]
+
+Think of it like a library. The books are the data, stored reliably and inexpensively in Google's distributed file system. When you want to find specific information, the librarians are the compute resources. BigQuery can call upon thousands of librarians (or compute workers) simultaneously to scan the entire library (your data) very quickly. This distributed processing engine, called Dremel, is what makes your queries run so fast.
+
+Because storage and compute are separate, they can scale independently.
+
+ 
