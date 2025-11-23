@@ -65,3 +65,136 @@ If that server had a second physical card or a virtualized connection, you would
 
 ![[Screenshot 2025-11-19 at 19.17.09.png]]
 ![[Screenshot 2025-11-24 at 00.35.50.png]]
+## Common Network Interface Types and Configurations
+
+### 1. Loopback Interface
+
+- **Typical Name:** `lo`
+    
+- **Purpose:** Allows a machine to communicate with itself (**`localhost`**), essential for internal diagnostics and running local services. It has no physical hardware.
+    
+- **Example Output Snippet:**
+    
+
+Plaintext
+
+```
+lo: <LOOPBACK,UP,LOWER_UP> mtu 65536
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+```
+
+### 2. Wired Ethernet Interface
+
+- **Typical Name:** `eth0` or `enpXsY`
+    
+- **Purpose:** Connects the machine to a **Local Area Network (LAN)** via a physical cable, using a **Network Interface Card (NIC)**.
+    
+- **Example Output Snippet:**
+    
+
+Plaintext
+
+```
+eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
+    link/ether 00:11:22:33:44:55 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.100/24 brd 192.168.1.255 scope global eth0
+```
+
+---
+
+### 3. Wireless Interface
+
+- **Typical Name:** `wlan0` or `wlpXsY`
+    
+- **Purpose:** Allows communication wirelessly via the **$802.11$ (Wi-Fi)** protocol.
+    
+- **Key Differences:** Uses `link/ieee802.11` instead of `link/ether`.
+    
+- **Example Output Snippet:**
+    
+
+Plaintext
+
+```
+wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
+    link/ieee802.11 66:77:88:99:AA:BB brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.105/24 brd 192.168.1.255 scope global wlan0
+```
+
+### 4. Virtual Bridge Interface
+
+- **Typical Name:** `br0` or `virbr0`
+    
+- **Purpose:** A **software switch** used to connect virtual devices (like VMs) to the physical network (bridging **virtual traffic** to the **physical NIC**).
+    
+- **Key Differences:** Shows the bridge type and links to other interfaces.
+    
+- **Example Output Snippet:**
+    
+
+Plaintext
+
+```
+br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
+    link/ether CA:FE:C0:LA:00:01 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.1/24 brd 10.0.0.255 scope global br0
+```
+
+### 5. Tunnel/VPN Interface
+
+- **Typical Name:** `tun0`, `tap0`, `wg0`
+    
+- **Purpose:** Creates a **secure, encrypted tunnel** for Virtual Private Network (VPN) traffic.
+    
+- **Key Differences:** Often uses the specific link type `link/none` for a purely virtual, encapsulated connection.
+    
+- **Example Output Snippet (Tunnel):**
+    
+
+Plaintext
+
+```
+tun0: <POINTOPOINT,MULTICAST,NOARP,UP,LOWER_UP> mtu 1400
+    link/none 
+    inet 10.8.0.2/24 scope global tun0
+```
+
+### 6. Docker/Container Interface
+
+- **Typical Name:** `docker0` (bridge) or `veth...` (virtual ethernet pairs)
+    
+- **Purpose:** Provides an internal network and IP addresses for **Docker containers** to communicate with each other and the host machine.
+    
+- **Key Differences:** Uses a dedicated private subnet (e.g., $172.17.0.0/16$) and is often managed entirely by the container platform.
+    
+- **Example Output Snippet (Docker Bridge):**
+    
+
+Plaintext
+
+```
+docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
+    link/ether 02:42:AC:11:00:01 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 scope global docker0
+```
+
+### 7. Alias/Sub-Interface
+
+- **Typical Name:** `eth0:0` (in older tools) or multiple `inet` entries (in modern `ip` tools)
+    
+- **Purpose:** Allows a **single physical NIC** to host multiple distinct IP addresses, often for different services or migrating networks.
+    
+- **Key Differences:** No separate interface entry is created in modern Linux tools; instead, the physical interface has multiple IP addresses listed.
+    
+- **Example Output Snippet (Modern Alias):**
+    
+
+Plaintext
+
+```
+eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
+    link/ether 00:11:22:33:44:55 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.100/24 scope global eth0
+    inet 192.168.10.50/24 scope global eth0  <-- Second IP (The "Alias")
+```
