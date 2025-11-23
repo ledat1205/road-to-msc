@@ -65,3 +65,7 @@ What are the **disadvantages** of data lakes?
 - **Management complexity:** Requires significant overhead to maintain.
 - **Time-consuming analysis:** Data often needs to be cleaned and wrangled before it is usable.
 - **Security risks:** Raw data formats can increase security and compliance risks.
+
+## Data warehouses
+
+A data warehouse, in contrast, is like a highly organized library. Data is cleaned, transformed, and structured before it's stored. This process, known as schema-on-write, ensures the data is optimized for analysis and business intelligence (BI).
