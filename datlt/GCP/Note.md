@@ -54,13 +54,14 @@ For Cymbal, this means storing:
 What are the **advantages** of data lakes?
 
 - **Flexibility**: Stores all data types.
-    
 - **Agility:** Fast to ingest data.
-    
 - **Scalability:** Can grow to exabyte scale.
-    
 - **Cost-effectiveness:** Uses low-cost object storage.
-    
-- 5
-    
-    **Support for advanced analytics:** Ideal for AI/ML model training.
+- **Support for advanced analytics:** Ideal for AI/ML model training.
+
+What are the **disadvantages** of data lakes?
+
+- **Risk of becoming a "data swamp":** Without proper governance, it can become a disorganized collection of unusable data.
+- **Management complexity:** Requires significant overhead to maintain.
+- **Time-consuming analysis:** Data often needs to be cleaned and wrangled before it is usable.
+- **Security risks:** Raw data formats can increase security and compliance risks.
