@@ -253,3 +253,70 @@ The IP address configuration must be placed on the device that handles the corre
 ![[Screenshot 2025-11-24 at 01.05.21.png]]
 ![[Screenshot 2025-11-24 at 01.05.47.png]]
 ![[Screenshot 2025-11-24 at 01.07.53.png]]
+## The Connection Process (Computer-Specific)
+
+Your computer, running an operating system like Linux, macOS, or Windows, uses the **TCP/IP stack** to handle this communication.
+
+---
+
+### 1. 🔍 Naming and Address Resolution (DNS & ARP)
+
+Before your computer can send a data packet, it needs two things: the destination's **IP address** and the next step's **MAC address**.
+
+- **DNS (If Applicable):** If you use a name (e.g., `payroll.corp.com`) instead of an IP address, your computer first sends a **DNS query** to the designated DNS server. The DNS server replies with the service's IP address (e.g., $192.168.5.100$).
+    
+- **Routing Decision:** Your computer's kernel checks its **routing table**.
+    
+    - It compares your computer's IP and subnet mask (e.g., $192.168.1.100/24$) with the destination IP ($192.168.5.100$).
+        
+    - Since these IPs are on **different subnets** (the 1.x network is different from the 5.x network), the computer knows it cannot talk directly to the host.
+        
+    - **Action:** The computer determines it must send the packet to its designated **Default Gateway (Router)**.
+        
+- **ARP (Address Resolution Protocol):** The computer now knows the IP address of its router. It needs the router's **MAC address** to build the Layer 2 frame.
+    
+    - Your computer sends an **ARP request broadcast** (to every device on its local subnet): "Who has the IP address of the router? Tell me their MAC address."
+        
+    - The router replies with its MAC address.
+        
+
+---
+
+### 2. 📦 Data Encapsulation and Framing
+
+Your computer's network stack now prepares the data for transmission (the **Encapsulation** process).
+
+1. **Transport Layer (Layer 4):** The operating system chooses a **Source Port** (a random high number) and uses the service's well-known **Destination Port** (e.g., Port 443 for HTTPS) to create a **TCP Segment**.
+    
+2. **Network Layer (Layer 3):** The kernel adds the **IP Header**.
+    
+    - **Source IP:** Your computer's IP (e.g., $192.168.1.100$).
+        
+    - **Destination IP:** The service's IP (e.g., $192.168.5.100$).
+        
+    - The result is an **IP Packet**.
+        
+3. **Data Link Layer (Layer 2):** The kernel adds the **Ethernet Frame Header**.
+    
+    - **Source MAC:** Your computer's NIC MAC address.
+        
+    - **Destination MAC:** The **Router's MAC address** (found via ARP).
+        
+    - The result is an **Ethernet Frame**.
+        
+
+---
+
+### 3. 🔌 Physical Transmission
+
+The Frame is sent to the NIC (e.g., `eth0`), where it is converted into electrical signals (bits) and transmitted over the physical medium (cable or air).
+
+---
+
+### 4. 🔀 Network Infrastructure Role (Routers)
+
+The data leaves your computer and is handled by the infrastructure, but this step is crucial for the communication to succeed:
+
+1. **Router Decapsulates:** The **Router** receives the Frame (since its MAC address was the destination). It strips the Layer 2 header and reads the **Layer 3 IP Header**.
+    
+2. **Router Routes:** The router sees the ultimate destination IP is $192.168.5.100$. It looks up this network in its routing table and forwards the packet toward the next device (likely a core switch or another router) on the $192.168.5.x$ network.
