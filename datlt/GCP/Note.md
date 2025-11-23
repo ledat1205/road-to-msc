@@ -148,4 +148,6 @@ Partitioning
 
 Partitioning is like adding dividers to a filing cabinet. Instead of one giant drawer, you have separate sections for each year, month, or day. In BigQuery, you can partition a table based on a date or an integer column.
 
-f
+- faster elapsed time
+- faster slot time consumed (few worker to run query)
+- bytes shuffled smaller ()
