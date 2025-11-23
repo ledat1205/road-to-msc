@@ -50,3 +50,17 @@ For Cymbal, this means storing:
 - **Structured data**, like transaction tables from its sales database.
 - **Semi-structured data**, like JSON logs from its web servers.
 - **Unstructured data**, like customer-submitted product images, videos, and text reviews.
+
+What are the **advantages** of data lakes?
+
+- **Flexibility**: Stores all data types.
+    
+- **Agility:** Fast to ingest data.
+    
+- **Scalability:** Can grow to exabyte scale.
+    
+- **Cost-effectiveness:** Uses low-cost object storage.
+    
+- 5
+    
+    **Support for advanced analytics:** Ideal for AI/ML model training.
