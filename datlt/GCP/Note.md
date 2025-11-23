@@ -41,3 +41,12 @@ OPTIONS (
 
 
 
+## Data lakes
+
+Think of a data lake as a vast reservoir of data. It stores enormous amounts of raw data in its native format. You can pour any kind of data into it; structured, semi-structured, and unstructured.
+
+For Cymbal, this means storing:
+
+- **Structured data**, like transaction tables from its sales database.
+- **Semi-structured data**, like JSON logs from its web servers.
+- **Unstructured data**, like customer-submitted product images, videos, and text reviews.
