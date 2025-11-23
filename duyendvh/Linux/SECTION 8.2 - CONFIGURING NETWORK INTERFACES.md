@@ -84,10 +84,10 @@ lo: <LOOPBACK,UP,LOWER_UP> mtu 65536
     inet 127.0.0.1/8 scope host lo
 ```
 
-| **Notation** | **Network Bits** | **Host Bits** | **Subnet Mask (Decimal)** | **Max Hosts (Usable)** | **Size**                                   |
-| ------------ | ---------------- | ------------- | ------------------------- | ---------------------- | ------------------------------------------ |
-| **$/8$**     | 8                | 24            | **$255.0.0.0$**           | $16,777,214$           | **Huge** (Class A size)                    |
-| **$/24$**    | 24               | 8             | **$255.255.255.0$**       | $254$                  | **Small - for private net** (Class C size) |
+| **Notation** | **Network Bits** | **Host Bits** | **Subnet Mask (Decimal)** | **Max Hosts (Usable)** | **Size**                                       |
+| ------------ | ---------------- | ------------- | ------------------------- | ---------------------- | ---------------------------------------------- |
+| **$/8$**     | 8                | 24            | **$255.0.0.0$**           | $16,777,214$           | **Huge** (Class A size)                        |
+| **$/24$**    | 24               | 8             | **$255.255.255.0$**       | $254$                  | **Small - for private network** (Class C size) |
 ### 2. Wired Ethernet Interface
 
 - **Typical Name:** `eth0` or `enpXsY`
