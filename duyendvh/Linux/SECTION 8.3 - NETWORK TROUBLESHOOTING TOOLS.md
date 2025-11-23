@@ -15,3 +15,5 @@ When used with the default, small packet size, the primary reasons for including
 - **Verify DF Bit Handling:** It confirms that all routers and the destination host correctly receive and process a packet that has the DF bit set. This is a subtle diagnostic check that can reveal issues with firewall rules that might improperly filter packets based on header flags.
 
 ![[Screenshot 2025-11-24 at 01.34.54.png]]
+![[Screenshot 2025-11-24 at 01.36.21.png]]
+![[Screenshot 2025-11-24 at 01.36.33.png]]
