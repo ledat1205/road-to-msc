@@ -202,3 +202,5 @@ eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
     inet 192.168.1.100/24 scope global eth0
     inet 192.168.10.50/24 scope global eth0  <-- Second IP (The "Alias")
 ```
+
+![[Screenshot 2025-11-24 at 00.59.24.png]]
