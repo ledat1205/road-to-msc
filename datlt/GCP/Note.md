@@ -161,3 +161,4 @@ it can jump directly to the data for that customer instead of reading through th
 
 BigQuery works differently depending on whether you’re using its native tables or external Apache Iceberg tables stored in Cloud Storage.
 
+Whether you’re working with BigQuery native tables or Apache Iceberg tables, the principle is the same: **Use metadata to skip unnecessary data, so queries run faster and cost less.**
