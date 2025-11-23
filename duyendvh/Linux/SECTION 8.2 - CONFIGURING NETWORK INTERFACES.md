@@ -252,3 +252,4 @@ Different devices require different Layer 2 (Link Layer) protocols:
 The IP address configuration must be placed on the device that handles the correct lower-layer protocol, making the **device specification mandatory**.
 ![[Screenshot 2025-11-24 at 01.05.21.png]]
 ![[Screenshot 2025-11-24 at 01.05.47.png]]
+![[Screenshot 2025-11-24 at 01.07.53.png]]
