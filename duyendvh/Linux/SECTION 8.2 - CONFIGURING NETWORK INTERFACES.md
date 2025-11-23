@@ -381,3 +381,4 @@ Shutterstock
 ![[Screenshot 2025-11-24 at 01.18.04.png]]![[Screenshot 2025-11-24 at 01.21.03.png]]
 ![[Screenshot 2025-11-24 at 01.21.31.png]]
 ![[Screenshot 2025-11-24 at 01.21.45.png]]
+![[Screenshot 2025-11-24 at 01.22.50.png]]
