@@ -374,3 +374,4 @@ Shutterstock
 4. **Key Exchange:** The client verifies the server's certificate. The client then generates a **Symmetric Session Key** and encrypts it using the server's **Public Key** (from the certificate).
     
 5. **Start Encrypting:** The server decrypts the session key using its private key. Both the client and server now have the same **symmetric key**. They declare the handshake is complete, and all subsequent communication will be encrypted using this session key.
+
