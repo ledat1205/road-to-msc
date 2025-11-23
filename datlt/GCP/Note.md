@@ -69,3 +69,17 @@ What are the **disadvantages** of data lakes?
 ## Data warehouses
 
 A data warehouse, in contrast, is like a highly organized library. Data is cleaned, transformed, and structured before it's stored. This process, known as schema-on-write, ensures the data is optimized for analysis and business intelligence (BI).
+
+What are the **advantages** of warehouses?
+
+- **Speed:** Optimized for high-performance queries.
+- **High-quality data:** Provides consistent and reliable information.
+- **Business-focused:** Directly answers common business questions.
+- **Historical intelligence:** Enables deep analysis of trends over time.
+
+What are the **disadvantages** of warehouses?
+
+- **Inflexibility:** Cannot easily accommodate new data types or unstructured data.
+- **Cost:** Often expensive to build and maintain.
+- **Limited data types:** Primarily designed for structured data only.
+- **Long development time:** Can take a long time to design and implement.
