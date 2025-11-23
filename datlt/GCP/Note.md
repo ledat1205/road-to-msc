@@ -83,3 +83,5 @@ What are the **disadvantages** of warehouses?
 - **Cost:** Often expensive to build and maintain.
 - **Limited data types:** Primarily designed for structured data only.
 - **Long development time:** Can take a long time to design and implement.
+
+# The modern approach: Data lakehouse
