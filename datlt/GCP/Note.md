@@ -129,4 +129,15 @@ Think of it like a library. The books are the data, stored reliably and inexpens
 
 Because storage and compute are separate, they can scale independently.
 
- 
+   
+Let's break down how BigQuery achieves its incredible speed by examining two core concepts:  
+**slots and shuffle.**
+
+What is a slot?
+
+Think of a slot as a virtual worker—a small, self-contained unit of computational power that includes CPU, RAM, and network bandwidth. When you run a query, BigQuery's Dremel engine assigns potentially thousands of these slots to your job. Each slot processes a small piece of your data simultaneously. This is the "massively parallel processing" that allows BigQuery to scan terabytes of data so quickly.
+
+
+What is shuffle?
+
+When the results from all those parallel workers need to be combined, such as for a `GROUP BY` or a `JOIN`, the shuffle comes in. Shuffle is the process of redistributing the intermediate data that the slots have processed. Using Google’s petabit internal network, Jupiter, shuffle gathers and reorganizes this data, sending it to the next set of slots for further processing like aggregation or joining. This incredibly fast redistribution of data between query stages is essential for executing complex analytical queries efficiently at a massive scale.
