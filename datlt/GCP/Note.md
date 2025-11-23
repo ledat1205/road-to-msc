@@ -105,3 +105,5 @@ Data lakehouses solve many challenges by unifying data storage and access.
 - Unified governance
 - Broken-down data silos
 - Improved flexibility and scalability
+
+Big query con perform federated query to query on external system
