@@ -156,3 +156,5 @@ Partitioning is like adding dividers to a filing cabinet. Instead of one giant d
 **Clustering**
 
 While partitioning divides the data into large chunks, clustering sorts the data within each of those chunks. Think of it as organizing the files within each drawer of your filing cabinet alphabetically by customer name.
+
+it can jump directly to the data for that customer instead of reading through the entire partition.
