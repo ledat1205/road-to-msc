@@ -205,7 +205,7 @@ eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500
 
 ![[Screenshot 2025-11-24 at 00.59.24.png]]
 
-##Why Specify ` eth0`?
+##Why Specify `eth0`?
 
 ### 1. Unique Association
 
