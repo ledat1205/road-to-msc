@@ -107,3 +107,7 @@ Data lakehouses solve many challenges by unifying data storage and access.
 - Improved flexibility and scalability
 
 Big query con perform federated query to query on external system
+
+## BigQuery fundamentals
+
+BigQuery is Google's enterprise-grade, fully managed, serverless data warehouse.
