@@ -144,10 +144,15 @@ When the results from all those parallel workers need to be combined, such as fo
 
 ### Partitioning and clustering in BigQuery
 
-Partitioning
+**Partitioning**
 
 Partitioning is like adding dividers to a filing cabinet. Instead of one giant drawer, you have separate sections for each year, month, or day. In BigQuery, you can partition a table based on a date or an integer column.
 
 - faster elapsed time
 - faster slot time consumed (few worker to run query)
-- bytes shuffled smaller ()
+- bytes shuffled smaller (data move between slot fewer)
+
+
+**Clustering**
+
+While partitioning divides the data into large chunks, clustering sorts the data within each of those chunks. Think of it as organizing the files within each drawer of your filing cabinet alphabetically by customer name.
