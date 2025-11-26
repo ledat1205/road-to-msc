@@ -1,23 +1,4 @@
-# C++ Variable Assignment & Initialization Cheat Sheet
-
-This cheat sheet summarizes the key concepts for defining, assigning, and initializing variables in C++.
-
----
-
-## 1. Variable Assignment
-
-**Assignment** is the process of giving a variable a new value _after_ it has already been defined.
-
-|**Concept**|**Syntax**|**Description**|
-|---|---|---|
-|**Assignment Operator**|`=`|Used to copy the value on the right-hand side (RHS) into the variable on the left-hand side (LHS). This overwrites any previous value.|
-|**Example**|`int width;`<br><br>  <br><br>`width = 5;`|First, define the variable.<br><br>  <br><br>Then, assign a value.|
-
-> ⚠️ **Common Warning**: Do not confuse the **Assignment Operator** (`=`) with the **Equality Operator** (`==`), which is used to test if two values are equal.
-
----
-
-## 2. Variable Initialization (Initial-ization)
+## Variable Initialization (Initial-ization)
 
 **Initialization** is the process of specifying an **initial value** for a variable at the moment it is defined, combining two steps into one.
 
