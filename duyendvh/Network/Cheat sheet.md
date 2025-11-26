@@ -43,26 +43,26 @@ These keywords define the basic types of data a variable can hold and how its de
 
 ---
 
-## 2. 🛡️ Storage & Type Qualifiers
+## Storage & Type Qualifiers
 
 These modify how and where a variable's memory is managed and accessed.
 
-|**Keyword**|**Purpose**|**Example / Notes**|
-|---|---|---|
-|**const**|Declares a variable as **read-only** (cannot be modified after initialization).|`const int size = 5;`|
-|**constexpr**|Specifies that a value or function can be evaluated at **compile time**.|`constexpr int sq(int x) { return x*x; }`|
-|**consteval** (C++20)|Specifies a function must be evaluated at **compile time** (immediately).|Enforces compile-time execution.|
-|**constinit** (C++20)|Guarantees a variable has **static initialization** (at compile time).|Prevents issues with initialization order.|
-|**volatile**|Tells the compiler that a variable's value may be changed by external factors (e.g., hardware), preventing aggressive optimization.|Used in multi-threaded or embedded programming.|
-|**extern**|Declares a variable or function is defined in another translation unit (file).|Used for specifying **external linkage**.|
-|**static**|Changes storage duration and linkage. Inside a function: keeps value between calls. Outside a class: restricts visibility to current file.|Used for specifying **internal linkage**.|
-|**thread_local**|Specifies that a variable will be distinct for each thread.|Used for thread-safe global variables.|
-|**mutable**|Allows a `const` object to modify a specific member variable.|Used in `const` member functions of a class.|
-|**register**|**Deprecated in C++17.** Hint to the compiler to store the variable in a CPU register (usually ignored).||
+| **Keyword**           | **Purpose**                                                                                                                                | **Example / Notes**                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| **const**             | Declares a variable as **read-only** (cannot be modified after initialization).                                                            | `const int size = 5;`                           |
+| **constexpr**         | Specifies that a value or function can be evaluated at **compile time**.                                                                   | `constexpr int sq(int x) { return x*x; }`       |
+| **consteval** (C++20) | Specifies a function must be evaluated at **compile time** (immediately).                                                                  | Enforces compile-time execution.                |
+| **constinit** (C++20) | Guarantees a variable has **static initialization** (at compile time).                                                                     | Prevents issues with initialization order.      |
+| **volatile**          | Tells the compiler that a variable's value may be changed by external factors (e.g., hardware), preventing aggressive optimization.        | Used in multi-threaded or embedded programming. |
+| **extern**            | Declares a variable or function is defined in another translation unit (file).                                                             | Used for specifying **external linkage**.       |
+| **static**            | Changes storage duration and linkage. Inside a function: keeps value between calls. Outside a class: restricts visibility to current file. | Used for specifying **internal linkage**.       |
+| **thread_local**      | Specifies that a variable will be distinct for each thread.                                                                                | Used for thread-safe global variables.          |
+| **mutable**           | Allows a `const` object to modify a specific member variable.                                                                              | Used in `const` member functions of a class.    |
+| **register**          | **Deprecated in C++17.** Hint to the compiler to store the variable in a CPU register (usually ignored).                                   |                                                 |
 
 ---
 
-## 3. ⚙️ Control Flow & Program Structure
+## Control Flow & Program Structure
 
 Keywords used to manage the logical flow and organization of a program.
 
@@ -79,7 +79,7 @@ Keywords used to manage the logical flow and organization of a program.
 
 ---
 
-## 4. 🧱 Object-Oriented & User-Defined Types
+## Object-Oriented & User-Defined Types
 
 These define custom data structures, their members, and access control.
 
@@ -98,7 +98,7 @@ These define custom data structures, their members, and access control.
 
 ---
 
-## 5. 🔬 Casting, Type ID, & Memory
+## Casting, Type ID, & Memory
 
 Keywords used for converting between types, runtime type information, and memory operations.
 
@@ -119,7 +119,7 @@ Keywords used for converting between types, runtime type information, and memory
 
 ---
 
-## 6. 🛠️ Template & Concepts (C++20)
+## Template & Concepts (C++20)
 
 Keywords central to generic programming.
 
@@ -132,7 +132,7 @@ Keywords central to generic programming.
 
 ---
 
-## 7. 💥 Exceptions & Coroutines (C++20)
+## Exceptions & Coroutines (C++20)
 
 Keywords for error handling and asynchronous programming.
 
@@ -149,7 +149,7 @@ Keywords for error handling and asynchronous programming.
 
 ---
 
-## 🅰️ Alternative Operator Tokens
+## Alternative Operator Tokens
 
 These keywords are text alternatives for C++ operators, often used to improve code readability in environments where certain symbols are not easily accessible (though rarely used in modern code).
 
