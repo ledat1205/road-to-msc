@@ -190,3 +190,6 @@ Without a centralized metadata system, data management can be difficult. Dataple
 For Cymbal's data analysts, this centralized catalog is critical. Instead of searching through different systems to fi nd the required datasets, they use the Dataplex catalog to discover data, understand data lineage, and manage and augment metadata.
 
 By providing a single reference source, Dataplex helps Cymbal manage data at scale while ensuring consistency and quality.
+
+### **Identity and Access Management (IAM)**
+
