@@ -171,3 +171,5 @@ BigLake acts as a storage engine and connector that allows you to extend the cap
 **Governance and security**
 
 One of the most powerful features of BigLake is how it centralizes governance and security. You can apply fine-grained security controls, including row-level and column-level security, directly on the BigLake tables within BigQuery. This is enabled through access delegation.
+
+**Google Cloud tools and practices that enable robust data governance and security.**
