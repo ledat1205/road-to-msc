@@ -199,3 +199,12 @@ the principle of least privilege, meaning users are given only the minimum acces
 
 For their lakehouse, this translates to specific IAM best practices for each Google Cloud service.
 * Cloud Storage: 
+	- Access controlled at the bucket level.
+	- Typically restricted to engineers and service accounts responsible for data ingestion.
+
+* Big Query: 
+	- Granular IAM control at dataset and table level.
+	- Analysts: read-only access to curated sales data.
+	- Data scientists: create/modify tables in sandbox datasets.
+
+* Big Lake: Extends BigQuery’s fine-grained security to Cloud Storage data. This provides a significant advantage.
