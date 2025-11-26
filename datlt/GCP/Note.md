@@ -193,3 +193,9 @@ By providing a single reference source, Dataplex helps Cymbal manage data at sca
 
 ### **Identity and Access Management (IAM)**
 
+Controlling data access is a cornerstone of effective governance. Identity and Access Management (IAM) in Google Cloud provides the foundation for access control.
+
+the principle of least privilege, meaning users are given only the minimum access necessary to perform their jobs
+
+For their lakehouse, this translates to specific IAM best practices for each Google Cloud service.
+* Cloud Storage: 
