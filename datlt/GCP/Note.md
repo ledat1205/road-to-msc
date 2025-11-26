@@ -183,3 +183,10 @@ Metadata is data about data. It identifies:
 - how it relates to other data,
 - who owns it, and
 - its security sensitivity
+
+**Usecase**:
+Without a centralized metadata system, data management can be difficult. Dataplex provides a **unified metadata hub**. For Cymbal, Dataplex acts as a universal catalog for all their data assets, whether they reside in BigQuery, Cloud Storage, or BigLake.  
+  
+For Cymbal's data analysts, this centralized catalog is critical. Instead of searching through different systems to fi nd the required datasets, they use the Dataplex catalog to discover data, understand data lineage, and manage and augment metadata.
+
+By providing a single reference source, Dataplex helps Cymbal manage data at scale while ensuring consistency and quality.
