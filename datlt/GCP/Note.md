@@ -172,4 +172,14 @@ BigLake acts as a storage engine and connector that allows you to extend the cap
 
 One of the most powerful features of BigLake is how it centralizes governance and security. You can apply fine-grained security controls, including row-level and column-level security, directly on the BigLake tables within BigQuery. This is enabled through access delegation.
 
-**Google Cloud tools and practices that enable robust data governance and security.**
+**Google Cloud tools and practices that enable robust data governance and security**
+### **Dataplex – The metadata hub**
+
+**Why metadata matters**
+Metadata is data about data. It identifies:
+- who created the data,
+- when it was created,
+- what it contains,
+- how it relates to other data,
+- who owns it, and
+- its security sensitivity
