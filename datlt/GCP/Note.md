@@ -218,4 +218,5 @@ For BigLake tables in Cloud Storage, **dynamic data masking** can also be appl
 
 ![[Pasted image 20251126175529.png]]
 
-Sensi
+**Sensitive Data Protection**
+
