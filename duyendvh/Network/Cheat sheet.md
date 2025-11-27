@@ -166,3 +166,11 @@ These keywords are text alternatives for C++ operators, often used to improve co
 |**or_eq**|`|=`|
 |**not_eq**|`!=`|Relational NOT equal|
 |**xor_eq**|`^=`|Bitwise XOR assignment|
+
+## Accessing Namespaced Identifiers
+
+| **Method**                 | **Syntax**              | **Description**                                                                                  | **Best Practice**                                                                                                                                                    |
+| -------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Explicit Qualification** | `namespace::identifier` | Uses the **Scope Resolution Operator (`::`)** to explicitly tell the compiler which name to use. | **Preferred.** Safe, clear, and avoids polluting the current scope.                                                                                                  |
+| **Using Declaration**      | `using std::cout;`      | Introduces a single identifier from a namespace into the current scope.                          | Okay for a few names, but use sparingly.                                                                                                                             |
+| **Using Directive**        | `using namespace std;`  | Introduces **all** names from a namespace into the current scope.                                | **Discouraged.** Often leads right back to naming collisions if multiple libraries or user code use the same identifier. **Avoid in header files and global scope.** |
