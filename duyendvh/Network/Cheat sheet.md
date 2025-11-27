@@ -6,13 +6,13 @@
 
 The C++ standard includes several forms for initialization. **List-initialization** is the modern, preferred approach.
 
-|**Form**|**Syntax/Example**|**Description**|**Modern?**|
-|---|---|---|---|
-|**Default-initialization**|`int a;`|**No initializer provided.** Often leaves the variable with an **indeterminate ("garbage") value** (unless it's a class type or global variable). **Avoid.**|No|
-|**Copy-initialization**|`int b = 5;`|Initial value provided after the **`=`** sign. Inherited from the C language.|Legacy|
-|**Direct-initialization**|`int c(6);`|Initial value provided in **parentheses `()`**.|Legacy|
-|**Direct-list-initialization**|`int d {7};`|Initial value in **braces `{}`**. This is a form of **List-Initialization** and is generally **preferred**.|**Yes**|
-|**Value-initialization**|`int e {};`|**Empty braces `{}`**. In most cases for fundamental types, this performs **Zero-initialization** (sets the value to 0).|**Yes**|
+| **Form**                       | **Syntax/Example** | **Description**                                                                                                                                              | **Modern?** |
+| ------------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| **Default-initialization**     | `int a;`           | **No initializer provided.** Often leaves the variable with an **indeterminate ("garbage") value** (unless it's a class type or global variable). **Avoid.** | No          |
+| **Copy-initialization**        | `int b = 5;`       | Initial value provided after the **`=`** sign. Inherited from the C language.                                                                                | Legacy      |
+| **Direct-initialization**      | `int c(6);`        | Initial value provided in **parentheses `()`**.                                                                                                              | Legacy      |
+| **Direct-list-initialization** | `int d {7};`       | Initial value in **braces `{}`**. This is a form of **List-Initialization** and is generally **preferred**.                                                  | **Yes**     |
+| **Value-initialization**       | `int e {};`        | **Empty braces `{}`**. In most cases for fundamental types, this performs **Zero-initialization** (sets the value to 0).                                     | **Yes**     |
 
 ### Key Benefit of List-Initialization (`{}`)
 
