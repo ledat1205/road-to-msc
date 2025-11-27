@@ -245,3 +245,8 @@ This could involve:
 4. Build the new pipelines and reports
 With the data flowing into Google Cloud, they can start building the new data pipelines to populate their Silver and Gold zones.
 The marketing team can then build new dashboards and reports in a tool like Looker, pointing them to the new Gold tables in BigQuery.
+
+
+5. Decommission and iterate
+Once the new marketing analytics solution is running successfully and business users approve the solution, they can decommission the old on-premises marketing reports. This demonstrates value and builds momentum for the next phase of the migration.
+They can then repeat this process for other use cases, such as supply chain optimization or financial reporting, gradually migrating more workloads to the cloud.
