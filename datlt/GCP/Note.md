@@ -264,3 +264,37 @@ For Cymbal, this means storing everything from website clickstream data in JSON 
 **BigQuery**
 
 This powerful, serverless data warehouse acts as the analytics engine for your lakehouse. What makes BigQuery unique is its ability to directly query data in Cloud Storage without needing to move it. This **separation of storage and compute** is a core principle, offering flexibility and cost savings.
+
+
+**Dataplex**
+
+As your data grows, managing it can become a signifi cant challenge. Dataplex provides an intelligent data fabric that allows you to discover, manage, monitor, govern, and describe your data across your entire lakehouse.
+
+For Cymbal, Dataplex can automatically catalog the data in their GCS buckets, making it easily searchable for their data analysts and scientists. It also helps enforce data quality rules and security policies, ensuring that sensitive customer information is protected.
+
+
+**AlloyDB for PostgreSQL**
+
+While the lakehouse is excellent for analytical workloads, many applications still rely on transactional databases. AlloyDB is a fully managed, PostgreSQL-compatible database service that offers superior performance and availability.
+
+In Cymbal's architecture, AlloyDB could power their e-commerce platform's backend, handling real-time order processing and customer account management. The data from AlloyDB can then be easily integrated into the lakehouse for broader analytics via federated queries.
+
+
+**Apache Iceberg**
+
+This is an open-source table format that brings the reliability and performance of a traditional database to your data lake. By using Iceberg with BigQuery and Cloud Storage, you can perform efficient updates and deletes on your data, a capability that was traditionally difficult in data lakes.
+
+This is crucial for Cymbal when they need to update product information or manage customer data privacy requests.
+
+
+### 
+
+**Best practices to keep in mind**
+
+- 1 **Embrace open standards:** Using open formats like Apache Iceberg and Parquet ensures that you're not locked into a single vendor and can use a variety of tools to work with your data.
+- 2**Govern your data from the start:** Implementing a data governance framework with tools like Dataplex is crucial for maintaining data quality, security, and compliance.
+- 3**Optimize for cost and performance:** Leverage BigQuery's separation of storage and compute to your advantage. Use partitioning and clustering in your tables to improve query performance and reduce costs.
+    
+- 4
+    
+    **Automate your data pipelines:** Use tools like Cloud Dataflow and Dataproc to build automated and scalable pipelines for ingesting and transforming your data.
