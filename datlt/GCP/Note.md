@@ -219,3 +219,17 @@ For BigLake tables in Cloud Storage, **dynamic data masking** can also be appl
 ![[Pasted image 20251126175529.png]]
 
 **BigQuery ML: Machine learning for data analysts**
+
+**Migration strategies**
+
+Establish the foundation
+The first step is to set up the core infrastructure on Google Cloud.
+This includes:
+- Setting up a Google Cloud project with the appropriate IAM permissions and networking.
+- Creating Cloud Storage buckets for the Bronze, Silver, and Gold zones.
+- Setting up Dataplex to manage metadata and governance across the new lakehouse.
+
+
+Start with a high-impact use case
+Instead of migrating everything at once, Cymbal could pick one specific business problem to solve. A great candidate would be marketing analytics.
+This is an area where having access to both structured and unstructured data can provide significant value.
