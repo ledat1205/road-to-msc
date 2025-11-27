@@ -250,3 +250,17 @@ The marketing team can then build new dashboards and reports in a tool like Look
 5. Decommission and iterate
 Once the new marketing analytics solution is running successfully and business users approve the solution, they can decommission the old on-premises marketing reports. This demonstrates value and builds momentum for the next phase of the migration.
 They can then repeat this process for other use cases, such as supply chain optimization or financial reporting, gradually migrating more workloads to the cloud.
+
+
+**Recap**
+
+**Google Cloud Storage (GCS)**
+
+This is the heart of your lakehouse, providing a highly scalable and cost-effective object storage service. Think of it as the foundational layer where all your data, in its raw and processed forms, resides.
+
+For Cymbal, this means storing everything from website clickstream data in JSON format to product images, supplier inventory files in CSV or Parquet, and historical data in Iceberg format.
+
+
+**BigQuery**
+
+This powerful, serverless data warehouse acts as the analytics engine for your lakehouse. What makes BigQuery unique is its ability to directly query data in Cloud Storage without needing to move it. This **separation of storage and compute** is a core principle, offering flexibility and cost savings.
