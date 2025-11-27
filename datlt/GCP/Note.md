@@ -215,4 +215,5 @@ For their lakehouse, this translates to specific IAM best practices for each Goo
 - **Row-level security:** Filters which rows a user can access. A regional sales manager for North America, for instance, would only have access to sales data for that region. This is particularly useful for large, multinational companies like Cymbal.
 
 For BigLake tables in Cloud Storage, **dynamic data masking** can also be applied.
+
 ![[Pasted image 20251126175529.png]]
