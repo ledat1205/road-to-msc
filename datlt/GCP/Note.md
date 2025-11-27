@@ -222,7 +222,7 @@ For BigLake tables in Cloud Storage, **dynamic data masking** can also be appl
 
 **Migration strategies**
 
-Establish the foundation
+1. Establish the foundation
 The first step is to set up the core infrastructure on Google Cloud.
 This includes:
 - Setting up a Google Cloud project with the appropriate IAM permissions and networking.
@@ -230,6 +230,18 @@ This includes:
 - Setting up Dataplex to manage metadata and governance across the new lakehouse.
 
 
-Start with a high-impact use case
+2. Start with a high-impact use case
 Instead of migrating everything at once, Cymbal could pick one specific business problem to solve. A great candidate would be marketing analytics.
 This is an area where having access to both structured and unstructured data can provide significant value.
+
+
+3. Migrate the data
+For the marketing analytics use case, they would need to migrate relevant data.
+This could involve:
+- Using BigQuery Data Transfer Service to set up recurring transfers of their existing sales and customer data from their on-premises warehouse to BigQuery.
+- Setting up a data pipeline with a tool like Dataflow to ingest new, real-time clickstream data into their Cloud Storage Bronze zone.
+
+
+4. Build the new pipelines and reports
+With the data flowing into Google Cloud, they can start building the new data pipelines to populate their Silver and Gold zones.
+The marketing team can then build new dashboards and reports in a tool like Looker, pointing them to the new Gold tables in BigQuery.
