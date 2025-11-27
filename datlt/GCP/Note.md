@@ -216,4 +216,3 @@ For their lakehouse, this translates to specific IAM best practices for each Goo
 
 For BigLake tables in Cloud Storage, **dynamic data masking** can also be applied.
 ![[Pasted image 20251126175529.png]]
-
