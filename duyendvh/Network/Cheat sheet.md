@@ -171,11 +171,11 @@ These keywords are text alternatives for C++ operators, often used to improve co
 
 This is a fundamental concept in C++. A **Definition** is always a **Declaration**, but a **Declaration** is not always a **Definition**.
 
-|**Term**|**Technical Meaning**|**Contains**|**Examples**|
-|---|---|---|---|
-|**Declaration**|Tells the compiler the **name** and **type** of an identifier.|**Only Type Info.**|`int x;` (Variable)<br><br>  <br><br>`int add(int x, int y);` (Function Prototype)|
-|**Definition**|Implements the function or allocates storage (instantiates) for the variable.|**Implementation/Storage.**|`int x;` (Variable, allocates storage)<br><br>  <br><br>`int add() { ... }` (Function, provides the body)|
-|**Pure Declaration**|A declaration that is **not** a definition (e.g., a function prototype).|**No storage/body.**|`extern int x;`<br><br>  <br><br>`void func();`|
+| **Term**             | **Technical Meaning**                                                         | **Contains**                | **Examples**                                                                                              |
+| -------------------- | ----------------------------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Declaration**      | Tells the compiler the **name** and **type** of an identifier.                | **Only Type Info.**         | `int x;` (Variable)<br><br>  <br><br>`int add(int x, int y);` (Function Prototype)                        |
+| **Definition**       | Implements the function or allocates storage (instantiates) for the variable. | **Implementation/Storage.** | `int x;` (Variable, allocates storage)<br><br>  <br><br>`int add() { ... }` (Function, provides the body) |
+| **Pure Declaration** | A declaration that is **not** a definition (e.g., a function prototype).      | **No storage/body.**        | `extern int x;`<br><br>  <br><br>`void func();`                                                           |
 
 > 🔑 **Key Insight:**
 > 
