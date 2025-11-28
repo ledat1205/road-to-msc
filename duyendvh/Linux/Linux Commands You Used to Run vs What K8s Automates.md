@@ -1,0 +1,37 @@
+|Area|Before Kubernetes (Manual Linux Ops)|After Kubernetes (Automated by K8s)|Linux Command / Internal Component Kubernetes Uses|
+|---|---|---|---|
+|**Starting the application**|`systemctl start app.service` or `./app` manually|Pod auto-started by Deployment/ReplicaSet|`systemd`, but K8s uses **kubelet** instead|
+|**Restarting crashed apps**|`systemctl restart app.service`|K8s restarts pods automatically|kubelet monitors via container runtime|
+|**Scaling services**|Add new VM, SSH, install app manually|`kubectl scale deploy myapp --replicas=10`|kubelet + scheduler create new pods|
+|**Choosing server to deploy**|You choose IP: `ssh user@10.10.2.15`|K8s scheduler picks node automatically|internal scheduling algorithm|
+|**Assigning IP to app**|Manually: `ip addr add 10.10.2.55/24 dev eth0`|CNI gives pod its own IP automatically|CNI plugin writes to `ip addr` and routing tables|
+|**Routing packets between servers**|You configure routes manually: `ip route add ...`|CNI (Calico/Cilium/Flannel) auto-configures routing|`ip route`, BGP, VXLAN, eBPF|
+|**Service discovery**|Hardcode IPs or use Consul: `10.10.2.17:8080`|Kubernetes DNS: `myapp.default.svc.cluster.local`|CoreDNS (uses `dnsmasq`-style config)|
+|**Load balancing across servers**|Install + configure HAProxy/Nginx|Kubernetes Service distributes traffic automatically|kube-proxy uses `iptables` or `ipvs`|
+|**Load balancer config**|Edit `/etc/haproxy/haproxy.cfg`|A `Service` object defines load balancing|kube-proxy rewrites `iptables -t nat` rules|
+|**Firewall rules**|`iptables -A INPUT ...` manually|NetworkPolicy enforces rules|CNI writes **iptables/eBPF** firewall rules|
+|**Mapping port 80 → app port**|Nginx reverse proxy: `listen 80; proxy_pass localhost:8080;`|Ingress Controller auto-routes traffic|Envoy/Nginx HAProxy inside K8s|
+|**Creating virtual IP for a service**|Use `ip addr add 10.10.5.5 dev lo` + NAT manually|Kubernetes Service has a ClusterIP|kube-proxy configures NAT via iptables|
+|**Ensuring process stays alive**|Use `supervisord` or `systemd restart`|K8s handles liveness/readiness probes|kubelet + health probes|
+|**Updating application**|SSH → stop service → replace binary → restart|`kubectl rollout restart deploy/myapp`|Deployment controller|
+|**Rolling deployments**|Hard: stop and start servers carefully|Built-in rolling updates|ReplicaSet + Deployment controller|
+|**Rollback**|Manual restore backups|`kubectl rollout undo deploy/myapp`|Deployment history|
+|**Monitoring processes**|`ps aux` + custom scripts|`kubectl get pods` and metrics-server|kubelet + cAdvisor|
+|**Checking network namespaces manually**|`ip netns add ...`|Every pod has its own network namespace automatically|CNI sets up namespaces under `/var/run/netns/`|
+|**Connecting two apps across VMs**|Open firewalls: `iptables -A INPUT -p tcp 8080 -s X.X.X.X`|Cluster-wide flat network|CNI automatically sets rules|
+|**Service routing across hosts**|Configure static routes|Kubernetes handles overlay or BGP routing|VXLAN (Flannel), BGP (Calico), eBPF (Cilium)|
+|**Storage mounts**|`mount /dev/sdb1 /data`|`PersistentVolumeClaim` auto-mounts|kubelet uses CSI plugins|
+|**Log storage**|SSH + check `/var/log/app.log`|`kubectl logs`|kubelet streams logs|
+|**Resource limits**|N/A or manual cgroups config|`resources.limits` in PodSpec|containerd uses cgroups automatically|
+|**Health checks**|Custom scripts|`livenessProbe` / `readinessProbe`|kubelet executes checks|
+|**Updating routing after scaling**|Must update LB config manually|Kubernetes updates Service Backends automatically|Endpoints controller|
+|**Ensuring consistent environments**|Use scripts, Ansible|Containers define identical environment|container runtime|
+|**Multi-environment (dev/staging/prod)**|Different VMs/networks|K8s namespaces|Namespace isolation|
+|**Security boundaries**|`iptables`, groups, users|NetworkPolicy, RBAC|API server + CNI|
+|**Isolated dev env per app**|Hard, need many VMs|Pod namespaces + ephemeral containers|Linux namespaces|
+|**Ingress (public traffic)**|Manually configure Nginx|Kubernetes Ingress|Ingress Controller|
+|**Zero downtime deploy**|Very hard manually|Built-in rolling update|Deployment controller|
+|**Observability**|`top`, `dmesg`, custom scripts|`kubectl top`, Prometheus, Grafana|metrics-server, cAdvisor|
+|**Autoscaling**|Write cron jobs + scripts|HPA (CPU), VPA, KEDA|Metrics API|
+|**Hardening security**|Manually configure firewall, SELinux|PodSecurity, NetworkPolicy|Admission controllers|
+|**Multi-node networking**|Set up route tables + NAT|Automatically managed|CNI (Calico/Cilium/Flannel)|
