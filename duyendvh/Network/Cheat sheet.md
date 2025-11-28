@@ -191,3 +191,34 @@ This is a fundamental concept in C++. A **Definition** is always a **Declaration
 | **Explicit Qualification** | `namespace::identifier` | Uses the **Scope Resolution Operator (`::`)** to explicitly tell the compiler which name to use. | **Preferred.** Safe, clear, and avoids polluting the current scope.                                                                                                  |
 | **Using Declaration**      | `using std::cout;`      | Introduces a single identifier from a namespace into the current scope.                          | Okay for a few names, but use sparingly.                                                                                                                             |
 | **Using Directive**        | `using namespace std;`  | Introduces **all** names from a namespace into the current scope.                                | **Discouraged.** Often leads right back to naming collisions if multiple libraries or user code use the same identifier. **Avoid in header files and global scope.** |
+
+## Example 1: Compiler Error (Same File Scope)
+
+This happens when you try to define the same identifier twice in the same scope, or when two identifiers from different namespaces are pulled into the same scope, creating **ambiguity**.
+
+|**Scenario**|**Code**|**Result**|
+|---|---|---|
+|**Direct Redefinition (ODR Violation)**|`cpp int count = 10; int count = 5; // Error`|**Compiler Error:** `redefinition of 'count'` (Violates ODR Part 1). The compiler stops immediately.|
+|**Ambiguity via `using` Directive**|`cpp namespace A { void log(); } namespace B { void log(); } using namespace A; using namespace B; void test() { log(); // Error }`|**Compiler Error:** `call to 'log' is ambiguous`. The compiler cannot decide which `log` function to call, as both are now visible in the current scope.|
+
+---
+
+## Example 2: Linker Error (Multiple Files)
+
+This happens when two different source files (translation units) define the same non-local global identifier. The compiler sees one definition per file and is happy, but the **linker** sees two definitions for the same symbol when combining the files.
+
+|**File**|**Code**|
+|---|---|
+|**`helper.cpp`**|`cpp // Definition 1: Global function void initialize_settings() { /* ... */ }`|
+|**`main.cpp`**|`cpp // Definition 2: Global function void initialize_settings() { /* ... */ } int main() { // Linker tries to resolve this name: initialize_settings(); }`|
+
+> ❌ **Result:** **Linker Error:** `multiple definition of 'initialize_settings'` (Violates ODR Part 2). The program compiles successfully but fails at the linking stage because the linker cannot include two separate function bodies for the same global name in the final executable.
+
+### How Namespaces Fix the Linker Error
+
+If you wrap the functions in namespaces, the collision is resolved because the names are no longer identical in the global scope:
+
+|**File**|**Code (Fixed)**|**Linker Sees**|
+|---|---|---|
+|**`helper.cpp`**|`cpp namespace Helper { void initialize_settings() { /* ... */ } }`|`Helper::initialize_settings`|
+|**`main.cpp`**|`cpp namespace Main { void initialize_settings() { /* ... */ } } int main() { Helper::initialize_settings(); Main::initialize_settings(); }`|
