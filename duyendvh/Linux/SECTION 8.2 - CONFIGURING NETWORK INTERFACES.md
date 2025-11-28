@@ -255,7 +255,7 @@ The IP address configuration must be placed on the device that handles the corre
 ![[Screenshot 2025-11-24 at 01.07.53.png]]
 ![[Screenshot 2025-11-29 at 01.45.05.png]]
 
-
+![[Screenshot 2025-11-29 at 01.52.04.png]]
 ## The Connection Process (Computer-Specific)
 
 Your computer, running an operating system like Linux, macOS, or Windows, uses the **TCP/IP stack** to handle this communication.
