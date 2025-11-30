@@ -21,7 +21,7 @@
 ![[Screenshot 2025-11-24 at 01.59.16.png]]
 ![[Screenshot 2025-11-24 at 01.59.34.png]]
 ![[Screenshot 2025-11-24 at 01.59.58.png]]
-
+![[Screenshot 2025-11-30 at 14.17.55.png]]
 ## **1. Filter Table (Packet Filtering – Firewall Rules)**
 
 |Chain|Example|Meaning / When Used|
