@@ -54,7 +54,7 @@
 
 ## **4. Raw Table (Disable Connection Tracking)**
 
-|Chain|Example|Meaning / When Used|
-|---|---|---|
-|**PREROUTING**|`iptables -t raw -A PREROUTING -p tcp --dport 80 -j NOTRACK`|Apply before connection tracking. Here, packets to port 80 are **not tracked** (used for performance or special cases).|
-|**OUTPUT**|`iptables -t raw -A OUTPUT -p tcp -j NOTRACK`|Locally generated packets **not tracked**.|
+| Chain          | Example                                                      | Meaning / When Used                                                                                                     |
+| -------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| **PREROUTING** | `iptables -t raw -A PREROUTING -p tcp --dport 80 -j NOTRACK` | Apply before connection tracking. Here, packets to port 80 are **not tracked** (used for performance or special cases). |
+| **OUTPUT**     | `iptables -t raw -A OUTPUT -p tcp -j NOTRACK`                | Locally generated packets **not tracked**.                                                                              |
