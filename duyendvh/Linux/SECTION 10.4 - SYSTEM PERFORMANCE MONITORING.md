@@ -110,13 +110,14 @@ Example output:
     
 - High swap with slow system = problem; low swap = healthy system
     
-
 ---
+
+![[Screenshot 2025-11-30 at 20.18.51.png]]
+
 ![[Screenshot 2025-11-30 at 17.19.24.png]]
 ![[Screenshot 2025-11-30 at 17.19.38.png]]
 ![[Screenshot 2025-11-30 at 17.19.54.png]]
 ![[Screenshot 2025-11-30 at 17.20.15.png]]
-
 
 ![[Screenshot 2025-11-30 at 17.16.25.png]]
 ![[Screenshot 2025-11-30 at 17.16.42.png]]
