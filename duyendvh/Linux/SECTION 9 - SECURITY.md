@@ -272,3 +272,7 @@ Think of a **keyring** as a **database of GPG keys** on your computer.
 5. **Verify**
     
     - Others use your public key to verify your signature.
+![[Screenshot 2025-11-30 at 16.18.09.png]]
+
+![[Screenshot 2025-11-30 at 16.17.55.png]]
+![[Screenshot 2025-11-30 at 16.18.30.png]]
