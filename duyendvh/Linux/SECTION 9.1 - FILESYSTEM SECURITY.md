@@ -1,1 +1,2 @@
-SECTION 9.1 - FILESYSTEM SECURITY
+
+![[Screenshot 2025-11-30 at 14.25.47.png]]
