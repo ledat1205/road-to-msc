@@ -144,3 +144,6 @@ Now Git operation continues:
 ![[Screenshot 2025-11-30 at 16.02.16.png]]
 ![[Screenshot 2025-11-30 at 16.04.20.png]]
 ![[Screenshot 2025-11-30 at 16.05.20.png]]
+![[Screenshot 2025-11-30 at 16.05.37.png]]
+![[Screenshot 2025-11-30 at 16.05.55.png]]
+![[Screenshot 2025-11-30 at 16.06.13.png]]
