@@ -113,6 +113,9 @@ Example output:
 
 ---
 ![[Screenshot 2025-11-30 at 17.19.24.png]]
+![[Screenshot 2025-11-30 at 17.19.38.png]]
+![[Screenshot 2025-11-30 at 17.19.54.png]]
+![[Screenshot 2025-11-30 at 17.20.15.png]]
 
 
 ![[Screenshot 2025-11-30 at 17.16.25.png]]
