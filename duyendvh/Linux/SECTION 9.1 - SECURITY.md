@@ -137,3 +137,5 @@ Now Git operation continues:
     
 - Only cryptographic proof
 ![[Screenshot 2025-11-30 at 15.52.04.png]]
+![[Screenshot 2025-11-30 at 15.53.12.png]]
+
