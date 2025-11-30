@@ -136,3 +136,4 @@ Now Git operation continues:
 - No password reused
     
 - Only cryptographic proof
+![[Screenshot 2025-11-30 at 15.52.04.png]]
