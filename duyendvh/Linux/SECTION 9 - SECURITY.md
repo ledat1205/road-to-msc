@@ -281,3 +281,4 @@ Think of a **keyring** as a **database of GPG keys** on your computer.
 ![[Screenshot 2025-11-30 at 16.21.25.png]]
 ![[Screenshot 2025-11-30 at 16.21.51.png]]
 
+![[Screenshot 2025-11-30 at 16.22.15.png]]
