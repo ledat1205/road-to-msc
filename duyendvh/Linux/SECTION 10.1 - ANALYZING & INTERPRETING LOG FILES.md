@@ -25,3 +25,67 @@
 # ✅ **5. `journalctl --priority=3` (error logs only)**
 
 `Dec 01 08:54:23 ubuntu-server systemd[1]: Failed to start MySQL Server. Dec 01 08:54:23 ubuntu-server mysqld[1874]: ERROR: Can't find messagefile '/usr/share/mysql/errmsg.sys' Dec 01 09:12:56 ubuntu-server sshd[2012]: error: kex_exchange_identification: Connection closed by remote host Dec 01 09:13:20 ubuntu-server kernel: [  345.123456] ext4-disk corruption detected on /dev/sda1`
+
+# ✅ **6. `journalctl -b` (logs from current boot only)**
+
+`-- Logs begin at Mon 2025-12-01 10:10:01 +0000, end at Mon 2025-12-01 12:04:03 +0000. -- Dec 01 10:10:02 ubuntu kernel: [    0.000000] Command line: BOOT_IMAGE=/vmlinuz-5.15.0 root=/dev/nvme0n1p2 ro quiet splash Dec 01 10:10:03 ubuntu systemd[1]: Mounted /boot/efi. Dec 01 10:10:05 ubuntu systemd[1]: Started Network Manager. Dec 01 10:10:06 ubuntu systemd[1]: Reached target Multi-User System. Dec 01 10:10:09 ubuntu systemd[1]: Started OpenSSH server daemon.`
+
+---
+
+# ✅ **7. `journalctl -b -1` (previous boot)**
+
+`-- Reboot -- Nov 30 22:18:44 ubuntu systemd[1]: Shutting down. Nov 30 22:18:45 ubuntu systemd-shutdown[1]: Syncing filesystems and block devices... Nov 30 22:18:47 ubuntu kernel: [  176.123456] ACPI: Preparing to enter system sleep state S5 Nov 30 22:18:47 ubuntu systemd-shutdown[1]: Powering off.`
+
+---
+
+# ✅ **8. `journalctl -xe` (errors with explanations)**
+
+This shows errors + context + suggestions.
+
+`Dec 01 11:20:34 ubuntu sshd[3882]: Failed password for invalid user admin from 141.98.10.2 port 51555 ssh2 Dec 01 11:20:34 ubuntu sshd[3882]: Received disconnect from 141.98.10.2 port 51555:11: Bye Bye Dec 01 11:20:34 ubuntu sshd[3882]: Disconnected from 141.98.10.2 port 51555 Dec 01 11:20:34 ubuntu sshd[3882]: PAM service(sshd) ignoring max retries; 4 > 3 Dec 01 11:20:34 ubuntu systemd[1]: ssh.service: Failed with result 'authentication-failure'. Dec 01 11:20:34 ubuntu systemd[1]: Failed to start OpenBSD Secure Shell server. Hint: Some lines were ellipsized, use -l to show in full.`
+
+---
+
+# ✅ **9. `journalctl -u docker` (Docker logs)**
+
+`Dec 01 11:30:13 ubuntu dockerd[1024]: time="2025-12-01T11:30:13.123456789Z" level=info msg="Starting Docker" Dec 01 11:30:14 ubuntu dockerd[1024]: time="2025-12-01T11:30:14.987123456Z" level=warning msg="overlay: the backing xfs filesystem is formatted without d_type support" Dec 01 11:30:17 ubuntu dockerd[1024]: time="2025-12-01T11:30:17.123456789Z" level=info msg="Daemon has completed initialization"`
+
+---
+
+# ✅ **10. `journalctl -u kubelet` (Kubernetes node logs)**
+
+`Dec 01 11:32:41 worker-node kubelet[2233]: Starting kubelet v1.30.2 Dec 01 11:32:42 worker-node kubelet[2233]: error: Image pull failed for "my-app:latest": ErrImagePull Dec 01 11:32:47 worker-node kubelet[2233]: Back-off pulling image "my-app:latest" Dec 01 11:33:15 worker-node kubelet[2233]: Created pod sandbox: 1234abcd-5678 Dec 01 11:33:20 worker-node kubelet[2233]: Started container app`
+
+---
+
+# ✅ **11. `journalctl -u cron` (cron logs)**
+
+`Dec 01 12:00:01 ubuntu CRON[4423]: pam_unix(cron:session): session opened for user root by (uid=0) Dec 01 12:00:01 ubuntu CRON[4423]: (/usr/bin/php /var/www/backup.php) completed with exit status 0 Dec 01 12:00:01 ubuntu CRON[4423]: pam_unix(cron:session): session closed for user root`
+
+---
+
+# ✅ **12. `journalctl -u ssh` (SSH service logs)**
+
+`Dec 01 12:10:32 ubuntu sshd[5042]: Accepted publickey for ubuntu from 192.168.0.50 port 40022 ssh2  Dec 01 12:10:32 ubuntu sshd[5042]: pam_unix(sshd:session): session opened for user ubuntu Dec 01 12:12:43 ubuntu sshd[5042]: pam_unix(sshd:session): session closed for user ubuntu`
+
+---
+
+# ✅ **13. `journalctl -t <process>` (logs for a specific syslog tag)**
+
+Example: `journalctl -t sudo`
+
+`Dec 01 12:15:44 ubuntu sudo[6234]:    ubuntu : TTY=pts/0 ; PWD=/home/ubuntu ; USER=root ; COMMAND=/bin/systemctl restart nginx Dec 01 12:15:44 ubuntu sudo[6234]: pam_unix(sudo:session): session opened for user root Dec 01 12:15:44 ubuntu sudo[6234]: pam_unix(sudo:session): session closed for user root`
+
+---
+
+# ✅ **14. Logs filtered by user (`--user`)**
+
+`Dec 01 12:20:05 ubuntu systemd[873]: Started /usr/bin/code. Dec 01 12:21:02 ubuntu systemd[873]: app-gnome-terminal-5678.scope: Succeeded.`
+
+---
+
+# ✅ **15. Time-filtering example**
+
+### _Last 1 hour_
+
+`Dec 01 12:04:02 ubuntu systemd[1]: Starting Cleanup of Temporary Directories... Dec 01 12:04:03 ubuntu systemd[1]: Finished Cleanup of Temporary Directories.`
