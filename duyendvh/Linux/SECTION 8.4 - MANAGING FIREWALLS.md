@@ -10,18 +10,6 @@
 ![[Screenshot 2025-11-24 at 01.54.17.png]]
 ![[Screenshot 2025-11-24 at 01.54.49.png]]
 ![[Screenshot 2025-11-24 at 01.56.33.png]]
-
-![[Screenshot 2025-11-24 at 01.55.44.png]]
-![[Screenshot 2025-11-24 at 01.55.58.png]]
-![[Screenshot 2025-11-24 at 01.58.44.png]]
-
-![[Screenshot 2025-11-24 at 01.57.34.png]]
-
-![[Screenshot 2025-11-24 at 01.57.17.png]]
-![[Screenshot 2025-11-24 at 01.59.16.png]]
-![[Screenshot 2025-11-24 at 01.59.34.png]]
-
-
 ## **1. Filter Table (Packet Filtering – Firewall Rules)**
 
 |Chain|Example|Meaning / When Used|
@@ -58,3 +46,18 @@
 | -------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
 | **PREROUTING** | `iptables -t raw -A PREROUTING -p tcp --dport 80 -j NOTRACK` | Apply before connection tracking. Here, packets to port 80 are **not tracked** (used for performance or special cases). |
 | **OUTPUT**     | `iptables -t raw -A OUTPUT -p tcp -j NOTRACK`                | Locally generated packets **not tracked**.                                                                              |
+
+
+
+
+![[Screenshot 2025-11-24 at 01.55.44.png]]
+![[Screenshot 2025-11-24 at 01.55.58.png]]
+![[Screenshot 2025-11-24 at 01.58.44.png]]
+
+![[Screenshot 2025-11-24 at 01.57.34.png]]
+
+![[Screenshot 2025-11-24 at 01.57.17.png]]
+![[Screenshot 2025-11-24 at 01.59.16.png]]
+![[Screenshot 2025-11-24 at 01.59.34.png]]
+
+
