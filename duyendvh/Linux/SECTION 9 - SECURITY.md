@@ -223,6 +223,26 @@ GPG (**GNU Privacy Guard**) is widely used in modern software for **encryption, 
 ![[Screenshot 2025-11-30 at 16.05.55.png]]
 ![[Screenshot 2025-11-30 at 16.06.13.png]]
 ![[Screenshot 2025-11-30 at 16.07.49.png]]
+# **What is a Keyring?**
+
+Think of a **keyring** as a **database of GPG keys** on your computer.
+
+- **Public keyring:** stores **public keys of others**
+    
+    - Used to encrypt files/messages for them
+        
+    - Used to verify their signatures
+        
+- **Private keyring:** stores **your private keys**
+    
+    - Used to decrypt messages sent to you
+        
+    - Used to create digital signatures
+        
+
+**Location on macOS/Linux:**
+
+`~/.gnupg/   pubring.kbx        # public keys   private-keys-v1.d/ # private keys   trustdb.gpg        # tracks which keys you trust`
 # **Key lifecycle**
 
 1. **Generate key pair**
