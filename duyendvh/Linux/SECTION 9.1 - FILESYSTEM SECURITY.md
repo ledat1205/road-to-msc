@@ -31,3 +31,108 @@
 ![[Screenshot 2025-11-30 at 15.41.45.png]]
 ![[Screenshot 2025-11-30 at 15.46.53.png]]
 ![[Screenshot 2025-11-30 at 15.47.54.png]]
+# 🔐 **SSH Authentication Flow (GitHub / Bitbucket)**
+
+## **1️⃣ You generate keys on your computer**
+
+You create:
+
+- **Private key** → stays on your machine
+    
+- **Public key** → can be shared safely
+    
+
+Example:
+
+`id_rsa         (private) id_rsa.pub     (public)`
+
+---
+
+## **2️⃣ You copy the PUBLIC key to GitHub/Bitbucket**
+
+You upload only:
+
+`id_rsa.pub`
+
+GitHub saves that key and says:
+
+> “If someone can prove they own the matching private key, I will trust them.”
+
+---
+
+## **3️⃣ You run a Git command**
+
+Example:
+
+`git push`
+
+VS Code → Git → SSH → Contacts GitHub.
+
+---
+
+## **4️⃣ GitHub sends a challenge to your computer**
+
+GitHub says:
+
+> “Prove you have the **PRIVATE key** matching this public key.”
+
+It sends an encrypted random message (a challenge).
+
+---
+
+## **5️⃣ Your computer decrypts the challenge using PRIVATE key**
+
+Your SSH agent does:
+
+- Receives challenge
+    
+- Decrypts it using **private key**
+    
+- Sends back the answer
+    
+
+**Private key never leaves your machine.**
+
+---
+
+## **6️⃣ GitHub verifies the answer**
+
+GitHub checks:
+
+- Does the answer match?
+    
+- Does this correspond to the public key in the account?
+    
+
+If yes:
+
+> “Authentication SUCCESS. You are who you say you are.”
+
+---
+
+## **7️⃣ GitHub allows the push/pull**
+
+Now Git operation continues:
+
+- `git pull` downloads your repo
+    
+- `git push` uploads your commits
+    
+
+---
+
+# 🧠 **Visualization of the FLOW**
+
+`(Your Machine)                      (GitHub / Bitbucket) ----------------------------------------------------------- Generate keys Private key ----- stays -----> Public key -------------------> Saved in account  git push ----------------------> SSH connection start                                   "Prove you have private key" <---- Encrypted challenge ------- Decrypt challenge with private key ------ Answer challenge -------->                                   ✔ Verified = OK                                   Allow git operation`
+
+---
+
+# 🎉 You are authenticated **WITHOUT** ever sending any password
+
+- No password across the network
+    
+- No password stored in Git
+    
+- No password reused
+    
+- Only cryptographic proof
