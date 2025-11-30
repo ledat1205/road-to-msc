@@ -7,3 +7,4 @@
 ![[Screenshot 2025-11-30 at 23.54.58.png]]
 ![[Screenshot 2025-11-30 at 23.56.31.png]]
 ![[Screenshot 2025-12-01 at 00.00.16.png]]
+![[Screenshot 2025-12-01 at 00.01.39.png]]
