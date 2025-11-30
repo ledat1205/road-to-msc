@@ -222,3 +222,4 @@ GPG (**GNU Privacy Guard**) is widely used in modern software for **encryption, 
 ![[Screenshot 2025-11-30 at 16.05.37.png]]
 ![[Screenshot 2025-11-30 at 16.05.55.png]]
 ![[Screenshot 2025-11-30 at 16.06.13.png]]
+![[Screenshot 2025-11-30 at 16.07.49.png]]
