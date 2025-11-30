@@ -223,3 +223,32 @@ GPG (**GNU Privacy Guard**) is widely used in modern software for **encryption, 
 ![[Screenshot 2025-11-30 at 16.05.55.png]]
 ![[Screenshot 2025-11-30 at 16.06.13.png]]
 ![[Screenshot 2025-11-30 at 16.07.49.png]]
+# **Key lifecycle**
+
+1. **Generate key pair**
+    
+    `gpg --full-generate-key`
+    
+    - Creates **private + public keys** in your keyring.
+        
+2. **Export public key**
+    
+    `gpg --export -a "Your Name" > public.key`
+    
+    - Sends your public key to others (or uploads to key servers / GitHub).
+        
+3. **Share public key**
+    
+    - People import it into their **public keyring**:
+        
+        `gpg --import public.key`
+        
+4. **Use key**
+    
+    - **Encrypt**: Others use your public key
+        
+    - **Sign**: You use your private key
+        
+5. **Verify**
+    
+    - Others use your public key to verify your signature.
