@@ -323,3 +323,12 @@ The value of the pipeline is realized when it is consumed by various application
 Orchestration and monitoring are essential components that wrap around the entire pipeline.
 - Orchestration involves scheduling, managing, and coordinating the various tasks within the pipeline, ensuring they run in the correct order and handle dependencies.
 - Monitoring: This involves tracking the health, performance, and data quality of the pipeline, alerting on errors, and ensuring data integrity.
+
+#### **Key features of batch data processing**
+
+**Scheduled and Automation**
+Batch processing jobs are fundamentally designed for periodic execution, often triggered by a schedule (e.g., daily at midnight) or a predefined event (e.g., source file availability).
+
+This automation minimizes manual intervention, ensures consistent processing cycles, and is crucial for utilizing compute resources during off-peak hours, thereby enhancing operational efficiency.
+
+High Throughtput 
