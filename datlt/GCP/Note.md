@@ -340,3 +340,8 @@ Their architecture prioritizes the rapid processing of a large quantity of data 
 Unlike real-time or streaming systems, batch processing operates in a non-interactive, "offline" mode. There's an inherent latency between data ingestion and the availability of processed results.
 
 This characteristic makes it suitable for use cases where consolidated, accurate results are more critical than immediate responses.
+
+**Resource Optimization**
+Compute resources can be provisioned, scaled up for the duration of a job, and then de-provisioned or scaled down.
+
+This "burst" nature of resource consumption avoids the continuous operational costs associated with always-on, real-time infrastructure, making it a highly economical choice for many analytical workloads.
