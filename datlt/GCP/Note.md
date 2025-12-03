@@ -1,4 +1,4 @@
-Week 1:
+# Week 1:
 
 **Creating a Data Warehouse Through Joins and Unions**
 
@@ -295,3 +295,5 @@ This is crucial for Cymbal when they need to update product information or manag
 - 2. **Govern your data from the start:** Implementing a data governance framework with tools like Dataplex is crucial for maintaining data quality, security, and compliance.
 - 3. **Optimize for cost and performance:** Leverage BigQuery's separation of storage and compute to your advantage. Use partitioning and clustering in your tables to improve query performance and reduce costs.
 - 4. **Automate your data pipelines:** Use tools like Cloud Dataflow and Dataproc to build automated and scalable pipelines for ingesting and transforming your data.
+
+# Week 2
