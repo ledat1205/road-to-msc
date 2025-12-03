@@ -297,3 +297,25 @@ This is crucial for Cymbal when they need to update product information or manag
 - 4. **Automate your data pipelines:** Use tools like Cloud Dataflow and Dataproc to build automated and scalable pipelines for ingesting and transforming your data.
 
 # Week 2
+
+#### **Batch pipeline components and stages**
+
+**Data sources**
+Every pipeline begins with data sources. These are the origins of your raw data, which can come in various formats (e.g., CSV, JSON, database tables, log files).
+
+**Data Ingestion**
+The first stage of the pipeline is data ingestion. This is the process of acquiring raw data from its sources and transferring it into a central, temporary storage area, often called a 'landing zone' or 'staging area.'  This process is frequently automated and the data is often directly transformed and landed in the final sink.
+
+**Data Transformation**
+Ingested data may be cleaned, validated, enriched, mapped, and/or restructured into a consistent and standardized format, before landing in the destination sink.
+This stage can involve various processing steps, such as filtering out irrelevant data, aggregating information, joining data from different sources, mapping, or applying business logic.
+
+## 
+
+Data Sink
+
+Throughout the pipeline, data needs to be stored. This includes:
+
+- Intermediate storage: Often part of the ingestion or transformation stages, this holds data temporarily as it moves through the pipeline (e.g., the landing zone in Cloud Storage).
+    
+- Final storage: After transformation, the clean, structured data is loaded into a destination optimized for its intended use. The final destination is frequently a data warehouse (like BigQuery), a data lake (like Cloud Storage with formats like Apache Iceberg), or other analytical data stores.
