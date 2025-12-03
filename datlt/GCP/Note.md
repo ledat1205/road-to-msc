@@ -331,4 +331,12 @@ Batch processing jobs are fundamentally designed for periodic execution, often t
 
 This automation minimizes manual intervention, ensures consistent processing cycles, and is crucial for utilizing compute resources during off-peak hours, thereby enhancing operational efficiency.
 
-High Throughtput 
+**High Throughput**
+Batch systems are engineered to efficiently process massive datasets that have accumulated over time (ranging from gigabytes to petabytes).
+
+Their architecture prioritizes the rapid processing of a large quantity of data records, making them ideal for comprehensive data transformations, aggregations, and analyses where real-time latency is not a primary concern.
+
+**Latency**
+Unlike real-time or streaming systems, batch processing operates in a non-interactive, "offline" mode. There's an inherent latency between data ingestion and the availability of processed results.
+
+This characteristic makes it suitable for use cases where consolidated, accurate results are more critical than immediate responses.
