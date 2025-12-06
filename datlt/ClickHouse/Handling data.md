@@ -23,3 +23,6 @@ We have to have resource for background merge task beside resource for run query
 
 ![[Pasted image 20251207040041.png]]
 
+![[Pasted image 20251207040449.png]]
+
+![[Pasted image 20251207040518.png]]
