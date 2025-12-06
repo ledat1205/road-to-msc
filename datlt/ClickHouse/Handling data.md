@@ -30,4 +30,5 @@ We have to have resource for background merge task beside resource for run query
 ![[Pasted image 20251207040758.png]]
 
 full scan workflow:
-- full a
+- break down to all granule
+- each granule will be handled by a thread (some thread c)
