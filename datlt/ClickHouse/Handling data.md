@@ -28,3 +28,6 @@ We have to have resource for background merge task beside resource for run query
 ![[Pasted image 20251207040518.png]]
 
 ![[Pasted image 20251207040758.png]]
+
+full scan workflow:
+- full a
