@@ -18,4 +18,8 @@ Note: in case care about real-time much
 ![[Pasted image 20251207035627.png]]
 
 ![[Pasted image 20251207035808.png]]
-We can not control, when part is merge to bigger part
+We can not control, when part is merge to bigger part.
+We have to have resource for background merge task beside resource for run
+
+![[Pasted image 20251207040041.png]]
+
