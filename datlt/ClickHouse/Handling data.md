@@ -16,3 +16,5 @@ Note: in case care about real-time much
 ![[Pasted image 20251207035510.png]]
 
 ![[Pasted image 20251207035627.png]]
+
+![[Pasted image 20251207035808.png]]
