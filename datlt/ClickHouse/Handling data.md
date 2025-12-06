@@ -11,5 +11,8 @@ Integration engines: Data will stream from other source to CH when query. Ex: S3
 ![[Pasted image 20251207035426.png]]
 
 can use `async_insert` to buffer row for later insert
+Note: in case care about real-time much
 
 ![[Pasted image 20251207035510.png]]
+
+![[Pasted image 20251207035627.png]]
