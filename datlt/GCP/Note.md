@@ -345,3 +345,6 @@ This characteristic makes it suitable for use cases where consolidated, accurate
 Compute resources can be provisioned, scaled up for the duration of a job, and then de-provisioned or scaled down.
 
 This "burst" nature of resource consumption avoids the continuous operational costs associated with always-on, real-time infrastructure, making it a highly economical choice for many analytical workloads.
+
+
+# Week 4
