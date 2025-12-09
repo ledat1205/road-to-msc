@@ -222,3 +222,437 @@ If you wrap the functions in namespaces, the collision is resolved because the n
 |---|---|---|
 |**`helper.cpp`**|`cpp namespace Helper { void initialize_settings() { /* ... */ } }`|`Helper::initialize_settings`|
 |**`main.cpp`**|`cpp namespace Main { void initialize_settings() { /* ... */ } } int main() { Helper::initialize_settings(); Main::initialize_settings(); }`|
+# ✅ **1. Raw Array**
+
+`int arr[5] = {1, 2, 3, 4, 5};`
+
+Common operations
+
+- `arr[i]` — access
+    
+- `sizeof(arr)/sizeof(arr[0])` — size
+    
+- No insert/delete (fixed size)
+    
+- Decays to pointer → dangerous if not careful
+    
+
+---
+
+# ✅ **2. std::vector**
+
+`vector<int> v = {1, 2, 3};`
+
+Common methods
+
+- `v.push_back(x)`
+    
+- `v.pop_back()`
+    
+- `v.insert(pos, x)`
+    
+- `v.erase(pos)`
+    
+- `v.clear()`
+    
+- `v.size()`
+    
+- `v.capacity()`
+    
+- `v.reserve(n)` — optimize memory allocations
+    
+- `v.shrink_to_fit()`
+    
+- `v.front()` / `v.back()`
+    
+- `v.data()` → raw pointer
+    
+- `std::sort(v.begin(), v.end())`
+    
+
+---
+
+# ✅ **3. std::array**
+
+`array<int, 5> a = {1,2,3,4,5};`
+
+Common methods
+
+- `a.size()`
+    
+- `a.fill(value)`
+    
+- `a.front()` / `a.back()`
+    
+- `a.data()`
+    
+- Supports all STL algorithms: sort, reverse, accumulate
+    
+
+---
+
+# ✅ **4. std::list** (doubly linked list)
+
+`list<int> l = {1,2,3};`
+
+Common methods
+
+- `l.push_front(x)` / `l.push_back(x)`
+    
+- `l.pop_front()` / `l.pop_back()`
+    
+- `l.insert(it, x)`
+    
+- `l.erase(it)`
+    
+- `l.remove(x)` — remove all with value x
+    
+- `l.sort()` — optimized merge sort
+    
+- `l.reverse()`
+    
+- `l.splice(pos, other_list)` — O(1) list transfer
+    
+- `l.size()` (C++11+ O(1))
+    
+- No random access (`l[i]` ❌)
+    
+
+---
+
+# ✅ **5. std::forward_list** (singly linked list)
+
+`forward_list<int> fl = {1,2,3};`
+
+Common methods
+
+- `fl.push_front(x)`
+    
+- `fl.pop_front()`
+    
+- `fl.insert_after(it, x)`
+    
+- `fl.erase_after(it)`
+    
+- `fl.remove(x)`
+    
+- `fl.sort()`
+    
+- `fl.reverse()`
+    
+- No `size()` (must count manually)
+    
+
+---
+
+# ✅ **6. std::deque**
+
+`deque<int> d = {1,2};`
+
+Common methods
+
+- `d.push_front(x)` / `d.push_back(x)`
+    
+- `d.pop_front()` / `d.pop_back()`
+    
+- `d[idx]` random access
+    
+- `d.size()`
+    
+- `d.clear()`
+    
+- Faster front insert/removal than vector
+    
+
+---
+
+# ✅ **7. std::stack**
+
+`stack<int> s;`
+
+Common methods
+
+- `s.push(x)`
+    
+- `s.pop()`
+    
+- `s.top()`
+    
+- `s.size()`
+    
+- `s.empty()`
+    
+
+Note: no iteration allowed.
+
+---
+
+# ✅ **8. std::queue**
+
+`queue<int> q;`
+
+Common methods
+
+- `q.push(x)`
+    
+- `q.pop()`
+    
+- `q.front()`
+    
+- `q.back()`
+    
+- `q.size()`
+    
+- `q.empty()`
+    
+
+---
+
+# ✅ **9. std::priority_queue** (heap)
+
+`priority_queue<int> pq;`
+
+Common methods
+
+- `pq.push(x)`
+    
+- `pq.pop()`
+    
+- `pq.top()`
+    
+- `pq.size()`
+    
+- `pq.empty()`
+    
+
+Min-heap:
+
+`priority_queue<int, vector<int>, greater<int>> minpq;`
+
+---
+
+# ✅ **10. std::set** (balanced BST)
+
+`set<int> s = {1,3,5};`
+
+Common methods
+
+- `s.insert(x)`
+    
+- `s.erase(x)` or `s.erase(it)`
+    
+- `s.find(x)`
+    
+- `s.lower_bound(x)` — first ≥ x
+    
+- `s.upper_bound(x)` — first > x
+    
+- `s.count(x)`
+    
+- `s.empty()`
+    
+- Ordered iteration
+    
+
+---
+
+# ✅ **11. std::multiset**
+
+`multiset<int> ms;`
+
+Common methods
+
+- `ms.insert(x)`
+    
+- `ms.erase(ms.find(x))` — erase single
+    
+- `ms.count(x)`
+    
+- `ms.equal_range(x)` — all duplicates
+    
+- Sorted iteration
+    
+
+---
+
+# ✅ **12. std::unordered_set** (hash set)
+
+`unordered_set<int> us;`
+
+Common methods
+
+- `us.insert(x)`
+    
+- `us.erase(x)`
+    
+- `us.find(x)`
+    
+- `us.count(x)`
+    
+- `us.bucket_count()` — hash buckets
+    
+- `us.load_factor()` / `us.rehash(n)` — tuning
+    
+
+Fast O(1) average.
+
+---
+
+# ✅ **13. std::map** (ordered key-value)
+
+`map<string, int> m;`
+
+Common methods
+
+- `m[key] = value`
+    
+- `m.at(key)` — throws if missing
+    
+- `m.insert({k,v})`
+    
+- `m.erase(key)`
+    
+- `m.find(key)`
+    
+- `m.lower_bound(key)`
+    
+- `m.upper_bound(key)`
+    
+- `m.empty()` / `m.size()`
+    
+
+Iteration is sorted by key.
+
+---
+
+# ✅ **14. std::multimap**
+
+`multimap<string,int> mm;`
+
+Common methods
+
+- `mm.insert({k,v})`
+    
+- `mm.equal_range(k)` — range of values
+    
+- `mm.erase(it)`
+    
+
+Allows duplicate keys.
+
+---
+
+# ✅ **15. std::unordered_map** (MOST used map in modern C++)
+
+`unordered_map<string,int> um;`
+
+Common methods
+
+- `um[key] = value`
+    
+- `um.at(key)`
+    
+- `um.find(key)`
+    
+- `um.erase(key)`
+    
+- `um.count(key)`
+    
+- `um.rehash(n)` — avoid rehashing
+    
+- `um.bucket_count()`
+    
+
+O(1) average, fastest map.
+
+---
+
+# ✅ **16. std::string**
+
+`string s = "hello";`
+
+Common methods
+
+- `s.size()` / `s.length()`
+    
+- `s.empty()`
+    
+- `s.clear()`
+    
+- `s.push_back(x)` / `s.pop_back()`
+    
+- `s.substr(pos, len)`
+    
+- `s.find(str)`
+    
+- `s.replace(pos, len, newstr)`
+    
+- `s.append(str)`
+    
+- `s.starts_with() / s.ends_with()` (C++20)
+    
+- `stoi(s)`, `stod(s)` — convert
+    
+
+---
+
+# ✅ **17. std::pair**
+
+`pair<int,string> p = {1,"hi"};`
+
+Common usage
+
+- `p.first`
+    
+- `p.second`
+    
+- `auto [a, b] = p;` (structured binding)
+    
+- Often used in maps, priority queues
+    
+
+---
+
+# ✅ **18. std::tuple**
+
+`tuple<int,string,double> t(1,"hi",3.14);`
+
+Common usage
+
+- `auto [a,b,c] = t`
+    
+- `get<0>(t)`
+    
+- `make_tuple(...)`
+    
+- `tuple_size<T>::value`
+    
+- `tuple_element<i,T>::type`
+    
+
+---
+
+# ✅ **19. std::bitset**
+
+`bitset<8> b("10101010");`
+
+Common methods
+
+- `b.set(i)`
+    
+- `b.reset(i)`
+    
+- `b.flip(i)`
+    
+- `b.any()`
+    
+- `b.none()`
+    
+- `b.count()` — # of 1 bits
+    
+- `b.to_string()`
+    
+- `b.to_ulong()`
+    
+
+Efficient bit manipulation.
