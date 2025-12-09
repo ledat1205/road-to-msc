@@ -222,3 +222,188 @@ If you wrap the functions in namespaces, the collision is resolved because the n
 |---|---|---|
 |**`helper.cpp`**|`cpp namespace Helper { void initialize_settings() { /* ... */ } }`|`Helper::initialize_settings`|
 |**`main.cpp`**|`cpp namespace Main { void initialize_settings() { /* ... */ } } int main() { Helper::initialize_settings(); Main::initialize_settings(); }`|
+# ✅ **1. Arrays**
+
+### **Raw array**
+
+`int arr[5] = {1, 2, 3, 4, 5};`
+
+### **Manipulation**
+
+- Access: `arr[i]`
+    
+- Size: No built‑in size → must track manually
+    
+
+---
+
+# ✅ **2. `std::vector` — dynamic array (most common)**
+
+### **Create**
+
+`vector<int> v = {1, 2, 3};`
+
+### **Manipulate**
+
+`v.push_back(4);     // add at end v.pop_back();       // remove last v[0];               // access v.size();           // number of elements v.begin(), v.end(); // iterators v.insert(v.begin()+1, 99); // insert at index 1 v.erase(v.begin()+1);      // erase index 1`
+
+### **Why use it?**
+
+✔ Fast random access  
+✔ Grows automatically  
+✔ Most commonly used container
+
+---
+
+# ✅ **3. `std::array` — fixed-size array with STL features**
+
+`array<int, 5> a = {1, 2, 3, 4, 5}; a[0]; a.size();`
+
+---
+
+# ✅ **4. `std::list` — doubly linked list**
+
+### **Create**
+
+`list<int> l = {1, 2, 3};`
+
+### **Manipulate**
+
+`l.push_back(4); l.push_front(0); l.pop_back(); l.pop_front(); l.insert(next(l.begin()), 99); // second position l.erase(next(l.begin()));`
+
+### **Why use it?**
+
+✔ Fast insertion/removal anywhere  
+✘ Slow random access (no `l[i]`)
+
+---
+
+# ✅ **5. `std::forward_list` — singly linked list (rarely used)**
+
+`forward_list<int> fl = {1, 2, 3}; fl.push_front(0); fl.insert_after(fl.begin(), 99); fl.erase_after(fl.begin());`
+
+---
+
+# ✅ **6. `std::deque` — double‑ended queue**
+
+`deque<int> d = {1, 2}; d.push_front(0); d.push_back(3); d.pop_front(); d.pop_back();`
+
+### **Why use it?**
+
+✔ Fast push/pop at both ends  
+✔ Random access allowed (`d[i]`)
+
+---
+
+# ✅ **7. `std::stack` — LIFO**
+
+`stack<int> s; s.push(1); s.push(2); s.top(); // 2 s.pop();`
+
+---
+
+# ✅ **8. `std::queue` — FIFO**
+
+`queue<int> q; q.push(1); q.push(2); q.front(); // 1 q.pop();`
+
+---
+
+# ✅ **9. `std::priority_queue` — max heap (default)**
+
+`priority_queue<int> pq; pq.push(3); pq.push(10); pq.push(1); pq.top(); // 10 pq.pop();`
+
+### **Min heap**
+
+`priority_queue<int, vector<int>, greater<int>> minpq;`
+
+---
+
+# ✅ **10. `std::set` — ordered, unique elements**
+
+### **Balanced BST (red-black tree)**
+
+`set<int> s = {3, 1, 4}; s.insert(2); s.erase(3); s.count(1); // check exist`
+
+### **Properties**
+
+✔ Sorted  
+✔ Unique  
+✔ Logarithmic operations
+
+---
+
+# ✅ **11. `std::multiset` — ordered, allows duplicates**
+
+`multiset<int> ms; ms.insert(1); ms.insert(1); ms.insert(2); ms.erase(ms.find(1)); // erase ONLY ONE`
+
+---
+
+# ✅ **12. `std::unordered_set` — hash set**
+
+Faster than `set`, but **not sorted**.
+
+`unordered_set<int> us; us.insert(1); us.insert(2); us.count(1); // check exist us.erase(2);`
+
+### **When to use?**
+
+✔ O(1) average lookup  
+✘ no ordering
+
+---
+
+# ✅ **13. `std::map` — key-value ordered map**
+
+### **Balanced BST (sorted by keys)**
+
+`map<string, int> m; m["apple"] = 3; m["banana"] = 10; m.erase("apple");`
+
+### **Iterate**
+
+`for (auto& [k, v] : m)     cout << k << " = " << v << endl;`
+
+---
+
+# ✅ **14. `std::multimap` — multiple values per key**
+
+`multimap<string, int> mm; mm.insert({"apple", 1}); mm.insert({"apple", 2});`
+
+---
+
+# ✅ **15. `std::unordered_map` — hash map**
+
+### **MOST commonly used map**
+
+`unordered_map<string, int> um; um["a"] = 10; um["b"] = 20; um.erase("a");`
+
+### **Check exist**
+
+`if (um.find("a") != um.end()) {}`
+
+---
+
+# ✅ **16. Strings**
+
+### **C-style**
+
+`char s[10] = "hello";`
+
+### **`std::string`**
+
+`string s = "hello"; s += " world"; s.substr(0, 3);    // "hel" s.find("lo");`
+
+---
+
+# ✅ **17. `std::pair`**
+
+`pair<int, string> p = {1, "hi"}; p.first;  // 1 p.second; // hi`
+
+---
+
+# ✅ **18. `std::tuple`**
+
+`tuple<int, string, double> t(1, "hi", 3.14); auto [a, b, c] = t;`
+
+---
+
+# ✅ **19. `std::bitset` — fixed-size bit array**
+
+`bitset<8> b("10101010"); b[0];     // access b.set(1); // set bit b.reset(2); b.count(); // number of bits = 1`
