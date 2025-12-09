@@ -440,9 +440,8 @@ Unordered key-value.
 | Iterators | As unordered_set | | |
 | Capacity | As unordered_set | | |
 | Hash Policy | As unordered_set | | |
-## std::string (String) - <string>
 
-Specialized vector<char>-like for text.
+## std::string
 
 | Category     | Method                                                                 | Description                       | Notes                                |
 | ------------ | ---------------------------------------------------------------------- | --------------------------------- | ------------------------------------ |
@@ -459,3 +458,15 @@ Specialized vector<char>-like for text.
 | Iterators    | As vector                                                              |                                   |                                      |
 | Capacity     | `size()` / `length()` / `empty()` / `capacity()` / `max_size()`        | length() == size()                |                                      |
 | Other        | `operator+=` / global `+`                                              | Concat                            |                                      |
+
+|Category|Method|Description|Notes|
+|---|---|---|---|
+|Constructors|`bitset<N>()` / `bitset<N>(unsigned long val)` / from string|N template param||
+|Access|`operator[](size_t pos)` / `test(pos)`|Bit at pos (test throws)||
+||`count()`|Set bits||
+||`any()` / `all()` / `none()`|Bits set? (all C++11)||
+|Modifiers|`set(pos, val=1)` / `reset(pos)` / `flip(pos)`|Set/reset/flip bit|All bits if no pos|
+||`operator&= /|= / ^= / ~`|Bitwise ops|
+||`operator<<= / >>=`|Shift||
+|Other|`to_string()` / `to_ulong()` / `to_ullong()`|Convert (ullong C++11)||
+||`size()`|N||
