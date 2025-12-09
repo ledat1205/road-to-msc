@@ -33,51 +33,114 @@ The BPM ensures data integrity and supports concurrent access by multiple thread
 - **Thread Safety:** The entire manager and its internal data structures must be protected by **latches (locks)** to prevent race conditions when multiple threads try to access or modify pages concurrently.
 
 
-### 1. `Evict()`
+## 1. Implement the Adaptive Replacement Cache (ARC) Replacer (Task #1) 💾
 
-- **Purpose:** The core function that selects and returns a victim frame for eviction.
+The ARC Replacer is a standalone component, making it the best starting point.
+
+- **Data Structures:** You will need to implement the logic for the four main lists that define the ARC policy:
     
-- **Logic:** Implements the actual ARC policy to choose a frame ID based on the internal T1 and T2 lists.
+    - **T1 & T2:** The MRU (most recently used, accessed once) and MFU (most frequently used, accessed multiple times) lists for pages _in_ the buffer pool.
+        
+    - **B1 & B2:** The "ghost" lists for recently evicted pages, which are crucial for the _adaptive_ part of the policy.
+        
+    - Use appropriate **STL containers** (e.g., `std::list` for ordered lists and `std::unordered_map` for fast lookups) to manage these lists and quickly find a page's location.
+        
+- **Core Logic:** Focus on the two primary methods:
     
-    - It first checks if any frame is currently marked as evictable.
+    - **`RecordAccess()`:** Implements the complex state transitions described in the project specification. This method updates the page's position across the four lists and adaptively adjusts the target size for the MRU list (`p`).
         
-    - It then applies the adaptive rules (comparing the MRU target size to the T1 list size) to decide whether to evict from the **T1 (Recency)** list or the **T2 (Frequency)** list.
+    - **`Evict()`:** Determines which frame to evict based on the adaptive policy (prioritizing MRU or MFU eviction based on the current target size).
         
-    - If a victim is found, it is removed from the internal tracking lists, and its ID is returned.
-        
-- **Return Type:** Returns the `frame_id_t` of the victim frame, or `std::nullopt` if no evictable frames are available.
+- **Thread Safety:** Since the BPM will call the replacer concurrently, you **must use a latch** (like `std::mutex`) to protect all internal data structures of the `ArcReplacer` from race conditions.
     
 
-### 2. `RecordAccess(frame_id_t frame_id, page_id_t page_id)`
+---
 
-- **Purpose:** Notifies the replacer that a specific page in a frame has been accessed by a thread.
+## 2. Implement the Disk Scheduler (Task #2) 💿
+
+The Disk Scheduler handles all disk I/O asynchronously, preventing the main thread from blocking.
+
+- **Channel Implementation:** Utilize the provided `Channel` class (a thread-safe queue) to store `DiskRequest` structs.
     
-- **Logic:** This is where the complex state management of ARC happens:
+    - **Enqueue:** When the BPM needs to read or write a page, it will add a request to this queue.
+        
+    - **Dequeue:** The scheduler's background thread continuously polls the queue for new requests.
+        
+- **Background Worker Thread:** Create a persistent thread (e.g., using `std::thread`) within the `DiskScheduler` constructor.
     
-    - It checks which of the four lists (T1, T2, B1, B2) the page ID belongs to.
+    - This thread's primary loop should repeatedly:
         
-    - If the page is currently **resident** (in T1 or T2), it moves the page to the front of **T2** (marking it as frequently used).
+        1. Wait for and dequeue a `DiskRequest`.
+            
+        2. Call the underlying `DiskManager`'s `ReadPage()` or `WritePage()` methods.
+            
+        3. Signal the requesting component (the BPM) that the I/O is complete (often done via a `std::promise/std::future` mechanism embedded in the request struct).
+            
+- **Cleanup:** Implement the destructor to safely shut down the background thread and ensure it finishes processing any remaining requests.
+    
+
+---
+
+## 3. Implement the Buffer Pool Manager (BPM) (Task #3) 🧠
+
+The BPM ties everything together and must be the final component you implement.
+
+### A. Data Structures and Initialization
+
+- **Page Table:** Use a thread-safe hash map (`std::unordered_map<page\_id\_t, frame\_id\_t>`) to map a page ID to the frame that currently holds it.
+    
+- **Free List:** Maintain a list of currently available (unoccupied) frame IDs.
+    
+- **Frame Headers:** Manage the necessary metadata for each frame: `pin_count_` (atomic), `is_dirty_`, and the actual `page_id_`.
+    
+- **Integration:** The BPM class must contain instances of your implemented **`ArcReplacer`** and **`DiskScheduler`**.
+    
+
+### B. Core BPM Logic Flow
+
+The most complex part is managing the workflow for fetching and evicting pages, which requires strict adherence to concurrency rules.
+
+#### **`FetchPage(page_id)`**
+
+1. **Acquire Latch:** Lock the BPM's main latch to protect its internal data structures (page table, free list, etc.).
+    
+2. **Page Table Check (Hit):** Check the page table. If the page is already in a frame (a **buffer pool hit**):
+    
+    - Increment the frame's `pin_count_`.
         
-    - If the page is a **ghost hit** (in B1 or B2), it triggers the **adaptive size adjustment** of the T1 target size (`p`), proving the eviction decision needs tuning. The page is then moved into the T2 resident list.
+    - Call the `ArcReplacer::RecordAccess()` method.
         
-    - If the page is a **miss** (not in any list), it is added to the front of **T1**.
+    - If the page's old pin count was 0, call `ArcReplacer::SetEvictable(false)`.
+        
+    - Release the latch and return the page.
+        
+3. **Page Table Miss (Miss):** If the page is not in memory:
+    
+    - **Find a Free Frame:**
+        
+        - First, check the **free list**. If a free frame is available, pop it.
+            
+        - If the free list is empty, call **`ArcReplacer::Evict()`** to find a victim frame. If `Evict()` fails (no evictable pages), return an error.
+            
+    - **Eviction (if necessary):** If a victim frame was found:
+        
+        - If the victim page's `is\_dirty\_` flag is true, schedule a write-back operation via the **`DiskScheduler`** (this is where you may need to release and re-acquire your latch, or use promises, to avoid blocking while waiting for I/O).
+            
+        - Update the page table to remove the victim page's entry.
+            
+    - **Load New Page:**
+        
+        - Update the frame's metadata to store the new `page\_id`.
+            
+        - Schedule a read operation via the **`DiskScheduler`** to load the data from disk into the frame.
+            
+    - **Final Update:** Increment the new page's `pin_count_`, update the page table with the new mapping, call `ArcReplacer::RecordAccess()`, release the latch, and return the page.
         
 
-### 3. `SetEvictable(frame_id_t frame_id, bool set_evictable)`
+#### **`UnpinPage(page_id, is_dirty)`**
 
-- **Purpose:** Allows the Buffer Pool Manager to explicitly control whether a frame can be chosen for eviction.
+1. Decrement the frame's `pin_count_`.
     
-- **Logic:** This function is called by the BPM when a page's pin count changes:
+2. If `is_dirty` is true, set the frame's `is_dirty_` flag to true.
     
-    - When a page's pin count drops to zero, the BPM calls `SetEvictable(frame_id, **true**)` to make it available for eviction.
-        
-    - When the BPM pins an unpinned page (pin count goes from 0 to 1), it calls `SetEvictable(frame_id, **false**)` to protect it from eviction.
-        
-    - It also updates the replacer's internal count of available evictable frames.
-        
-
-### 4. `Size()`
-
-- **Purpose:** Returns the current number of frames that are available to be evicted.
-    
-- **Logic:** Simply returns the count of frames currently marked as evictable. The BPM uses this to quickly check if an eviction is possible before committing to finding a victim.
+3. If the `pin_count_` drops to zero, call **`ArcReplacer::SetEvictable(true)`**.
