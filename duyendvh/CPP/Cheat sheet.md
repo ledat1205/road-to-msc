@@ -440,37 +440,22 @@ Unordered key-value.
 | Iterators | As unordered_set | | |
 | Capacity | As unordered_set | | |
 | Hash Policy | As unordered_set | | |
+## std::string (String) - <string>
 
-## std::string (String) - `<string>`
 Specialized vector<char>-like for text.
 
-| Category | Method | Description | Notes |
-|----------|--------|-------------|-------|
-| Constructors | `string()` / `string(const char* s)` / from range / n chars | | |
-| Access | `at(pos)` / `operator[]` / `front()` / `back()` / `data()` / `c_str()` | c_str() null-terminated | data() const char* (C++11 non-const) |
-| Modifiers | `append(const string& str)` / `append(const char* s)` | Concat | + overloads |
-| | `push_back(char c)` / `pop_back()` | | |
-| | `insert(pos, str)` / `erase(pos, len)` / `replace(pos, len, str)` | | |
-| | `clear()` / `resize(n, c)` / `assign(str)` / `swap(...)` | | |
-| | `reserve(n)` / `shrink_to_fit()` | As vector | |
-| Search | `find(str, pos=0)` / `rfind(...)` / `find_first_of(...)` etc. | Returns size_t, npos if not found | |
-| Substring | `substr(pos=0, len=npos)` | | |
-| Compare | `compare(str)` / operators ==, < etc. | | |
-| Iterators | As vector | | |
-| Capacity | `size()` / `length()` / `empty()` / `capacity()` / `max_size()` | length() == size() | |
-| Other | `operator+=` / global `+` | Concat | |
-
-## std::bitset (Fixed-Size Bit Array) - `<bitset>`
-For bit manipulation, fixed at compile-time.
-
-| Category | Method | Description | Notes |
-|----------|--------|-------------|-------|
-| Constructors | `bitset<N>()` / `bitset<N>(unsigned long val)` / from string | N template param | |
-| Access | `operator[](size_t pos)` / `test(pos)` | Bit at pos (test throws) | |
-| | `count()` | Set bits | |
-| | `any()` / `all()` / `none()` | Bits set? (all C++11) | |
-| Modifiers | `set(pos, val=1)` / `reset(pos)` / `flip(pos)` | Set/reset/flip bit | All bits if no pos |
-| | `operator&= / |= / ^= / ~` | Bitwise ops | |
-| | `operator<<= / >>=` | Shift | |
-| Other | `to_string()` / `to_ulong()` / `to_ullong()` | Convert (ullong C++11) | |
-| | `size()` | N | |
+| Category     | Method                                                                 | Description                       | Notes                                |
+| ------------ | ---------------------------------------------------------------------- | --------------------------------- | ------------------------------------ |
+| Constructors | `string()` / `string(const char* s)` / from range / n chars            |                                   |                                      |
+| Access       | `at(pos)` / `operator[]` / `front()` / `back()` / `data()` / `c_str()` | c_str() null-terminated           | data() const char* (C++11 non-const) |
+| Modifiers    | `append(const string& str)` / `append(const char* s)`                  | Concat                            | + overloads                          |
+|              | `push_back(char c)` / `pop_back()`                                     |                                   |                                      |
+|              | `insert(pos, str)` / `erase(pos, len)` / `replace(pos, len, str)`      |                                   |                                      |
+|              | `clear()` / `resize(n, c)` / `assign(str)` / `swap(...)`               |                                   |                                      |
+|              | `reserve(n)` / `shrink_to_fit()`                                       | As vector                         |                                      |
+| Search       | `find(str, pos=0)` / `rfind(...)` / `find_first_of(...)` etc.          | Returns size_t, npos if not found |                                      |
+| Substring    | `substr(pos=0, len=npos)`                                              |                                   |                                      |
+| Compare      | `compare(str)` / operators ==, < etc.                                  |                                   |                                      |
+| Iterators    | As vector                                                              |                                   |                                      |
+| Capacity     | `size()` / `length()` / `empty()` / `capacity()` / `max_size()`        | length() == size()                |                                      |
+| Other        | `operator+=` / global `+`                                              | Concat                            |                                      |
