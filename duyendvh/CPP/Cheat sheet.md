@@ -222,28 +222,43 @@ If you wrap the functions in namespaces, the collision is resolved because the n
 |---|---|---|
 |**`helper.cpp`**|`cpp namespace Helper { void initialize_settings() { /* ... */ } }`|`Helper::initialize_settings`|
 |**`main.cpp`**|`cpp namespace Main { void initialize_settings() { /* ... */ } } int main() { Helper::initialize_settings(); Main::initialize_settings(); }`|
-# ✅ **1. Raw Array**
+# 🔵 **1. Raw Array**
 
-`int arr[5] = {1, 2, 3, 4, 5};`
+`int arr[5] = {1,2,3,4,5};`
 
-Common operations
-
-- `arr[i]` — access
+- Access: `arr[i]`
     
-- `sizeof(arr)/sizeof(arr[0])` — size
+- Size: `sizeof(arr)/sizeof(arr[0])`
     
-- No insert/delete (fixed size)
+- No insert/delete
     
-- Decays to pointer → dangerous if not careful
+- Decays to pointer
     
 
 ---
 
-# ✅ **2. std::vector**
+# 🔵 **2. std::vector** (Dynamic array)
 
-`vector<int> v = {1, 2, 3};`
+`vector<int> v;`
 
-Common methods
+### Access & size
+
+- `v[i]`
+    
+- `v.at(i)` _(bounds-checked)_
+    
+- `v.front()`
+    
+- `v.back()`
+    
+- `v.data()`
+    
+- `v.size()`
+    
+- `v.empty()`
+    
+
+### Insert/remove
 
 - `v.push_back(x)`
     
@@ -251,51 +266,61 @@ Common methods
     
 - `v.insert(pos, x)`
     
+- `v.insert(pos, count, x)`
+    
 - `v.erase(pos)`
+    
+- `v.erase(first, last)`
     
 - `v.clear()`
     
-- `v.size()`
+- `v.emplace(pos, args...)`
+    
+- `v.emplace_back(args...)` _(no copies, constructs in-place)_
+    
+
+### Capacity control
+
+- `v.reserve(n)`
     
 - `v.capacity()`
     
-- `v.reserve(n)` — optimize memory allocations
-    
 - `v.shrink_to_fit()`
-    
-- `v.front()` / `v.back()`
-    
-- `v.data()` → raw pointer
-    
-- `std::sort(v.begin(), v.end())`
     
 
 ---
 
-# ✅ **3. std::array**
+# 🔵 **3. std::array** (Fixed-size)
 
-`array<int, 5> a = {1,2,3,4,5};`
+`array<int, 5> a;`
 
-Common methods
-
+- `a[i]` / `a.at(i)`
+    
+- `a.front()` / `a.back()`
+    
 - `a.size()`
     
 - `a.fill(value)`
     
-- `a.front()` / `a.back()`
-    
 - `a.data()`
     
-- Supports all STL algorithms: sort, reverse, accumulate
+- Supports STL algorithms
     
 
 ---
 
-# ✅ **4. std::list** (doubly linked list)
+# 🔵 **4. std::list** (Doubly linked list)
 
-`list<int> l = {1,2,3};`
+`list<int> l;`
 
-Common methods
+### Access
+
+- `l.front()`
+    
+- `l.back()`
+    
+
+### Insert/remove
 
 - `l.push_front(x)` / `l.push_back(x)`
     
@@ -305,27 +330,41 @@ Common methods
     
 - `l.erase(it)`
     
-- `l.remove(x)` — remove all with value x
+- `l.erase(first, last)`
     
-- `l.sort()` — optimized merge sort
+- `l.remove(value)` _(remove all matching)_
+    
+- `l.remove_if(pred)`
+    
+- `l.clear()`
+    
+
+### Special linked list features (vector cannot do)
+
+- `l.sort()`
     
 - `l.reverse()`
     
-- `l.splice(pos, other_list)` — O(1) list transfer
+- `l.unique()` _(remove consecutive duplicates)_
     
-- `l.size()` (C++11+ O(1))
+- `l.splice(pos, other)` _(O(1) move nodes across lists)_
     
-- No random access (`l[i]` ❌)
+
+### Size
+
+- `l.size()` (O(1) since C++11)
+    
+- `l.empty()`
     
 
 ---
 
-# ✅ **5. std::forward_list** (singly linked list)
+# 🔵 **5. std::forward_list** (Singly linked list — minimal)
 
-`forward_list<int> fl = {1,2,3};`
+`forward_list<int> fl;`
 
-Common methods
-
+- `fl.front()`
+    
 - `fl.push_front(x)`
     
 - `fl.pop_front()`
@@ -334,43 +373,43 @@ Common methods
     
 - `fl.erase_after(it)`
     
-- `fl.remove(x)`
+- `fl.remove(value)`
+    
+- `fl.remove_if(pred)`
     
 - `fl.sort()`
     
-- `fl.reverse()`
-    
-- No `size()` (must count manually)
+- `fl.reverse()`  
+    ❌ No `back()`  
+    ❌ No `size()`
     
 
 ---
 
-# ✅ **6. std::deque**
+# 🔵 **6. std::deque** (Double-ended queue)
 
-`deque<int> d = {1,2};`
+`deque<int> d;`
 
-Common methods
-
+- `d[i]` (random access)
+    
+- `d.front()` / `d.back()`
+    
 - `d.push_front(x)` / `d.push_back(x)`
     
 - `d.pop_front()` / `d.pop_back()`
     
-- `d[idx]` random access
+- `d.insert()` / `d.erase()`
     
 - `d.size()`
     
 - `d.clear()`
     
-- Faster front insert/removal than vector
-    
 
 ---
 
-# ✅ **7. std::stack**
+# 🔵 **7. std::stack** (LIFO)
 
-`stack<int> s;`
-
-Common methods
+Wrapper around vector/deque.
 
 - `s.push(x)`
     
@@ -383,15 +422,11 @@ Common methods
 - `s.empty()`
     
 
-Note: no iteration allowed.
-
 ---
 
-# ✅ **8. std::queue**
+# 🔵 **8. std::queue** (FIFO)
 
-`queue<int> q;`
-
-Common methods
+Wrapper around deque.
 
 - `q.push(x)`
     
@@ -408,11 +443,9 @@ Common methods
 
 ---
 
-# ✅ **9. std::priority_queue** (heap)
+# 🔵 **9. std::priority_queue** (Heap)
 
 `priority_queue<int> pq;`
-
-Common methods
 
 - `pq.push(x)`
     
@@ -431,55 +464,57 @@ Min-heap:
 
 ---
 
-# ✅ **10. std::set** (balanced BST)
+# 🔵 **10. std::set** (Ordered tree, unique keys)
 
-`set<int> s = {1,3,5};`
+`set<int> s;`
 
-Common methods
+### Insert/remove
 
 - `s.insert(x)`
     
-- `s.erase(x)` or `s.erase(it)`
+- `s.erase(x)`
     
+- `s.erase(it)`
+    
+- `s.clear()`
+    
+
+### Search
+
 - `s.find(x)`
-    
-- `s.lower_bound(x)` — first ≥ x
-    
-- `s.upper_bound(x)` — first > x
     
 - `s.count(x)`
     
+- `s.lower_bound(x)` _(first ≥ x)_
+    
+- `s.upper_bound(x)` _(first > x)_
+    
+
+### Other
+
 - `s.empty()`
     
-- Ordered iteration
+- `s.size()`
     
 
 ---
 
-# ✅ **11. std::multiset**
+# 🔵 **11. std::multiset** (Ordered, duplicates allowed)
 
 `multiset<int> ms;`
 
-Common methods
-
-- `ms.insert(x)`
+- Same as set
     
-- `ms.erase(ms.find(x))` — erase single
+- `ms.equal_range(x)` _(range of duplicates)_
     
-- `ms.count(x)`
-    
-- `ms.equal_range(x)` — all duplicates
-    
-- Sorted iteration
+- `ms.erase(ms.find(x))` removes one copy
     
 
 ---
 
-# ✅ **12. std::unordered_set** (hash set)
+# 🔵 **12. std::unordered_set** (Hash set)
 
 `unordered_set<int> us;`
-
-Common methods
 
 - `us.insert(x)`
     
@@ -489,154 +524,186 @@ Common methods
     
 - `us.count(x)`
     
-- `us.bucket_count()` — hash buckets
+- `us.size()`
     
-- `us.load_factor()` / `us.rehash(n)` — tuning
+- `us.empty()`
     
 
-Fast O(1) average.
+Hash tuning:
+
+- `us.bucket_count()`
+    
+- `us.load_factor()`
+    
+- `us.rehash(n)`
+    
 
 ---
 
-# ✅ **13. std::map** (ordered key-value)
+# 🔵 **13. std::map** (Ordered key-value)
 
-`map<string, int> m;`
+`map<string,int> m;`
 
-Common methods
+### Access
 
-- `m[key] = value`
+- `m[key]` _(inserts default if missing)_
     
-- `m.at(key)` — throws if missing
+- `m.at(key)` _(no insert, throws)_
     
+
+### Insert/remove
+
 - `m.insert({k,v})`
+    
+- `m.emplace(k,v)`
     
 - `m.erase(key)`
     
-- `m.find(key)`
-    
-- `m.lower_bound(key)`
-    
-- `m.upper_bound(key)`
-    
-- `m.empty()` / `m.size()`
+- `m.erase(it)`
     
 
-Iteration is sorted by key.
+### Search
+
+- `m.find(k)`
+    
+- `m.count(k)`
+    
+- `m.lower_bound(k)`
+    
+- `m.upper_bound(k)`
+    
+
+### Other
+
+- `m.size()`
+    
+- `m.empty()`
+    
 
 ---
 
-# ✅ **14. std::multimap**
+# 🔵 **14. std::multimap** (Ordered, duplicate keys)
 
 `multimap<string,int> mm;`
 
-Common methods
-
 - `mm.insert({k,v})`
     
-- `mm.equal_range(k)` — range of values
+- `mm.equal_range(k)`
     
 - `mm.erase(it)`
     
 
-Allows duplicate keys.
-
 ---
 
-# ✅ **15. std::unordered_map** (MOST used map in modern C++)
+# 🔵 **15. std::unordered_map** (Hash map — MOST COMMON)
 
 `unordered_map<string,int> um;`
 
-Common methods
-
-- `um[key] = value`
+- `um[key] = v`
     
 - `um.at(key)`
     
-- `um.find(key)`
+- `um.find(k)`
     
-- `um.erase(key)`
+- `um.erase(k)`
     
-- `um.count(key)`
+- `um.count(k)`
     
-- `um.rehash(n)` — avoid rehashing
+- `um.size()`
     
-- `um.bucket_count()`
+- `um.empty()`
     
 
-O(1) average, fastest map.
+Hash management:
+
+- `um.bucket_count()`
+    
+- `um.rehash(n)`
+    
+- `um.load_factor()`
+    
 
 ---
 
-# ✅ **16. std::string**
+# 🔵 **16. std::string**
 
-`string s = "hello";`
+`string s;`
 
-Common methods
+### Access
 
-- `s.size()` / `s.length()`
+- `s[i]`
+    
+- `s.at(i)`
+    
+
+### Modify
+
+- `s.push_back(c)`
+    
+- `s.pop_back()`
+    
+- `s.append(str)`
+    
+- `s.insert(pos, str)`
+    
+- `s.erase(pos, len)`
+    
+- `s.replace(pos, len, newstr)`
+    
+
+### Query
+
+- `s.size()`
     
 - `s.empty()`
-    
-- `s.clear()`
-    
-- `s.push_back(x)` / `s.pop_back()`
     
 - `s.substr(pos, len)`
     
 - `s.find(str)`
     
-- `s.replace(pos, len, newstr)`
+- `s.rfind(str)`
     
-- `s.append(str)`
+- `s.starts_with()` (C++20)
     
-- `s.starts_with() / s.ends_with()` (C++20)
+- `s.ends_with()` (C++20)
     
-- `stoi(s)`, `stod(s)` — convert
+
+### Convert
+
+- `stoi(s)` / `stol(s)` / `stod(s)`
     
 
 ---
 
-# ✅ **17. std::pair**
+# 🔵 **17. std::pair**
 
-`pair<int,string> p = {1,"hi"};`
-
-Common usage
+`pair<int,string> p;`
 
 - `p.first`
     
 - `p.second`
     
-- `auto [a, b] = p;` (structured binding)
-    
-- Often used in maps, priority queues
+- `auto [a,b] = p;` _(structured binding)_
     
 
 ---
 
-# ✅ **18. std::tuple**
+# 🔵 **18. std::tuple**
 
-`tuple<int,string,double> t(1,"hi",3.14);`
+`tuple<int,string,double> t;`
 
-Common usage
-
-- `auto [a,b,c] = t`
-    
 - `get<0>(t)`
+    
+- `auto [a,b,c] = t;`
     
 - `make_tuple(...)`
     
-- `tuple_size<T>::value`
-    
-- `tuple_element<i,T>::type`
-    
 
 ---
 
-# ✅ **19. std::bitset**
+# 🔵 **19. std::bitset**
 
-`bitset<8> b("10101010");`
-
-Common methods
+`bitset<8> b;`
 
 - `b.set(i)`
     
@@ -648,11 +715,8 @@ Common methods
     
 - `b.none()`
     
-- `b.count()` — # of 1 bits
+- `b.count()`
     
 - `b.to_string()`
     
 - `b.to_ulong()`
-    
-
-Efficient bit manipulation.
