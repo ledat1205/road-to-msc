@@ -222,501 +222,255 @@ If you wrap the functions in namespaces, the collision is resolved because the n
 |---|---|---|
 |**`helper.cpp`**|`cpp namespace Helper { void initialize_settings() { /* ... */ } }`|`Helper::initialize_settings`|
 |**`main.cpp`**|`cpp namespace Main { void initialize_settings() { /* ... */ } } int main() { Helper::initialize_settings(); Main::initialize_settings(); }`|
-# 🔵 **1. Raw Array**
-
-`int arr[5] = {1,2,3,4,5};`
-
-- Access: `arr[i]`
-    
-- Size: `sizeof(arr)/sizeof(arr[0])`
-    
-- No insert/delete
-    
-- Decays to pointer
-    
-
----
-
-# 🔵 **2. std::vector** (Dynamic array)
-
-`vector<int> v;`
-
-### Access & size
-
-- `v[i]`
-    
-- `v.at(i)` _(bounds-checked)_
-    
-- `v.front()`
-    
-- `v.back()`
-    
-- `v.data()`
-    
-- `v.size()`
-    
-- `v.empty()`
-    
-
-### Insert/remove
-
-- `v.push_back(x)`
-    
-- `v.pop_back()`
-    
-- `v.insert(pos, x)`
-    
-- `v.insert(pos, count, x)`
-    
-- `v.erase(pos)`
-    
-- `v.erase(first, last)`
-    
-- `v.clear()`
-    
-- `v.emplace(pos, args...)`
-    
-- `v.emplace_back(args...)` _(no copies, constructs in-place)_
-    
-
-### Capacity control
-
-- `v.reserve(n)`
-    
-- `v.capacity()`
-    
-- `v.shrink_to_fit()`
-    
-
----
-
-# 🔵 **3. std::array** (Fixed-size)
-
-`array<int, 5> a;`
-
-- `a[i]` / `a.at(i)`
-    
-- `a.front()` / `a.back()`
-    
-- `a.size()`
-    
-- `a.fill(value)`
-    
-- `a.data()`
-    
-- Supports STL algorithms
-    
-
----
-
-# 🔵 **4. std::list** (Doubly linked list)
-
-`list<int> l;`
-
-### Access
-
-- `l.front()`
-    
-- `l.back()`
-    
-
-### Insert/remove
-
-- `l.push_front(x)` / `l.push_back(x)`
-    
-- `l.pop_front()` / `l.pop_back()`
-    
-- `l.insert(it, x)`
-    
-- `l.erase(it)`
-    
-- `l.erase(first, last)`
-    
-- `l.remove(value)` _(remove all matching)_
-    
-- `l.remove_if(pred)`
-    
-- `l.clear()`
-    
-
-### Special linked list features (vector cannot do)
-
-- `l.sort()`
-    
-- `l.reverse()`
-    
-- `l.unique()` _(remove consecutive duplicates)_
-    
-- `l.splice(pos, other)` _(O(1) move nodes across lists)_
-    
-
-### Size
-
-- `l.size()` (O(1) since C++11)
-    
-- `l.empty()`
-    
-
----
-
-# 🔵 **5. std::forward_list** (Singly linked list — minimal)
-
-`forward_list<int> fl;`
-
-- `fl.front()`
-    
-- `fl.push_front(x)`
-    
-- `fl.pop_front()`
-    
-- `fl.insert_after(it, x)`
-    
-- `fl.erase_after(it)`
-    
-- `fl.remove(value)`
-    
-- `fl.remove_if(pred)`
-    
-- `fl.sort()`
-    
-- `fl.reverse()`  
-    ❌ No `back()`  
-    ❌ No `size()`
-    
-
----
-
-# 🔵 **6. std::deque** (Double-ended queue)
-
-`deque<int> d;`
-
-- `d[i]` (random access)
-    
-- `d.front()` / `d.back()`
-    
-- `d.push_front(x)` / `d.push_back(x)`
-    
-- `d.pop_front()` / `d.pop_back()`
-    
-- `d.insert()` / `d.erase()`
-    
-- `d.size()`
-    
-- `d.clear()`
-    
-
----
-
-# 🔵 **7. std::stack** (LIFO)
-
-Wrapper around vector/deque.
-
-- `s.push(x)`
-    
-- `s.pop()`
-    
-- `s.top()`
-    
-- `s.size()`
-    
-- `s.empty()`
-    
-
----
-
-# 🔵 **8. std::queue** (FIFO)
-
-Wrapper around deque.
-
-- `q.push(x)`
-    
-- `q.pop()`
-    
-- `q.front()`
-    
-- `q.back()`
-    
-- `q.size()`
-    
-- `q.empty()`
-    
-
----
-
-# 🔵 **9. std::priority_queue** (Heap)
-
-`priority_queue<int> pq;`
-
-- `pq.push(x)`
-    
-- `pq.pop()`
-    
-- `pq.top()`
-    
-- `pq.size()`
-    
-- `pq.empty()`
-    
-
-Min-heap:
-
-`priority_queue<int, vector<int>, greater<int>> minpq;`
-
----
-
-# 🔵 **10. std::set** (Ordered tree, unique keys)
-
-`set<int> s;`
-
-### Insert/remove
-
-- `s.insert(x)`
-    
-- `s.erase(x)`
-    
-- `s.erase(it)`
-    
-- `s.clear()`
-    
-
-### Search
-
-- `s.find(x)`
-    
-- `s.count(x)`
-    
-- `s.lower_bound(x)` _(first ≥ x)_
-    
-- `s.upper_bound(x)` _(first > x)_
-    
-
-### Other
-
-- `s.empty()`
-    
-- `s.size()`
-    
-
----
-
-# 🔵 **11. std::multiset** (Ordered, duplicates allowed)
-
-`multiset<int> ms;`
-
-- Same as set
-    
-- `ms.equal_range(x)` _(range of duplicates)_
-    
-- `ms.erase(ms.find(x))` removes one copy
-    
-
----
-
-# 🔵 **12. std::unordered_set** (Hash set)
-
-`unordered_set<int> us;`
-
-- `us.insert(x)`
-    
-- `us.erase(x)`
-    
-- `us.find(x)`
-    
-- `us.count(x)`
-    
-- `us.size()`
-    
-- `us.empty()`
-    
-
-Hash tuning:
-
-- `us.bucket_count()`
-    
-- `us.load_factor()`
-    
-- `us.rehash(n)`
-    
-
----
-
-# 🔵 **13. std::map** (Ordered key-value)
-
-`map<string,int> m;`
-
-### Access
-
-- `m[key]` _(inserts default if missing)_
-    
-- `m.at(key)` _(no insert, throws)_
-    
-
-### Insert/remove
-
-- `m.insert({k,v})`
-    
-- `m.emplace(k,v)`
-    
-- `m.erase(key)`
-    
-- `m.erase(it)`
-    
-
-### Search
-
-- `m.find(k)`
-    
-- `m.count(k)`
-    
-- `m.lower_bound(k)`
-    
-- `m.upper_bound(k)`
-    
-
-### Other
-
-- `m.size()`
-    
-- `m.empty()`
-    
-
----
-
-# 🔵 **14. std::multimap** (Ordered, duplicate keys)
-
-`multimap<string,int> mm;`
-
-- `mm.insert({k,v})`
-    
-- `mm.equal_range(k)`
-    
-- `mm.erase(it)`
-    
-
----
-
-# 🔵 **15. std::unordered_map** (Hash map — MOST COMMON)
-
-`unordered_map<string,int> um;`
-
-- `um[key] = v`
-    
-- `um.at(key)`
-    
-- `um.find(k)`
-    
-- `um.erase(k)`
-    
-- `um.count(k)`
-    
-- `um.size()`
-    
-- `um.empty()`
-    
-
-Hash management:
-
-- `um.bucket_count()`
-    
-- `um.rehash(n)`
-    
-- `um.load_factor()`
-    
-
----
-
-# 🔵 **16. std::string**
-
-`string s;`
-
-### Access
-
-- `s[i]`
-    
-- `s.at(i)`
-    
-
-### Modify
-
-- `s.push_back(c)`
-    
-- `s.pop_back()`
-    
-- `s.append(str)`
-    
-- `s.insert(pos, str)`
-    
-- `s.erase(pos, len)`
-    
-- `s.replace(pos, len, newstr)`
-    
-
-### Query
-
-- `s.size()`
-    
-- `s.empty()`
-    
-- `s.substr(pos, len)`
-    
-- `s.find(str)`
-    
-- `s.rfind(str)`
-    
-- `s.starts_with()` (C++20)
-    
-- `s.ends_with()` (C++20)
-    
-
-### Convert
-
-- `stoi(s)` / `stol(s)` / `stod(s)`
-    
-
----
-
-# 🔵 **17. std::pair**
-
-`pair<int,string> p;`
-
-- `p.first`
-    
-- `p.second`
-    
-- `auto [a,b] = p;` _(structured binding)_
-    
-
----
-
-# 🔵 **18. std::tuple**
-
-`tuple<int,string,double> t;`
-
-- `get<0>(t)`
-    
-- `auto [a,b,c] = t;`
-    
-- `make_tuple(...)`
-    
-
----
-
-# 🔵 **19. std::bitset**
-
-`bitset<8> b;`
-
-- `b.set(i)`
-    
-- `b.reset(i)`
-    
-- `b.flip(i)`
-    
-- `b.any()`
-    
-- `b.none()`
-    
-- `b.count()`
-    
-- `b.to_string()`
-    
-- `b.to_ulong()`
+
+# C++ Data Structures Cheat Sheet
+
+This cheat sheet covers the most commonly used methods for key data structures in the C++ Standard Library, including both pre-C++11 ("old") and modern features (C++11 and later, up to C++23 where applicable). I've focused on containers from `<vector>`, `<list>`, `<deque>`, `<array>`, `<forward_list>`, `<stack>`, `<queue>`, `<set>`, `<map>`, `<unordered_set>`, `<unordered_map>`, `<string>`, and `<bitset>`. Methods are grouped by category (e.g., constructors, access, modifiers, iterators, capacity). 
+
+Rarely used or deprecated methods are omitted for brevity. Always include the relevant headers and use `std::` namespace. For modern features, assume C++11+ unless noted.
+
+## Arrays (Built-in, Fixed-Size)
+Built-in arrays are "old-school" C-style. For modern fixed-size, use `std::array` (below).
+
+- **Declaration**: `T arr[N];` (fixed size N, T is type)
+- **Common Operations**:
+  - Access: `arr[i]` (0-based indexing, no bounds checking)
+  - Size: Use `sizeof(arr)/sizeof(arr[0])` (manual, error-prone)
+  - Iteration: Manual loop or `std::begin(arr)`, `std::end(arr)` (C++11+)
+  - No dynamic resize, insert, or erase.
+
+## std::vector (Dynamic Array) - `<vector>`
+Resizable array, contiguous storage. Most used container.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | `vector()` | Empty vector | |
+| | `vector(size_type n, const T& val = T())` | n elements with value val | |
+| | `vector(InputIt first, InputIt last)` | From range [first, last) | |
+| | `vector(initializer_list<T> il)` | From initializer list (C++11) | |
+| Access | `at(size_type pos)` | Element at pos (bounds-checked) | Throws if out-of-range |
+| | `operator[](size_type pos)` | Element at pos (no bounds check) | |
+| | `front()` / `back()` | First/last element | |
+| | `data()` | Pointer to underlying array | |
+| Modifiers | `push_back(const T& val)` / `push_back(T&& val)` | Add to end | Move overload (C++11) |
+| | `pop_back()` | Remove last | |
+| | `insert(const_iterator pos, const T& val)` / `insert(const_iterator pos, T&& val)` | Insert at pos | Move (C++11) |
+| | `emplace_back(Args&&... args)` | Construct in-place at end (C++11) | |
+| | `emplace(const_iterator pos, Args&&... args)` | Construct in-place at pos (C++11) | |
+| | `erase(const_iterator pos)` / `erase(const_iterator first, const_iterator last)` | Remove at pos or range | |
+| | `clear()` | Remove all | |
+| | `resize(size_type n, T val = T())` | Resize to n (add val if growing) | |
+| | `swap(vector& other)` | Swap contents | |
+| | `assign(InputIt first, InputIt last)` / `assign(initializer_list<T> il)` | Replace contents | il (C++11) |
+| Iterators | `begin()` / `end()` / `cbegin()` / `cend()` | Iterators (const versions C++11) | |
+| | `rbegin()` / `rend()` | Reverse iterators | |
+| Capacity | `size()` | Number of elements | |
+| | `capacity()` | Allocated storage | |
+| | `empty()` | True if size==0 | |
+| | `reserve(size_type n)` | Reserve space for n | |
+| | `shrink_to_fit()` | Reduce capacity to size (C++11) | |
+| Other | `max_size()` | Theoretical max size | |
+
+## std::array (Fixed-Size Array) - `<array>` (C++11+)
+Modern wrapper for fixed-size arrays.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | `array()` | Default-initialized | |
+| Access | `at(size_type pos)` | Bounds-checked access | |
+| | `operator[](size_type pos)` | No bounds check | |
+| | `front()` / `back()` | First/last | |
+| | `data()` | Pointer to data | |
+| Modifiers | `fill(const T& val)` | Fill with val | |
+| | `swap(array& other)` | Swap | |
+| Iterators | `begin()` / `end()` / `cbegin()` / `cend()` | Iterators | |
+| | `rbegin()` / `rend()` | Reverse | |
+| Capacity | `size()` | Fixed size | Compile-time constant |
+| | `empty()` | True if size==0 | |
+| Other | `max_size()` | Same as size() | |
+
+## std::list (Doubly-Linked List) - `<list>`
+Bidirectional, non-contiguous.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | Similar to vector | | |
+| Access | `front()` / `back()` | First/last | No random access |
+| Modifiers | `push_front(const T& val)` / `push_front(T&&)` | Add to front | Move (C++11) |
+| | `push_back(...)` / `pop_back()` / `pop_front()` | As vector, plus front | |
+| | `insert(const_iterator pos, const T& val)` | Insert at pos | |
+| | `emplace_front(Args&&...)` / `emplace_back(...)` / `emplace(pos, ...)` | In-place (C++11) | |
+| | `erase(const_iterator pos)` / `erase(first, last)` | Remove | |
+| | `clear()` / `resize(n, val)` / `assign(...)` / `swap(...)` | As vector | |
+| | `remove(const T& val)` / `remove_if(Pred pred)` | Remove matching | pred (unary predicate) |
+| | `unique()` / `unique(BinaryPred pred)` | Remove consecutive duplicates | |
+| | `merge(list& other)` / `merge(other, Comp comp)` | Merge sorted lists | |
+| | `sort()` / `sort(Comp comp)` | Sort | |
+| | `reverse()` | Reverse order | |
+| | `splice(const_iterator pos, list& other)` | Transfer from other | Variants for ranges/single |
+| Iterators | `begin()` / `end()` etc. | Bidirectional iterators | |
+| Capacity | `size()` / `empty()` / `max_size()` | As vector | No capacity/reserve |
+
+## std::forward_list (Singly-Linked List) - `<forward_list>` (C++11+)
+Forward-only, efficient for insertions.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | Similar to list, no back | | |
+| Access | `front()` | First element | No back/random |
+| Modifiers | `push_front(...)` / `pop_front()` | Front only | |
+| | `insert_after(const_iterator pos, const T& val)` | Insert after pos | |
+| | `emplace_front(Args&&...)` / `emplace_after(pos, ...)` | In-place (C++11) | |
+| | `erase_after(const_iterator pos)` / `erase_after(first, last)` | Erase after pos | |
+| | `clear()` / `resize(n, val)` / `assign(...)` / `swap(...)` | As list | |
+| | `remove(val)` / `remove_if(pred)` / `unique()` / `merge(...)` / `sort(...)` / `reverse()` / `splice_after(...)` | Similar to list | |
+| Iterators | `before_begin()` / `begin()` / `end()` | Forward iterators | before_begin for inserts |
+| Capacity | `empty()` / `max_size()` | No size() (O(n) to compute) | |
+
+## std::deque (Double-Ended Queue) - `<deque>`
+Efficient push/pop at both ends.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | Similar to vector | | |
+| Access | `at(pos)` / `operator[]` / `front()` / `back()` | As vector | |
+| Modifiers | `push_front(...)` / `push_back(...)` / `pop_front()` / `pop_back()` | Both ends | |
+| | `insert(pos, val)` / `emplace(pos, ...)` / `erase(pos)` / `clear()` / `resize(...)` / `assign(...)` / `swap(...)` | As vector | |
+| | `emplace_front(...)` / `emplace_back(...)` | In-place both ends (C++11) | |
+| | `shrink_to_fit()` | (C++11) | |
+| Iterators | `begin()` / `end()` etc. | Random access iterators | |
+| Capacity | `size()` / `empty()` / `max_size()` / `reserve(n)` | As vector | No capacity, but reserve |
+
+## std::stack (LIFO Adapter) - `<stack>`
+Adapter over container (default deque).
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | `stack()` / `stack(const Container& c)` | From container | |
+| Access | `top()` | Top element | |
+| Modifiers | `push(const T& val)` / `push(T&& val)` | Add to top | Move (C++11) |
+| | `emplace(Args&&... args)` | In-place (C++11) | |
+| | `pop()` | Remove top | |
+| | `swap(stack& other)` | Swap | |
+| Capacity | `size()` / `empty()` | | |
+
+## std::queue (FIFO Adapter) - `<queue>`
+Adapter over container (default deque).
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | Similar to stack | | |
+| Access | `front()` / `back()` | Front/back | |
+| Modifiers | `push(...)` / `emplace(...)` | Add to back | As stack |
+| | `pop()` | Remove front | |
+| | `swap(...)` | | |
+| Capacity | `size()` / `empty()` | | |
+
+## std::priority_queue (Priority Adapter) - `<queue>`
+Heap-based, max-heap by default.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | `priority_queue()` / `priority_queue(Comp comp)` / from range | Custom comparator | |
+| Access | `top()` | Highest priority | |
+| Modifiers | `push(...)` / `emplace(...)` | Insert (heapify) | |
+| | `pop()` | Remove top | |
+| | `swap(...)` | | |
+| Capacity | `size()` / `empty()` | | |
+
+## std::set / std::multiset (Sorted Unique/Multi Set) - `<set>`
+Ordered, balanced tree (usually red-black).
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | `set()` / from range / with Comp | Custom comparator | multiset allows duplicates |
+| Access | `find(const Key& k)` | Iterator to k or end() | |
+| | `count(const Key& k)` | Number of k (1 or 0 in set) | |
+| | `lower_bound(k)` / `upper_bound(k)` / `equal_range(k)` | Bounds for range | |
+| Modifiers | `insert(const T& val)` / `insert(T&& val)` | Insert, returns pair<it,bool> | multiset always inserts |
+| | `emplace(Args&&... args)` / `emplace_hint(hint, ...)` | In-place (C++11) | hint is iterator |
+| | `erase(const_iterator pos)` / `erase(const Key& k)` / `erase(first, last)` | Remove | Returns size erased (C++11) |
+| | `clear()` / `swap(...)` | | |
+| Iterators | `begin()` / `end()` etc. | Sorted order | |
+| Capacity | `size()` / `empty()` / `max_size()` | | |
+| Other | `key_comp()` / `value_comp()` | Comparators | |
+
+## std::map / std::multimap (Sorted Key-Value) - `<map>`
+Ordered associative array.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | Similar to set | Key is first, value second | multimap allows duplicate keys |
+| Access | `operator[](const Key& k)` | Access/insert with default value | map only (not multi) |
+| | `at(const Key& k)` | Bounds-checked (C++11) | Throws if missing |
+| | `find(k)` / `count(k)` / `lower_bound(k)` etc. | As set | |
+| Modifiers | `insert(const value_type& val)` / `insert(T&&)` | value_type is pair<Key, T> | Returns pair<it,bool> |
+| | `emplace(Args&&... args)` / `emplace_hint(hint, ...)` | In-place for pair (C++11) | |
+| | `try_emplace(k, Args&&... args)` | Insert if missing (C++17) | |
+| | `erase(...)` / `clear()` / `swap(...)` | As set | |
+| | `insert_or_assign(k, obj)` | Insert or assign (C++17) | |
+| Iterators | As set | | |
+| Capacity | As set | | |
+
+## std::unordered_set / std::unordered_multiset (Hash Set) - `<unordered_set>` (C++11+)
+Unordered, hash-based.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | `unordered_set()` / with Hash, Eq / bucket_count | Custom hash/equal | unordered_multiset for duplicates |
+| Access | `find(k)` / `count(k)` / `equal_range(k)` | As set, but unordered | |
+| Modifiers | `insert(val)` / `emplace(...)` / `emplace_hint(hint, ...)` | As set | |
+| | `erase(pos)` / `erase(k)` / `clear()` / `swap(...)` | | |
+| Iterators | `begin()` / `end()` etc. | Unordered traversal | |
+| Capacity | `size()` / `empty()` / `max_size()` | | |
+| Hash Policy | `load_factor()` / `max_load_factor(f)` | Current/max load | |
+| | `rehash(n)` / `reserve(n)` | Set buckets / preallocate | reserve (C++11) |
+| | `bucket_count()` / `bucket(k)` | Bucket info | |
+
+## std::unordered_map / std::unordered_multimap (Hash Map) - `<unordered_map>` (C++11+)
+Unordered key-value.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | Similar to unordered_set | | unordered_multimap for dup keys |
+| Access | `operator[](k)` / `at(k)` | As map | |
+| | `find(k)` / `count(k)` / `equal_range(k)` | | |
+| Modifiers | `insert(val)` / `emplace(...)` / `try_emplace(k, ...)` / `insert_or_assign(k, obj)` | As map | |
+| | `erase(...)` / `clear()` / `swap(...)` | | |
+| Iterators | As unordered_set | | |
+| Capacity | As unordered_set | | |
+| Hash Policy | As unordered_set | | |
+
+## std::string (String) - `<string>`
+Specialized vector<char>-like for text.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | `string()` / `string(const char* s)` / from range / n chars | | |
+| Access | `at(pos)` / `operator[]` / `front()` / `back()` / `data()` / `c_str()` | c_str() null-terminated | data() const char* (C++11 non-const) |
+| Modifiers | `append(const string& str)` / `append(const char* s)` | Concat | + overloads |
+| | `push_back(char c)` / `pop_back()` | | |
+| | `insert(pos, str)` / `erase(pos, len)` / `replace(pos, len, str)` | | |
+| | `clear()` / `resize(n, c)` / `assign(str)` / `swap(...)` | | |
+| | `reserve(n)` / `shrink_to_fit()` | As vector | |
+| Search | `find(str, pos=0)` / `rfind(...)` / `find_first_of(...)` etc. | Returns size_t, npos if not found | |
+| Substring | `substr(pos=0, len=npos)` | | |
+| Compare | `compare(str)` / operators ==, < etc. | | |
+| Iterators | As vector | | |
+| Capacity | `size()` / `length()` / `empty()` / `capacity()` / `max_size()` | length() == size() | |
+| Other | `operator+=` / global `+` | Concat | |
+
+## std::bitset (Fixed-Size Bit Array) - `<bitset>`
+For bit manipulation, fixed at compile-time.
+
+| Category | Method | Description | Notes |
+|----------|--------|-------------|-------|
+| Constructors | `bitset<N>()` / `bitset<N>(unsigned long val)` / from string | N template param | |
+| Access | `operator[](size_t pos)` / `test(pos)` | Bit at pos (test throws) | |
+| | `count()` | Set bits | |
+| | `any()` / `all()` / `none()` | Bits set? (all C++11) | |
+| Modifiers | `set(pos, val=1)` / `reset(pos)` / `flip(pos)` | Set/reset/flip bit | All bits if no pos |
+| | `operator&= / |= / ^= / ~` | Bitwise ops | |
+| | `operator<<= / >>=` | Shift | |
+| Other | `to_string()` / `to_ulong()` / `to_ullong()` | Convert (ullong C++11) | |
+| | `size()` | N | |
