@@ -1,3 +1,38 @@
+Here is a breakdown of what the Buffer Pool Manager does:
+
+### 1. Primary Function: Caching Data
+
+The BPM serves as a **cache** for the data stored on disk.
+
+- **Goal:** To keep frequently accessed data pages in memory (in structures called **frames**) to avoid slow I/O operations to the disk.
+    
+- **Mechanism:** When a component (like the query execution engine) needs a specific data page, the BPM first checks if the page is already in one of its frames (a **buffer pool hit**). If it is, the page is returned immediately.
+    
+- **Page vs. Frame:** A **page** is the logical unit of data (e.g., 8 KB) on disk. A **frame** is the fixed-size block of physical memory (RAM) where a page is temporarily stored.
+    
+
+### 2. Managing I/O and Eviction
+
+When the requested page is **not** in memory (a **buffer pool miss**), the BPM must load it from disk. This requires careful management of the limited memory space:
+
+- **Fetching:** It sends a request to the disk subsystem to read the required page into an available memory frame.
+    
+- **Eviction:** If all memory frames are full, the BPM must choose an existing, unpinned page to remove (evict) to make room for the new page. This is handled by a **Replacement Policy** (like ARC, LRU, or LRU-K).
+    
+- **Write-Back (Flushing):** If the page chosen for eviction has been modified while in memory (it is "dirty"), the BPM must first schedule a write operation to flush the modified version back to disk before overwriting the frame with the new page.
+    
+
+### 3. Concurrency Control and Integrity
+
+The BPM ensures data integrity and supports concurrent access by multiple threads:
+
+- **Pin Count:** It maintains a **pin count** (or reference count) for each page. Any page with a pin count greater than zero is actively being used by one or more threads and **cannot be evicted**.
+    
+- **Page Table:** It uses a hash map (**page table**) to track which logical page ID is currently stored in which physical frame ID, allowing for fast lookups.
+    
+- **Thread Safety:** The entire manager and its internal data structures must be protected by **latches (locks)** to prevent race conditions when multiple threads try to access or modify pages concurrently.
+
+
 ### 1. `Evict()`
 
 - **Purpose:** The core function that selects and returns a victim frame for eviction.
