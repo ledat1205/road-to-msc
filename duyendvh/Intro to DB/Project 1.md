@@ -146,3 +146,4 @@ The most complex part is managing the workflow for fetching and evicting pages, 
 3. If the `pin_count_` drops to zero, call **`ArcReplacer::SetEvictable(true)`**.
 
 
+![[Screenshot 2025-12-11 at 11.35.03.png]]
