@@ -81,7 +81,6 @@ However, branch instructions in particular introduce complications in pipelining
 	- More accurate than static methods.
 
 
-
 ### Branching in Database Systems
 The Filter Example
 In a **DBMS sequential scan**, we often execute code like:
