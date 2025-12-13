@@ -108,3 +108,4 @@ _pd for doubles
 Compilers can recognise some patterns and vectorize your code, sometimes it may produce better vectorized code than programmer.
 
 Given this simple code compiler produces much more code than we expected when we compile with optimization flags enabled.
+
