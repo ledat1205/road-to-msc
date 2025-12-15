@@ -3,8 +3,8 @@ Trong những **năm 1990**, việc truy cập Internet **rất khó khăn**. C�
 
 | Bản Gốc (Draft)                                                                                                  | Bản Sửa (Corrected Version)                                                                                |
 | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| During the 90s, accessing internet **was** very difficult.                                                       | During the **90s**, accessing the internet **was** very difficult.                                         |
-| **(Many)** companies **used** big computers and dial-up connection **was** slow.                                 | **Many** companies **used** big computers, and dial-up connections **were** slow.                          |
+| During the 90s, accessing internet **was** very difficult.                                                       | During the **90s**, accessing **the** internet **was** very difficult.                                     |
+| **Companies **used** big computers and dial-up connection **was** slow.                                          | **Many** companies **used** big computers, and dial-up connections **were** slow.                          |
 | To send an email, we **had to wait** for minutes.                                                                | To send an email, we **often had to wait** for minutes.                                                    |
 | Nowadays, everything **has changed** totally.                                                                    | Nowadays, everything **has changed** completely.                                                           |
 | Most of **people can access to** high-speed wifi.                                                                | **Most people can access** high-speed Wi-Fi. (hoặc: Most people **have access to** high-speed Wi-Fi.)      |
