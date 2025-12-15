@@ -10,11 +10,8 @@ Trong những **năm 1990**, việc truy cập Internet **rất khó khăn**. C�
 | I often **download** big files in **(couple of)** seconds.                                              | I often **download** big files in **just a few** seconds.                                                  | Tự nhiên hơn.                                                                                                                                     |
 | Technology always **develops** and the devices **become/get** smaller and more powerful **day by day**. | Technology is **always developing**, and devices **are becoming** smaller and more powerful **every day**. | Dùng **Hiện tại tiếp diễn (Present Continuous)** với **always** để thể hiện sự thay đổi, phát triển liên tục. **Every day** (hai từ) là trạng từ. |
 
-Xuất sang Trang tính
-
----
-
 ### 2. Hiện tại Hoàn thành và Hiện tại Tiếp diễn (Work Experience)
+**Kể từ năm ngoái**, tôi **đã làm việc** tại một công ty công nghệ ở Hà Nội. Đây **là** một trải nghiệm tuyệt vời. Tôi **chưa bao giờ gặp** một đội ngũ nào nhiệt huyết và chuyên nghiệp như thế. **Hiện tại**, tôi **đang học** thêm về lập trình web. Cùng lúc đó, các đồng nghiệp của tôi **đang chuẩn bị** cho một buổi ra mắt sản phẩm lớn vào tuần tới. Chúng tôi **đã hoàn thành** phần lớn công việc, nhưng **vẫn đang nỗ lực** để đảm bảo mọi thứ diễn ra suôn sẻ.
 
 | Bản Gốc (Draft)                                                                                                              | Bản Sửa (Corrected Version)                                                                                                | Giải thích/Gợi ý                                                                                                                                                                                                                    |
 | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
