@@ -1,19 +1,15 @@
-Trong những **năm 1990**, việc truy cập Internet **rất khó khăn**. Các công ty **đã sử dụng** máy tính lớn và kết nối dial-up chậm chạp. **Để gửi** một email, chúng ta **phải đợi** hàng phút. **Hiện nay**, mọi thứ **đã thay đổi hoàn toàn**. **Ngày nay**, **hầu hết** người dùng **có** truy cập Wi-Fi tốc độ cao. Tôi **thường xuyên tải xuống** các tệp lớn trong vài giây. Công nghệ **luôn luôn phát triển**, và các thiết bị **trở nên** nhỏ hơn và mạnh mẽ hơn mỗi ngày.
-Đây là bản sửa lỗi và đề xuất của bạn, tập trung vào ngữ pháp, cách dùng từ tự nhiên và thì (tenses) trong tiếng Anh, đồng thời giữ nguyên ý nghĩa của các câu tiếng Việt gốc.
-
-## ✅ Sửa Lỗi Ngữ Pháp và Cách Dùng Từ (Corrections and Suggestions)
-
 ### 1. Quá khứ Đơn và Hiện tại Đơn (The 90s vs. Now)
+Trong những **năm 1990**, việc truy cập Internet **rất khó khăn**. Các công ty **đã sử dụng** máy tính lớn và kết nối dial-up chậm chạp. **Để gửi** một email, chúng ta **phải đợi** hàng phút. **Hiện nay**, mọi thứ **đã thay đổi hoàn toàn**. **Ngày nay**, **hầu hết** người dùng **có** truy cập Wi-Fi tốc độ cao. Tôi **thường xuyên tải xuống** các tệp lớn trong vài giây. Công nghệ **luôn luôn phát triển**, và các thiết bị **trở nên** nhỏ hơn và mạnh mẽ hơn mỗi ngày.
 
-|Bản Gốc (Draft)|Bản Sửa (Corrected Version)|Giải thích/Gợi ý|
-|---|---|---|
-|During the 90s, accessing the internet **was** very difficult.|During the **90s**, accessing the internet **was** very difficult.|**Thì quá khứ đơn (Simple Past)** được dùng để mô tả trạng thái và hành động trong quá khứ.|
-|**(Many)** companies **used** big computers and dial-up connection **was** slow.|**Many** companies **used** big computers, and dial-up connections **were** slow.|Thêm **were** (số nhiều) để phù hợp với **connections** (số nhiều) hoặc giữ **connection was** nếu ý bạn là **một** loại kết nối.|
-|To send an email, we **had to wait** for minutes.|To send an email, we **often had to wait** for minutes.|**Had to wait** là đúng. Thêm **often** để nhấn mạnh tính thường xuyên.|
-|Nowadays, everything **has changed** totally.|Nowadays, everything **has changed** completely.|**Completely** (hoàn toàn) nghe tự nhiên hơn **totally**. **Has changed** là **Hiện tại hoàn thành (Present Perfect)**, nhấn mạnh kết quả thay đổi đến hiện tại.|
-|Most of **people can access to** high-speed wifi.|**Most people can access** high-speed Wi-Fi. (hoặc: Most people **have access to** high-speed Wi-Fi.)|Bỏ **of** và **to**. Động từ **access** không cần **to** khi nó là một động từ chuyển tiếp (transitive verb). Wi-Fi thường viết hoa chữ cái đầu.|
-|I often **download** big files in **(couple of)** seconds.|I often **download** big files in **a matter of** seconds. (hoặc: ...in **just a few** seconds.)|**A matter of seconds** (chỉ trong vòng vài giây) là cách diễn đạt tự nhiên hơn.|
-|Technology always **develops** and the devices **become/get** smaller and more powerful **day by day/everyday**.|Technology is **always developing**, and devices **are becoming** smaller and more powerful **every day**.|Dùng **Hiện tại tiếp diễn (Present Continuous)** với **always** để thể hiện sự thay đổi, phát triển liên tục. **Every day** (hai từ) là trạng từ.|
+| Bản Gốc (Draft)                                                                                                  | Bản Sửa (Corrected Version)                                                                                |
+| ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| During the 90s, accessing internet **was** very difficult.                                                       | During the **90s**, accessing the internet **was** very difficult.                                         |
+| **(Many)** companies **used** big computers and dial-up connection **was** slow.                                 | **Many** companies **used** big computers, and dial-up connections **were** slow.                          |
+| To send an email, we **had to wait** for minutes.                                                                | To send an email, we **often had to wait** for minutes.                                                    |
+| Nowadays, everything **has changed** totally.                                                                    | Nowadays, everything **has changed** completely.                                                           |
+| Most of **people can access to** high-speed wifi.                                                                | **Most people can access** high-speed Wi-Fi. (hoặc: Most people **have access to** high-speed Wi-Fi.)      |
+| I often **download** big files in **(couple of)** seconds.                                                       | I often **download** big files in **a matter of** seconds. (hoặc: ...in **just a few** seconds.)           |
+| Technology always **develops** and the devices **become/get** smaller and more powerful **day by day/everyday**. | Technology is **always developing**, and devices **are becoming** smaller and more powerful **every day**. |
 
 Xuất sang Trang tính
 
