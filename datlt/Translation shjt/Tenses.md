@@ -1,1 +1,45 @@
 Trong những **năm 1990**, việc truy cập Internet **rất khó khăn**. Các công ty **đã sử dụng** máy tính lớn và kết nối dial-up chậm chạp. **Để gửi** một email, chúng ta **phải đợi** hàng phút. **Hiện nay**, mọi thứ **đã thay đổi hoàn toàn**. **Ngày nay**, **hầu hết** người dùng **có** truy cập Wi-Fi tốc độ cao. Tôi **thường xuyên tải xuống** các tệp lớn trong vài giây. Công nghệ **luôn luôn phát triển**, và các thiết bị **trở nên** nhỏ hơn và mạnh mẽ hơn mỗi ngày.
+Đây là bản sửa lỗi và đề xuất của bạn, tập trung vào ngữ pháp, cách dùng từ tự nhiên và thì (tenses) trong tiếng Anh, đồng thời giữ nguyên ý nghĩa của các câu tiếng Việt gốc.
+
+## ✅ Sửa Lỗi Ngữ Pháp và Cách Dùng Từ (Corrections and Suggestions)
+
+### 1. Quá khứ Đơn và Hiện tại Đơn (The 90s vs. Now)
+
+|Bản Gốc (Draft)|Bản Sửa (Corrected Version)|Giải thích/Gợi ý|
+|---|---|---|
+|During the 90s, accessing the internet **was** very difficult.|During the **90s**, accessing the internet **was** very difficult.|**Thì quá khứ đơn (Simple Past)** được dùng để mô tả trạng thái và hành động trong quá khứ.|
+|**(Many)** companies **used** big computers and dial-up connection **was** slow.|**Many** companies **used** big computers, and dial-up connections **were** slow.|Thêm **were** (số nhiều) để phù hợp với **connections** (số nhiều) hoặc giữ **connection was** nếu ý bạn là **một** loại kết nối.|
+|To send an email, we **had to wait** for minutes.|To send an email, we **often had to wait** for minutes.|**Had to wait** là đúng. Thêm **often** để nhấn mạnh tính thường xuyên.|
+|Nowadays, everything **has changed** totally.|Nowadays, everything **has changed** completely.|**Completely** (hoàn toàn) nghe tự nhiên hơn **totally**. **Has changed** là **Hiện tại hoàn thành (Present Perfect)**, nhấn mạnh kết quả thay đổi đến hiện tại.|
+|Most of **people can access to** high-speed wifi.|**Most people can access** high-speed Wi-Fi. (hoặc: Most people **have access to** high-speed Wi-Fi.)|Bỏ **of** và **to**. Động từ **access** không cần **to** khi nó là một động từ chuyển tiếp (transitive verb). Wi-Fi thường viết hoa chữ cái đầu.|
+|I often **download** big files in **(couple of)** seconds.|I often **download** big files in **a matter of** seconds. (hoặc: ...in **just a few** seconds.)|**A matter of seconds** (chỉ trong vòng vài giây) là cách diễn đạt tự nhiên hơn.|
+|Technology always **develops** and the devices **become/get** smaller and more powerful **day by day/everyday**.|Technology is **always developing**, and devices **are becoming** smaller and more powerful **every day**.|Dùng **Hiện tại tiếp diễn (Present Continuous)** với **always** để thể hiện sự thay đổi, phát triển liên tục. **Every day** (hai từ) là trạng từ.|
+
+Xuất sang Trang tính
+
+---
+
+### 2. Hiện tại Hoàn thành và Hiện tại Tiếp diễn (Work Experience)
+
+|Bản Gốc (Draft)|Bản Sửa (Corrected Version)|Giải thích/Gợi ý|
+|---|---|---|
+|I **have worked** for a technology company in **HN** since last year. This **is** a great experience.|I **have been working** for a technology company in **Hanoi** since last year. This **has been** a great experience.|Dùng **Present Perfect Continuous (have been working)** để nhấn mạnh hành động bắt đầu trong quá khứ và vẫn tiếp diễn đến hiện tại. Dùng **has been** (trải nghiệm cho đến nay) nghe tự nhiên hơn. Viết đầy đủ tên thành phố.|
+|I **have never met** such **euthusiastic** and professional team **like that**.|I **have never met** such an **enthusiastic** and professional team.|Sửa lỗi chính tả: **enthusiastic**. Bỏ **like that** vì **such a team** đã đủ nghĩa.|
+|Now, **Im studying** more about web development.|Now, I**'m studying** more about web development.|**Present Continuous (I'm studying)** là đúng.|
+|At the same time, my colleagues **are preparing** for a big release of **new product on** next week.|At the same time, my colleagues **are preparing** for a big new product release **next week**.|Đổi cấu trúc: **a big new product release**. Bỏ **on** trước **next week**.|
+|We **have finished** most of the work, but **in the mean time** we **are trying to ensure** everything **will go** smoothly.|We **have finished** most of the work, but **in the meantime**, we **are working** to ensure everything **goes** smoothly.|Sửa lỗi chính tả: **in the meantime** (viết tách). Dùng **are working** (đang nỗ lực) thay cho **are trying to ensure**. Dùng **Present Simple (goes)** trong mệnh đề chỉ thời gian/điều kiện (**to ensure**) khi nói về tương lai.|
+
+Xuất sang Trang tính
+
+---
+
+### 3. Quá khứ Tiếp diễn và Quá khứ Hoàn thành (The Rain)
+
+|Bản Gốc (Draft)|Bản Sửa (Corrected Version)|Giải thích/Gợi ý|
+|---|---|---|
+|I **was walking** home last night when it **started** to rain very hard. / While I **was walking** home last night, it **started** to rain.|**Cả hai câu đều đúng ngữ pháp.** (Câu đầu tiên tự nhiên hơn một chút.)|Sử dụng **Past Continuous (was walking)** cho hành động đang diễn ra và **Past Simple (started)** cho hành động xen vào.|
+|**Bc** I **thought** the **wether would be** nice the whole day.|**Because** I **had thought** the **weather would be** nice the whole day.|Sửa lỗi chính tả: **Because** và **weather**. Dùng **Past Perfect (had thought)** để diễn tả hành động (**nghĩ**) xảy ra trước hành động chính trong quá khứ (**trời bắt đầu mưa**).|
+|Around 7pm, my mom **called** me when I **was waiting** for the rain to stop under the roof of a store.|Around 7 PM, my mom **called** me while I **was sheltering** under a store awning.|Dùng **was sheltering** (đang trú) thay cho **was waiting for the rain to stop under the roof** để tự nhiên hơn. **Awning** là mái hiên/mái che cửa hàng.|
+|My mom **asked** me what I **did** during the day, I **explained** that I **had done** my project and I **was on my way** home.|My mom **asked** me what I **had done** during the day. I **explained** that I **had finished** my project and **was** on my way home.|Dùng **Past Perfect (had done/had finished)** vì hành động này xảy ra _trước_ khi mẹ gọi. **Had finished** nghe tự nhiên hơn **had done** khi nói về dự án. Bỏ **I** thứ hai (I was on my way home) nếu ý bạn là câu ghép.|
+
+Xuất sang Trang tính
