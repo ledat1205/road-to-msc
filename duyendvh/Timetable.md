@@ -34,22 +34,19 @@
 
 ### **Saturday (5h)**
 
-| Time Block | Activity                  |
-| ---------- | ------------------------- |
-| 2h         | Linux+                    |
-| 1h         | Linux+ practice questions |
-| 1h         | Weak-area review          |
-| 1h         | Bash scripting            |
+| Time Block | Activity |
+| ---------- | -------- |
+| 2h         | Linux+   |
+
 
 ---
 
-### **Sunday (5h)**
+### **Sunday (6h)**
 
-|Time Block|Activity|
-|---|---|
-|2h|C++ mini-project|
-|1.5h|Networking fundamentals|
-|1.5h|Intro to DB (CMU – continue lesson 7+)|
+| Time Block | Activity                               |
+| ---------- | -------------------------------------- |
+| 3h         | C++ mini-project                       |
+| 3h         | Intro to DB (CMU – continue lesson 7+) |
 
 ---
 
