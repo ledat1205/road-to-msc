@@ -6,12 +6,12 @@
 
 ## 🗓️ PHASE 1 — WEEKDAY TIMETABLE (Mon–Fri)
 
-| Time            | Mon                       | Tue       | Wed                 | Thu           | Fri            |
-| --------------- | ------------------------- | --------- | ------------------- | ------------- | -------------- |
-| **9:00–10:30**  | Linux (Book + commands)   | Linux     | Linux               | Linux         | Linux          |
-| **10:30–11:00** | Linux+ objectives & notes | Linux+    | Linux+              | Linux+        | Linux+         |
-| **11:00–12:00** | C++ (learncpp)            | C++       | C++                 | C++           | Networking     |
-| **12:00–1:00**  | Linux lab / bash          | Linux lab | Review / flashcards | IELTS (light) | Linux practice |
+| Time            | Mon   | Tue    | Wed    | Thu    | Fri        |
+| --------------- | ----- | ------ | ------ | ------ | ---------- |
+| **9:00–10:30**  | Linux | Linux  | Linux  | Linux  | Linux      |
+| **10:30–11:00** | Linux | Linux+ | Linux+ | Linux+ | Linux+     |
+| **11:00–12:00** | C++   | C++    | C++    | C++    | Networking |
+| **12:00–1:00**  | C++   | C++    | C++    | C++    | Networking |
 
 **Linux block includes:**
 
@@ -34,12 +34,12 @@
 
 ### **Saturday (5h)**
 
-|Time Block|Activity|
-|---|---|
-|2h|Linux hands-on labs|
-|1h|Linux+ practice questions|
-|1h|Weak-area review|
-|1h|Bash scripting|
+| Time Block | Activity                  |
+| ---------- | ------------------------- |
+| 2h         | Linux+                    |
+| 1h         | Linux+ practice questions |
+| 1h         | Weak-area review          |
+| 1h         | Bash scripting            |
 
 ---
 
