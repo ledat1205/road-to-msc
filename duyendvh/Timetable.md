@@ -8,8 +8,8 @@
 
 | Time            | Mon   | Tue    | Wed    | Thu    | Fri        |
 | --------------- | ----- | ------ | ------ | ------ | ---------- |
-| **9:00–10:30**  | Linux | Linux  | Linux  | Linux  | Linux      |
-| **10:30–11:00** | Linux | Linux+ | Linux+ | Linux+ | Linux+     |
+| **9:00–10:30**  | Linux | Linux  | Linux  | Linux  | Networking |
+| **10:30–11:00** | Linux | Linux+ | Linux+ | Linux+ | Networking |
 | **11:00–12:00** | C++   | C++    | C++    | C++    | Networking |
 | **12:00–1:00**  | C++   | C++    | C++    | C++    | Networking |
 
@@ -36,8 +36,7 @@
 
 | Time Block | Activity |
 | ---------- | -------- |
-| 2h         | Linux+   |
-
+| 5h         | Linux+   |
 
 ---
 
