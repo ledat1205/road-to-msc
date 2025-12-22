@@ -9,3 +9,8 @@
 ![[Pasted image 20251223005738.png]]
 
 ![[Pasted image 20251223010358.png]]
+
+Dataproc: require cluster
+Dataflow: serverless
+
+![[Pasted image 20251223025845.png]]
