@@ -14,3 +14,4 @@ Dataproc: require cluster
 Dataflow: serverless
 
 ![[Pasted image 20251223025845.png]]
+
