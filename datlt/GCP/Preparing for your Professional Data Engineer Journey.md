@@ -64,4 +64,6 @@ Dataflow solutions
 	- 3 ways of loading data into BigQuery:
 		- files in disk, Cloud Storage or Filestore
 		- stream data
-		- federated data sourf
+		- federated data source
+
+Noted: transferring data from on-premises location use gsutill
