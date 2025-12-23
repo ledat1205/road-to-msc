@@ -12,3 +12,16 @@
 | make a mistake          | They’ve made a mistake in our bill.                                     |     |
 | make a phone call       | I’ve got to make some phone calls before dinner.                        |     |
 | make progress           | Holly is making progress with all her schoolwork.                       |     |
+
+
+| Verb       | Common collocations                              | Example                                               |
+| ---------- | ------------------------------------------------ | ----------------------------------------------------- |
+| **go**     | go mad / bald / grey / blind / deaf              | People go grey as they get older.                     |
+| **go**     | go red / dark                                    | His face went red with embarrassment.                 |
+| **go**     | go yellow                                        | The pages of the book had gone yellow over the years. |
+| **turn**   | turn red / white / gold                          | The sky turned gold as the sun set.                   |
+| **get**    | get angry / bored / upset                        | She got angry when she heard the news.                |
+| **become** | become angry / depressed / involved              | He became depressed after his wife’s death.           |
+| **become** | become extinct / famous / homeless / (un)popular | The bakery has become famous for its apple tarts.     |
+| **fall**   | fall ill / fall silent                           | Everyone fell silent when they heard the news.        |
+| **grow**   | grow older / louder                              | The noise grew louder as the plane approached.        |
