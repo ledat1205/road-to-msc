@@ -16,4 +16,5 @@ When you add a new row to a database table using SQL, that row is converted inte
 
 # Pages
 When this record is created, it is added to a _page._ Databases tend to work with pages. A page is the smallest unit of data that a database will load into a memory cache.
-Why pages are import
+Why pages are important:
+* database can have billions of records or more. Store records in a page can have data easire
