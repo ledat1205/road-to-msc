@@ -13,15 +13,22 @@
 | make a phone call       | I’ve got to make some phone calls before dinner.                        |     |
 | make progress           | Holly is making progress with all her schoolwork.                       |     |
 
-
-| Verb       | Common collocations                              | Example                                               |
-| ---------- | ------------------------------------------------ | ----------------------------------------------------- |
-| **go**     | go mad / bald / grey / blind / deaf              | People go grey as they get older.                     |
-| **go**     | go red / dark                                    | His face went red with embarrassment.                 |
-| **go**     | go yellow                                        | The pages of the book had gone yellow over the years. |
-| **turn**   | turn red / white / gold                          | The sky turned gold as the sun set.                   |
-| **get**    | get angry / bored / upset                        | She got angry when she heard the news.                |
-| **become** | become angry / depressed / involved              | He became depressed after his wife’s death.           |
-| **become** | become extinct / famous / homeless / (un)popular | The bakery has become famous for its apple tarts.     |
-| **fall**   | fall ill / fall silent                           | Everyone fell silent when they heard the news.        |
-| **grow**   | grow older / louder                              | The noise grew louder as the plane approached.        |
+| Verb       | Main use                        | Common collocations                              | Example                               |
+| ---------- | ------------------------------- | ------------------------------------------------ | ------------------------------------- |
+| **go**     | Personality / physical change   | go mad / bald / grey / blind / deaf              | People often go grey with age.        |
+| **go**     | Sudden (often negative) change  | go red / dark / wrong / bad                      | His face went red with embarrassment. |
+| **go**     | Gradual colour change           | go yellow                                        | The pages had gone yellow over time.  |
+| **go**     | Status change                   | go missing / bankrupt / quiet                    | The documents went missing.           |
+| **turn**   | Colour change                   | turn red / white / gold                          | The sky turned gold at sunset.        |
+| **turn**   | Change of state / behaviour     | turn nasty / violent                             | The argument turned violent.          |
+| **turn**   | Change of form or result        | turn into / turn out                             | The plan turned out well.             |
+| **get**    | Informal change (spoken)        | get angry / bored / upset                        | She got upset easily.                 |
+| **get**    | Life events / condition         | get married / divorced / ready / dressed         | He got married last year.             |
+| **get**    | Degree of change                | get better / worse / lost / stuck                | The situation got worse.              |
+| **become** | Formal change (writing, essays) | become angry / depressed / involved              | He became depressed after the loss.   |
+| **become** | Fixed collocations              | become extinct / famous / homeless / (un)popular | The town became famous.               |
+| **become** | Awareness / possibility         | become aware / clear / possible/ popular         | It became clear later.                |
+| **fall**   | Sudden negative change          | fall ill / silent                                | She fell ill suddenly.                |
+| **fall**   | Loss or failure                 | fall behind / apart                              | The system fell apart.                |
+| **grow**   | Gradual change                  | grow older / louder                              | The noise grew louder.                |
+| **grow**   | Abstract development            | grow stronger / confident / popular              | He grew more confident.               |
