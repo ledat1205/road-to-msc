@@ -36,4 +36,4 @@ Page structure:
 - The Record Offset array helps to manage the location of the records on a page. Each 'slot' in the array points to the beginning of a record, and helps to locate where the record is physically stored on disk.
 
 # Writeback
-The records will be added to page are in-memory cache first. Writeback is the process data write page in cache to disk.
+The records will be added to page are in-memory cache first. Writeback is the process data write page in cache to disk. 
