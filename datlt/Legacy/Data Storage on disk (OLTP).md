@@ -26,4 +26,5 @@ Read and Write operations.
 2. When you want to read a record from your database table, the system first checks if the page exists in the cache before hitting the disk otherwise.
 
 How pages are loaded from the disk into the in-memory cache.
-1. **Temporal Locality**: means that the pages are loaded in-memory based on the likelihood that a recently accessed page will be accessed again soon 
+1. **Temporal Locality**: means that the pages are loaded in-memory based on the likelihood that a recently accessed page will be accessed again soon. It means that if you make a query that happens to fetch some data pages from disk, those data pages will be stored in memory for as long as possible to prevent having to go to the disk to fetch them again. 
+2. **Spatial Locality**: This works based on the prediction that if a page is loaded in memory, the pages that are stored physically close to that page on disk will likely be accessed soon. As a result, some pages are 'pre-fetched' ahead of when they are actually used. It means that if you run a query that fetches a page which has records with IDs that range from 1-30, the page which has records from 31-60 will also likely be loaded alongside it to prevent a subsequent trip to the disk. 
