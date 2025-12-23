@@ -84,3 +84,5 @@ Common applications of Pub/Sub
 - prevent over-provisioning
 - exactly once, ordered processing
 
+**Serverless analytics solution**
+![[Pasted image 20251223112638.png]]
