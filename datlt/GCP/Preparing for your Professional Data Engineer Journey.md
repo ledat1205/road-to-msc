@@ -39,4 +39,8 @@ template workflow supports non-developer users
 - Pay for use
 - inexpensive; charged on amount of data processed
 - durable
-- immu
+- immutable audit logs
+- mashing up different datasets
+- interactive analysis of pertabyte-scale databases 
+- familiar sql
+- many ways to ingest, transform, load 
