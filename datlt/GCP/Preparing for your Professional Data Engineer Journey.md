@@ -66,4 +66,7 @@ Dataflow solutions
 		- stream data
 		- federated data source
 
-Noted: transferring data from on-premises location use gsutill
+Noted:
+- transferring data from on-premises location use gsutill
+- from another cloud provider iuse Storage Transfer Service
+- otherwise, evaluate both tools with respect to your spec
