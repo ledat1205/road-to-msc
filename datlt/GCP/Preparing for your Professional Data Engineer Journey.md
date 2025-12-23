@@ -51,8 +51,11 @@ Warehouse solution
 Governance in many levels: table, column, row
 
 BigQuery Solutions 
-
 ![[Pasted image 20251223110444.png]]
 
-dataproc solution
+Dataproc solutions
 ![[Pasted image 20251223110515.png]]
+
+Dataflow solutions
+![[Pasted image 20251223110600.png]]
+
