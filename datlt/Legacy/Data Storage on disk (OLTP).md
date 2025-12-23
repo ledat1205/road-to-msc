@@ -14,4 +14,6 @@ When you add a new row to a database table using SQL, that row is converted inte
     1. The number of columns that match the condition i.e. fixed length, null or variable length.
     2. The positions of those columns; where those columns start and end. This makes it easier to query the data for a particular column.
 
-	### Pages [#](https://timilearning.com/posts/data-storage-on-disk/part-one/#pages)
+# Pages
+When this record is created, it is added to a _page._ Databases tend to work with pages. A page is the smallest unit of data that a database will load into a memory cache.
+Why pages are import
