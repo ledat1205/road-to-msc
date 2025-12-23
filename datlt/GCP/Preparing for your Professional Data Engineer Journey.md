@@ -27,4 +27,5 @@ operations:
 - FlatMap: For non 1:1 relationships, usually with generator in Python
 - .apply(ParDo): Java for Map and FlatMap
 - GroupBy: Shuffle
-- GroupByKey: e
+- GroupByKey: Explicitly shuffle
+- Combine: Aggregate values
