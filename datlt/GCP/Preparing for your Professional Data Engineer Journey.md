@@ -32,4 +32,11 @@ operations:
 
 template workflow supports non-developer users
 
-# BigQeur
+# BigQuery
+
+- Near real-time analysis of massive datasets
+- NoOps 
+- Pay for use
+- inexpensive; charged on amount of data processed
+- durable
+- immu
