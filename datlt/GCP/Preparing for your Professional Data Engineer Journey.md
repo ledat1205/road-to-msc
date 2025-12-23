@@ -20,3 +20,8 @@ Dataflow: serverless
 - open-source api can also be executed on Flink, Spark, etc
 - parallel task are autoscaled
 - real-time and batch 
+
+operations: 
+- ParDo: Allows for parallel processing
+- Map: 1:1 relationship between input and output in Python
+- FlatMap: 
