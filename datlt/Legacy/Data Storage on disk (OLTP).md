@@ -31,3 +31,8 @@ How pages are loaded from the disk into the in-memory cache.
 
 This process help database minimize I/O operations needed.
 Page structure:
+![[Pasted image 20251223172328.png]]
+- The Page Header contains information about the page like: how many records it contains, how much space it has left, what table a page belongs to etc.
+- The Record Offset array helps to manage the location of the records on a page. Each 'slot' in the array points to the beginning of a record, and helps to locate where the record is physically stored on disk.
+
+# Writeback
