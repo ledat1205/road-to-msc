@@ -19,4 +19,5 @@ When this record is created, it is added to a _page._ Databases tend to work w
 Why pages are important:
 * database can have billions of records or more. Store records in a page can have data easier to manage (storing and retrieving)
 * with fixed size page, databases determine how much space to allocate in memory for the operations easily 
-* easy to find a record in a page in stead search in a billions of records 
+* easy to find a record in a page in stead search in a billions of records
+
