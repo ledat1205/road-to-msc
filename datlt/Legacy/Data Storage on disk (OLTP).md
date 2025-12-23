@@ -4,4 +4,4 @@
 * **Pages**: a page consists of many records. Pages have fixed size
 
 # Records 
-
+When you add a new row to a database table using SQL, that row is converted internally to a _record_.
