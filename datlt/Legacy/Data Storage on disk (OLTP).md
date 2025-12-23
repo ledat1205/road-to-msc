@@ -26,4 +26,4 @@ Read and Write operations.
 2. When you want to read a record from your database table, the system first checks if the page exists in the cache before hitting the disk otherwise.
 
 How pages are loaded from the disk into the in-memory cache.
-1. Temporal Locality 
+1. **Temporal Locality**: means that the pages are loaded in-memory based on the likelihood that a recently accessed page will be accessed again soon 
