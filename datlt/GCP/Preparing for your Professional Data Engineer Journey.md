@@ -48,3 +48,4 @@ template workflow supports non-developer users
 - structured data
 
 Warehouse solution
+Governance in many levels: table, column, row
