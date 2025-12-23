@@ -49,3 +49,5 @@ template workflow supports non-developer users
 
 Warehouse solution
 Governance in many levels: table, column, row
+
+BigQuery Solutions 
