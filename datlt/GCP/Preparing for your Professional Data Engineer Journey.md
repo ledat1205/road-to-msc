@@ -24,4 +24,7 @@ Dataflow: serverless
 operations: 
 - ParDo: Allows for parallel processing
 - Map: 1:1 relationship between input and output in Python
-- FlatMap: 
+- FlatMap: For non 1:1 relationships, usually with generator in Python
+- .apply(ParDo): Java for Map and FlatMap
+- GroupBy: Shuffle
+- GroupByKey: e
