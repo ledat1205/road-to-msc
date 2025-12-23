@@ -78,3 +78,9 @@ Noted:
 - push subscription and pull subscription delivery flows 
 - fast
 
+Common applications of Pub/Sub
+- application connection
+- asynchronous
+- prevent over-provisioning
+- exactly once, ordered processing
+
