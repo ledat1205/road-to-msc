@@ -29,3 +29,5 @@ operations:
 - GroupBy: Shuffle
 - GroupByKey: Explicitly shuffle
 - Combine: Aggregate values
+
+template workflow supports non-developer users
