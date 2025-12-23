@@ -61,4 +61,7 @@ Dataflow solutions
 
 **Design Data Processing Infrastructure**
 - Data ingest solutions: CLI, web UI, or API![[Pasted image 20251223111129.png]]
-- 
+	- 3 ways of loading data into BigQuery:
+		- files in disk, Cloud Storage or Filestore
+		- stream data
+		- federated data sourf
