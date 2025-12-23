@@ -4,4 +4,14 @@
 * **Pages**: a page consists of many records. Pages have fixed size
 
 # Records 
-When you add a new row to a database table using SQL, that row is converted internally to a _record_.
+When you add a new row to a database table using SQL, that row is converted internally to a _record_. Think of a record as an array of bytes, where each byte or group of bytes stores information about the record. The information stored in a group of bytes could be:
+- The type of the record: data, index, or other metadata.
+- Whether the inserted row has columns with null values or columns have fixed or variable length data types.
+- Where each column's data starts and ends in the array.
+- The actual data encoded in bytes, divided into separate sections depending on whether the data type used for storing the data has a fixed length or a variable length.
+- ![[Pasted image 20251223170744.png]]
+- The "Information about columns..." here typically includes:
+    1. The number of columns that match the condition i.e. fixed length, null or variable length.
+    2. The positions of those columns; where those columns start and end. This makes it easier to query the data for a particular column.
+
+	### Pages [#](https://timilearning.com/posts/data-storage-on-disk/part-one/#pages)
