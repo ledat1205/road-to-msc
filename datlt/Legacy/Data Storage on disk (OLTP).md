@@ -21,3 +21,6 @@ Why pages are important:
 * with fixed size page, databases determine how much space to allocate in memory for the operations easily 
 * easy to find a record in a page in stead search in a billions of records
 
+Read and Write operations.
+1. When you add a new record (row) or update an existing record in your database table, that change is reflected on a data page which exists in an in-memory cache.
+2. When you want to read a record from your database table, the system first checks if the page exists in the cache before hitting the disk otherwise.
