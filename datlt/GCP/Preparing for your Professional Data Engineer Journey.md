@@ -70,3 +70,8 @@ Noted:
 - transferring data from on-premises location use gsutill
 - from another cloud provider iuse Storage Transfer Service
 - otherwise, evaluate both tools with respect to your specific scenario
+
+# Pub/Sub
+- NoOps, serverless global message queue
+- 
+
