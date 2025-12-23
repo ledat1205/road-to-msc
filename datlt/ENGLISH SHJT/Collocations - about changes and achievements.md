@@ -1,5 +1,4 @@
 
-
 | Verb       | Main uses & common collocations                                                                                                                                                               | Example                                         |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | **go**     | personality/physical change (go mad, bald, grey, blind); sudden or negative change (go red, dark, wrong, bad); gradual colour change (go yellow); status change (go missing, bankrupt, quiet) | His company went bankrupt.                      |
@@ -8,7 +7,6 @@
 | **become** | formal change (become angry, depressed, involved); fixed collocations (become extinct, famous, homeless, (un)popular); awareness/possibility (become aware, clear, possible)                  | The bakery _became famous_ for its apple tarts. |
 | **fall**   | sudden or negative change (fall ill, silent); loss or failure (fall behind, fall apart, fall asleep)                                                                                          | Everyone _fell silent_.                         |
 | **grow**   | slow or gradual change (grow older, louder); abstract development (grow stronger, confident, popular)                                                                                         | He _grew more confident_ over time.             |
-
 
 | Verb              | Common collocations                                | Example                                                                    |
 | ----------------- | -------------------------------------------------- | -------------------------------------------------------------------------- |
