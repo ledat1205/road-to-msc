@@ -17,4 +17,6 @@ Dataflow: serverless
 
 Dataflow 
 - java or python
-- 
+- open-source api can also be executed on Flink, Spark, etc
+- parallel task are autoscaled
+- real-time and batch 
