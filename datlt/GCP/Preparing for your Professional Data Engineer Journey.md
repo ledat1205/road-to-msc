@@ -73,5 +73,5 @@ Noted:
 
 # Pub/Sub
 - NoOps, serverless global message queue
-- 
+- Asynchronous; publisher never waits, a subscriber can get the message now or any time within 7
 
