@@ -43,4 +43,8 @@ template workflow supports non-developer users
 - mashing up different datasets
 - interactive analysis of pertabyte-scale databases 
 - familiar sql
-- many ways to ingest, transform, load 
+- many ways to ingest, transform, load and export data
+- nested and repeated fields, user-defined functions in JS
+- structured data
+
+Warehouse solution
