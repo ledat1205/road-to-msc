@@ -9,3 +9,5 @@
 | getting divorced     | Her sister was getting divorced                        |
 | making demands on    | This job is making heavy demands on my time and energy |
 | give sb a call       | Julie had promised to give her sister a call           |
+| run herself a bath   | She decided to run herself a bath first                |
+|                      |                                                        |
