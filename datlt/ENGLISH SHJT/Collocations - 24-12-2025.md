@@ -6,4 +6,4 @@
 | desperately jealous  | Julie felt desperately jealous of him  |
 | spent my time + Ving | She spent her time doing homeworks     |
 | take care of         | She takes care of him and the children |
-|                      |                                        |
+| getting divorced     | Her sister was getting divorced        |
