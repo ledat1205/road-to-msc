@@ -57,18 +57,18 @@ Keywords used to manage the logical flow and organization of a program.
 
 These define custom data structures, their members, and access control.
 
-|**Keyword**|**Purpose**|**Context**|
-|---|---|---|
-|**class**, **struct**|Defines a custom user-defined type (aggregate data structure). **`class`** defaults to **private** members; **`struct`** defaults to **public**.|`class MyClass { ... };`|
-|**union**|Defines a type where all members share the same memory location.|Only one member can be used at a time.|
-|**enum**|Declares an enumeration type (a set of named constant integer values).|`enum Color { RED, BLUE };`|
-|**public**, **protected**, **private**|**Access specifiers** that control the visibility of class/struct members.|Used inside `class` or `struct` definition.|
-|**virtual**|Used for functions in a base class to allow derived classes to override the implementation (**Polymorphism**).|`virtual void func();`|
-|**friend**|Grants a non-member function or another class access to a class's private and protected members.|Used inside the class definition.|
-|**this**|A pointer to the object on which a member function is currently executing.|Used inside member functions.|
-|**explicit**|Prevents a constructor from being used for implicit conversions.|Used before a single-argument constructor.|
-|**namespace**|Provides a scope to organize code and prevent name collisions.|`namespace MyLib { ... }`|
-|**operator**|Used to **overload** an operator (e.g., `+`, `<<`) for a user-defined type.|`MyClass operator+(const MyClass& other);`|
+| **Keyword**                            | **Purpose**                                                                                                                                      | **Context**                                 |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| **class**, **struct**                  | Defines a custom user-defined type (aggregate data structure). **`class`** defaults to **private** members; **`struct`** defaults to **public**. | `class MyClass { ... };`                    |
+| **union**                              | Defines a type where all members share the same memory location.                                                                                 | Only one member can be used at a time.      |
+| **enum**                               | Declares an enumeration type (a set of named constant integer values).                                                                           | `enum Color { RED, BLUE };`                 |
+| **public**, **protected**, **private** | **Access specifiers** that control the visibility of class/struct members.                                                                       | Used inside `class` or `struct` definition. |
+| **virtual**                            | Used for functions in a base class to allow derived classes to override the implementation (**Polymorphism**).                                   | `virtual void func();`                      |
+| **friend**                             | Grants a non-member function or another class access to a class's private and protected members.                                                 | Used inside the class definition.           |
+| **this**                               | A pointer to the object on which a member function is currently executing.                                                                       | Used inside member functions.               |
+| **explicit**                           | Prevents a constructor from being used for implicit conversions.                                                                                 | Used before a single-argument constructor.  |
+| **namespace**                          | Provides a scope to organize code and prevent name collisions.                                                                                   | `namespace MyLib { ... }`                   |
+| **operator**                           | Used to **overload** an operator (e.g., `+`, `<<`) for a user-defined type.                                                                      | `MyClass operator+(const MyClass& other);`  |
 
 ---
 
