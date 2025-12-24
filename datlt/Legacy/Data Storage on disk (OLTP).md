@@ -39,4 +39,4 @@ Page structure:
 The records will be added to page are in-memory cache first. Writeback is the process data write page in cache to disk. Because a page can have 2 copies: in cache and in disk so we have to update content in disk since it is the durable data store.
 
 # Write-ahead Logs
-append-only file  
+append-only file. Because its a append-only file, database just keep track of the latest record in log file.  
