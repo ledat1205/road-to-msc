@@ -8,4 +8,4 @@
 | take care of         | She takes care of him and the children                 |
 | getting divorced     | Her sister was getting divorced                        |
 | making demands on    | This job is making heavy demands on my time and energy |
-| give sb a call       | Julie had promised to give her sister                  |
+| give sb a call       | Julie had promised to give her sister a call           |
