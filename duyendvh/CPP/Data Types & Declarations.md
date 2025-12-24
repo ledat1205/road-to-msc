@@ -216,34 +216,34 @@ Built-in arrays are "old-school" C-style. For modern fixed-size, use `std::array
 ## std::vector (Dynamic Array) - `<vector>`
 Resizable array, contiguous storage. Most used container.
 
-| Category | Method | Description | Notes |
-|----------|--------|-------------|-------|
-| Constructors | `vector()` | Empty vector | |
-| | `vector(size_type n, const T& val = T())` | n elements with value val | |
-| | `vector(InputIt first, InputIt last)` | From range [first, last) | |
-| | `vector(initializer_list<T> il)` | From initializer list (C++11) | |
-| Access | `at(size_type pos)` | Element at pos (bounds-checked) | Throws if out-of-range |
-| | `operator[](size_type pos)` | Element at pos (no bounds check) | |
-| | `front()` / `back()` | First/last element | |
-| | `data()` | Pointer to underlying array | |
-| Modifiers | `push_back(const T& val)` / `push_back(T&& val)` | Add to end | Move overload (C++11) |
-| | `pop_back()` | Remove last | |
-| | `insert(const_iterator pos, const T& val)` / `insert(const_iterator pos, T&& val)` | Insert at pos | Move (C++11) |
-| | `emplace_back(Args&&... args)` | Construct in-place at end (C++11) | |
-| | `emplace(const_iterator pos, Args&&... args)` | Construct in-place at pos (C++11) | |
-| | `erase(const_iterator pos)` / `erase(const_iterator first, const_iterator last)` | Remove at pos or range | |
-| | `clear()` | Remove all | |
-| | `resize(size_type n, T val = T())` | Resize to n (add val if growing) | |
-| | `swap(vector& other)` | Swap contents | |
-| | `assign(InputIt first, InputIt last)` / `assign(initializer_list<T> il)` | Replace contents | il (C++11) |
-| Iterators | `begin()` / `end()` / `cbegin()` / `cend()` | Iterators (const versions C++11) | |
-| | `rbegin()` / `rend()` | Reverse iterators | |
-| Capacity | `size()` | Number of elements | |
-| | `capacity()` | Allocated storage | |
-| | `empty()` | True if size==0 | |
-| | `reserve(size_type n)` | Reserve space for n | |
-| | `shrink_to_fit()` | Reduce capacity to size (C++11) | |
-| Other | `max_size()` | Theoretical max size | |
+| Category     | Method                                                                             | Description                       | Notes                  |
+| ------------ | ---------------------------------------------------------------------------------- | --------------------------------- | ---------------------- |
+| Constructors | `vector()`                                                                         | Empty vector                      |                        |
+|              | `vector(size_type n, const T& val = T())`                                          | n elements with value val         |                        |
+|              | `vector(InputIt first, InputIt last)`                                              | From range [first, last)          |                        |
+|              | `vector(initializer_list<T> il)`                                                   | From initializer list (C++11)     |                        |
+| Access       | `at(size_type pos)`                                                                | Element at pos (bounds-checked)   | Throws if out-of-range |
+|              | `operator[](size_type pos)`                                                        | Element at pos (no bounds check)  |                        |
+|              | `front()` / `back()`                                                               | First/last element                |                        |
+|              | `data()`                                                                           | Pointer to underlying array       |                        |
+| Modifiers    | `push_back(const T& val)` / `push_back(T&& val)`                                   | Add to end                        | Move overload (C++11)  |
+|              | `pop_back()`                                                                       | Remove last                       |                        |
+|              | `insert(const_iterator pos, const T& val)` / `insert(const_iterator pos, T&& val)` | Insert at pos                     | Move (C++11)           |
+|              | `emplace_back(Args&&... args)`                                                     | Construct in-place at end (C++11) |                        |
+|              | `emplace(const_iterator pos, Args&&... args)`                                      | Construct in-place at pos (C++11) |                        |
+|              | `erase(const_iterator pos)` / `erase(const_iterator first, const_iterator last)`   | Remove at pos or range            |                        |
+|              | `clear()`                                                                          | Remove all                        |                        |
+|              | `resize(size_type n, T val = T())`                                                 | Resize to n (add val if growing)  |                        |
+|              | `swap(vector& other)`                                                              | Swap contents                     |                        |
+|              | `assign(InputIt first, InputIt last)` / `assign(initializer_list<T> il)`           | Replace contents                  | il (C++11)             |
+| Iterators    | `begin()` / `end()` / `cbegin()` / `cend()`                                        | Iterators (const versions C++11)  |                        |
+|              | `rbegin()` / `rend()`                                                              | Reverse iterators                 |                        |
+| Capacity     | `size()`                                                                           | Number of elements                |                        |
+|              | `capacity()`                                                                       | Allocated storage                 |                        |
+|              | `empty()`                                                                          | True if size==0                   |                        |
+|              | `reserve(size_type n)`                                                             | Reserve space for n               |                        |
+|              | `shrink_to_fit()`                                                                  | Reduce capacity to size (C++11)   |                        |
+| Other        | `max_size()`                                                                       | Theoretical max size              |                        |
 
 ## std::array (Fixed-Size Array) - `<array>` (C++11+)
 Modern wrapper for fixed-size arrays.
