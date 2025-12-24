@@ -102,20 +102,20 @@ These define custom data structures, their members, and access control.
 
 Keywords used for converting between types, runtime type information, and memory operations.
 
-|**Keyword**|**Purpose**|**Context / Notes**|
-|---|---|---|
-|**static_cast**|Converts between related types (e.g., base $\leftrightarrow$ derived class, `int` $\leftrightarrow$ `float`). Safest C++ cast.|`static_cast<int>(f);`|
-|**const_cast**|Used only to add or remove `const` or `volatile` qualifiers from a type.|**Use with caution.**|
-|**reinterpret_cast**|Converts between unrelated types (e.g., a pointer to an integer). Most dangerous C++ cast.|Used for low-level, bitwise conversions.|
-|**dynamic_cast**|Performs checked conversion of polymorphic types during **run time**.|Used primarily for safe downcasting in class hierarchies.|
-|**typeid**|Returns an object of type `std::type_info` that describes the object's type at **run time**.|Used in conjunction with `dynamic_cast`.|
-|**new**|Allocates memory dynamically (on the heap) and returns a pointer to the allocated object(s).|`int* p = new int[10];`|
-|**delete**|Deallocates dynamically allocated memory.|`delete p;`|
-|**nullptr**|A literal value that represents a null pointer (safer than using the integer `0` or `NULL`).|`int* p = nullptr;`|
-|**sizeof**|Returns the size in bytes of a variable or a type.|`sizeof(int)` or `sizeof(my_var)`|
-|**alignas**|Specifies the desired memory alignment for a variable or user-defined type.|`alignas(16) int x;`|
-|**alignof**|Queries the alignment requirement of a type.|`alignof(int)`|
-|**decltype**|Determines the type of an expression at **compile time**.|`decltype(x + y) z;`|
+| **Keyword**          | **Purpose**                                                                                                                    | **Context / Notes**                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| **static_cast**      | Converts between related types (e.g., base $\leftrightarrow$ derived class, `int` $\leftrightarrow$ `float`). Safest C++ cast. | `static_cast<int>(f);`                                    |
+| **const_cast**       | Used only to add or remove `const` or `volatile` qualifiers from a type.                                                       | **Use with caution.**                                     |
+| **reinterpret_cast** | Converts between unrelated types (e.g., a pointer to an integer). Most dangerous C++ cast.                                     | Used for low-level, bitwise conversions.                  |
+| **dynamic_cast**     | Performs checked conversion of polymorphic types during **run time**.                                                          | Used primarily for safe downcasting in class hierarchies. |
+| **typeid**           | Returns an object of type `std::type_info` that describes the object's type at **run time**.                                   | Used in conjunction with `dynamic_cast`.                  |
+| **new**              | Allocates memory dynamically (on the heap) and returns a pointer to the allocated object(s).                                   | `int* p = new int[10];`                                   |
+| **delete**           | Deallocates dynamically allocated memory.                                                                                      | `delete p;`                                               |
+| **nullptr**          | A literal value that represents a null pointer (safer than using the integer `0` or `NULL`).                                   | `int* p = nullptr;`                                       |
+| **sizeof**           | Returns the size in bytes of a variable or a type.                                                                             | `sizeof(int)` or `sizeof(my_var)`                         |
+| **alignas**          | Specifies the desired memory alignment for a variable or user-defined type.                                                    | `alignas(16) int x;`                                      |
+| **alignof**          | Queries the alignment requirement of a type.                                                                                   | `alignof(int)`                                            |
+| **decltype**         | Determines the type of an expression at **compile time**.                                                                      | `decltype(x + y) z;`                                      |
 
 ---
 
