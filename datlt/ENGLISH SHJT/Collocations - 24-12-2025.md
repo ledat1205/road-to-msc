@@ -20,4 +20,6 @@
 | learnt the hard way                         | i learnt the hard way that Jack can't be trusted               |
 | getting in your way                         | please tell me if i'm getting in your way                      |
 | give way to                                 | you must give way to traffic from the left                     |
-| tried every possible way                    | I've trie                                                      |
+| tried every possible way                    | I've tried every possible way to get him change his mind       |
+
+My friend Abigail is desperately worried about her son at the moment. He wants to enrol on a course of some sort but just can’t make a decision about what to study. I gave Abigail a ring and we had a long chat about it last night. She said he’d like to study for a degree but is afraid he won’t meet the requirements for university entry. Abigail thinks he should do a course in Management because he’d like to set up his own business in the future. I agreed that that would be a wise choice.
