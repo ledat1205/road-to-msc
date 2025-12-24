@@ -14,4 +14,5 @@
 | ease the pain                               | a hot bath might ease the pain                                 |
 | a sharp bend/turn                           | the road makes a sharp bend near mountain                      |
 | a sharp contrast / difference / distinction | there is a sharp contrast between life in city and countryside |
+| a sharp rise / increase / drop              | there was a sharp rise in housing price last year              |
 |                                             |                                                                |
