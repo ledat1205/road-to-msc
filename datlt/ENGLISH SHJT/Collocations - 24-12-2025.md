@@ -15,4 +15,6 @@
 | a sharp bend/turn                           | the road makes a sharp bend near mountain                      |
 | a sharp contrast / difference / distinction | there is a sharp contrast between life in city and countryside |
 | a sharp rise / increase / drop              | there was a sharp rise in housing price last year              |
+| find a way                                  | I must find a way to help him                                  |
+| find your way                               | Can you find your way back to my house?                        |
 |                                             |                                                                |
