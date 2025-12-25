@@ -15,7 +15,7 @@
 | a sharp rise / increase / drop              | there was a sharp rise in housing price last year              |
 | find a way                                  | I must find a way to help him                                  |
 | find your way                               | Can you find your way back to my house?                        |
-| learnt the hard way                         | i learnt the hard way that Jack can't be trusted               |
+| learn the hard way                          | i learnt the hard way that Jack can't be trusted               |
 | getting in your way                         | please tell me if i'm getting in your way                      |
 | give way to                                 | you must give way to traffic from the left                     |
 | tried every possible way                    | I've tried every possible way to get him change his mind       |
