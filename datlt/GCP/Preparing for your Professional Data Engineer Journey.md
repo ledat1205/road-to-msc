@@ -86,3 +86,5 @@ Common applications of Pub/Sub
 
 **Serverless analytics solution**
 ![[Pasted image 20251223112638.png]]
+
+![[Pasted image 20251225220210.png]]
