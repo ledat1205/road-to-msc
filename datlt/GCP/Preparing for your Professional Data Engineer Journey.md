@@ -92,3 +92,5 @@ Common applications of Pub/Sub
 ![[Pasted image 20251225220337.png]]
 
 ![[Pasted image 20251225224541.png]]
+
+![[Pasted image 20251225224735.png]]
