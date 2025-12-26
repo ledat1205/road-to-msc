@@ -14,3 +14,7 @@ It ensures that different container runtimes can produce consistent execution en
 3. OCI Distribution Specification ([distribution-spec(opens in a new tab)](https://github.com/opencontainers/distribution-spec)):
 An API protocol for distributing container images. This standardizes how container registries (eg. Docker Hub, GCR, ECR, Harbor) store, pull, and push container images
 It allows various container tools to interact with different registries, promoting a unified ecosystem for image distribution
+
+### What is runc ?
+is a lightweight, portable, low-level container runtime that serves as the reference implementation of the OCI Runtime Specification.
+
