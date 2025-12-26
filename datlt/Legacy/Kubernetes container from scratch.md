@@ -29,4 +29,6 @@ Example workflow in Docker:
 1. `docker run nginx`: Docker CLI -> Docker daemon 
 2. dockerd -.> containerd: Docker used containerd as its runtime. Dockerd send gRPC request to containerd
 3. containerd prepare OCI bundle
-4. 
+	Note: create rootfs and config.json 
+4. containerd executes: `runc create <container_id>`
+5. 
