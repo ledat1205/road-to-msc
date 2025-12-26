@@ -59,3 +59,19 @@ CRI defines a gRPC API with two main services:
     - Attach to containers
     - Port forwarding
 The CRI acts as a translation layer, converting `kubelet`'s high-level requests (eg. create a pod) into the appropriate low-level operations that the container runtime can understand and execute.
+
+k8s workflow: 
+kubectl
+   ↓
+kube-apiserver
+   ↓
+kubelet
+   ↓  (CRI gRPC)
+containerd / CRI-O
+   ↓
+runc
+   ↓
+Linux kernel
+
+example: Pod creation via CRI
+po
