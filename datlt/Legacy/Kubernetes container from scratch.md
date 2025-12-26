@@ -39,4 +39,4 @@ Example workflow in Docker:
 	5. `execve()`: start user process
 		After all runc exits, container process keep running
 
-Kubernetes is kinda same with Docker's workflow. 
+Kubernetes is kinda same with Docker's workflow. The difference is only `kubelet` will send request to `containerd`.
