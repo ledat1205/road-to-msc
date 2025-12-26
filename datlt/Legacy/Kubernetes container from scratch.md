@@ -74,4 +74,17 @@ runc
 Linux kernel
 
 example: Pod creation via CRI
-po
+Pod YAML
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.25
+```
+
+1. kubelet receives pod 
+2. kubelet 
