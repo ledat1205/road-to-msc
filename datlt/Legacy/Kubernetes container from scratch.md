@@ -41,4 +41,20 @@ Example workflow in Docker:
 
 Kubernetes is kinda same with Docker's workflow. The difference is only `kubelet` will send request to `containerd`.
 
-`kubelet` is called is Container Runtime Interface (CRI). A Kubernetes API that standardizes how `kubelet` communicates with container runt
+### What is CRI ?
+
+`kubelet` is called is Container Runtime Interface (CRI). A Kubernetes API that standardizes how `kubelet` communicates with container runtimes.
+
+CRI defines a gRPC API with two main services:
+
+1. **ImageService**: Manages container images
+    
+    - Pull, list, remove, and inspect images
+    - Image filesystem usage statistics
+2. **RuntimeService**: Manages pods and containers
+    
+    - Create, start, stop, remove, and inspect containers
+    - Create, stop, remove, and inspect pods (sandbox containers)
+    - Execute commands in containers
+    - Attach to containers
+    - Port forwarding
