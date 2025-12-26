@@ -26,4 +26,5 @@ is a lightweight, portable, low-level container runtime that serves as the refer
 - Seccomp, AppArmor, SELinux: Apply security profiles for granular control over system calls and permissions
 
 Example workflow in Docker:
-1. `docke`
+1. `docker run nginx`: Docker CLI -> Docker daemon 
+2. dockerd -.> containerd: Docker used conta
