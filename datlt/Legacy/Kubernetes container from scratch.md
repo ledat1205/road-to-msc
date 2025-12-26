@@ -38,3 +38,5 @@ Example workflow in Docker:
 	4. `cgroupfs()`: apply limits
 	5. `execve()`: start user process
 		After all runc exits, container process keep running
+
+Kubernetes is kinda same with Docker's workflow. 
