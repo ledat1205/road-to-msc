@@ -90,4 +90,6 @@ spec:
 2. kubelet call CRI -> RunPodSandbox (pause container)
 3. CRI runtime creates sandbox 
 4. kubelet -> PullImage
-5. kubelet -> CreateContainer
+5. kubelet -> CreateContainer: prepare rootfs, config.json
+6. kubelet -> StartContainer: runtime call `runc` to start container
+
