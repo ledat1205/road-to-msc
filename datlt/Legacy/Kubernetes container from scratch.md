@@ -18,3 +18,12 @@ It allows various container tools to interact with different registries, promoti
 ### What is runc ?
 is a lightweight, portable, low-level container runtime that serves as the reference implementation of the OCI Runtime Specification.
 
+`runc` interacts directly with the Linux kernel's low-level features, specifically:
+
+- Namespaces: Provide process isolation (PID, network, mount, IPC, UTS, user namespaces)
+- Cgroups: Enforce resource limits (CPU, memory, I/O) on the container process
+- `pivot_root`/`chroot`: Change the root filesystem of the process to the container's rootfs bundle
+- Seccomp, AppArmor, SELinux: Apply security profiles for granular control over system calls and permissions
+
+Example workflow in Docker:
+1. `docke`
