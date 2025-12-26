@@ -34,4 +34,7 @@ Example workflow in Docker:
 5. `runc` does:
 	1. `clone()`: create namespace
 	2. `setns()`: join namespace
-	3. `pivot_root()`: switch roo
+	3. `pivot_root()`: switch rootfs
+	4. `cgroupfs()`: apply limits
+	5. `execve()`: start user process
+		After all runc exits, container process keep running
