@@ -40,4 +40,5 @@ Example workflow in Docker:
 		After all runc exits, container process keep running
 
 Kubernetes is kinda same with Docker's workflow. The difference is only `kubelet` will send request to `containerd`.
-`kubelet` is called is _Container Runtime Interface (CRI)
+
+`kubelet` is called is Container Runtime Interface (CRI). A Kubernetes API that standardizes how `kubelet` communicates with container runt
