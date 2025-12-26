@@ -89,4 +89,5 @@ spec:
 1. kubelet receives pod 
 2. kubelet call CRI -> RunPodSandbox (pause container)
 3. CRI runtime creates sandbox 
-4. 
+4. kubelet -> PullImage
+5. kubelet -> CreateContainer
