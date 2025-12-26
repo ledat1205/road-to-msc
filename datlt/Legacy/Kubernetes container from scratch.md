@@ -4,4 +4,7 @@
 
 OCI focuses on 3 main specifications:
 1. OCI Image Specification ([image-spec(opens in a new tab)](https://github.com/opencontainers/image-spec)):
+The format for a container image. This includes how an image is structured on disk, its layers, manifest (metadata), and configuration
+Image build from a tool or platform follow OCI can por
+
 2. 
