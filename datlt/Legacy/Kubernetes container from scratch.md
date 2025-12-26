@@ -31,4 +31,7 @@ Example workflow in Docker:
 3. containerd prepare OCI bundle
 	Note: create rootfs and config.json 
 4. containerd executes: `runc create <container_id>`
-5. 
+5. `runc` does:
+	1. `clone()`: create namespace
+	2. `setns()`: join namespace
+	3. `pivot_root()`: switch roo
