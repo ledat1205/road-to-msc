@@ -1,4 +1,4 @@
-# 🔥 **3. Rule of 5 – What is it?**
+# 🔥 **Rule of 5 – What is it?**
 
 If a class **manages a resource**, and you define **ANY ONE** of these:
 
