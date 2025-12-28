@@ -123,3 +123,114 @@ Use smart pointers:
 
 
 
+### ✅ Use **non-virtual** when:
+
+- Behavior **must not change** in derived classes
+    
+- You want **compile-time binding**
+    
+- It’s an **implementation detail**, not part of a polymorphic interface
+    
+- High-performance or low-level code (hot paths)
+    
+
+Example:
+
+`class Shape { public:     void normalize() { /* invariant logic */ } };`
+
+---
+
+### ✅ Use **virtual** when:
+
+- You want **runtime polymorphism**
+    
+- Behavior **depends on the dynamic type**
+    
+- The base class represents an **interface / contract**
+    
+- You expect subclassing
+    
+
+Example:
+
+`class Shape { public:     virtual void draw() = 0; // interface };`
+
+📌 **Rule of thumb**
+
+> If a function is meant to be overridden → **make it virtual**  
+> If it must never be overridden → **keep it non-virtual**
+
+---
+
+## 2️⃣ How it works behind the scenes
+
+### 🔹 Non-virtual call (`type()`)
+
+`s->type();`
+
+### What the compiler does
+
+- The **static type** of `s` is `Shape*`
+    
+- `type()` is **non-virtual**
+    
+- The call target is known **at compile time**
+    
+
+The compiler emits something like:
+
+`call Shape::type`
+
+No lookup. No indirection.  
+This is called **static dispatch**.
+
+---
+
+### 🔹 Virtual call (`draw()`)
+
+`s->draw();`
+
+### What actually happens
+
+Each object of a class with virtual functions contains:
+
+- a hidden pointer: **vptr**
+    
+- pointing to a **vtable**
+    
+
+#### Memory layout (conceptual)
+
+`Circle object in memory: +--------------------+ | vptr --------------+-----> Circle vtable | Shape subobject    | +--------------------+  Circle vtable: [0] Circle::draw`
+
+At runtime:
+
+`load vptr from object load function pointer from vtable call through that pointer`
+
+This is **dynamic dispatch**.
+
+---
+
+### Why `draw()` calls `Circle::draw`
+
+Because:
+
+- `s` points to a `Circle` object
+    
+- That object’s `vptr` points to **Circle’s vtable**
+    
+- `draw()` entry resolves to `Circle::draw`
+    
+
+---
+
+## 3️⃣ Key difference summarized
+
+|Aspect|Non-virtual|Virtual|
+|---|---|---|
+|Binding time|Compile time|Runtime|
+|Based on|Static type|Dynamic type|
+|Uses vtable|❌ No|✅ Yes|
+|Performance|Slightly faster|Slight overhead|
+|Overridable|❌ No|✅ Yes|
+|Enables polymorphism|❌|✅|
