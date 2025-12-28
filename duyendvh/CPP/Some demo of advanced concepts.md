@@ -1,4 +1,43 @@
+# 🔥 **3. Rule of 5 – What is it?**
 
+If a class **manages a resource**, and you define **ANY ONE** of these:
+
+1. destructor
+    
+2. copy constructor
+    
+3. copy assignment
+    
+4. move constructor
+    
+5. move assignment
+    
+
+👉 **You probably need to define ALL FIVE**
+
+---
+
+# 📌 Rule of 5 Functions
+
+|Function|Purpose|
+|---|---|
+|Destructor|release resource|
+|Copy constructor|deep copy|
+|Copy assignment|deep copy|
+|Move constructor|steal resource|
+|Move assignment|steal resource|
+
+---
+
+# ❌ Bad Example (Rule of 5 violation)
+
+`class Buffer { public:     int* data;      Buffer(int n) : data(new int[n]) {}     ~Buffer() { delete[] data; } };`
+
+❌ Problem:
+
+`Buffer b1(10); Buffer b2 = b1;  // shallow copy → double delete!`
+
+# ✅ Correct Example (Rule of 5 implemented)
 ```
 // ===============================================
 // 1. Rule of 5 + RAII
