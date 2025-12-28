@@ -226,11 +226,144 @@ Because:
 
 ## 3️⃣ Key difference summarized
 
-|Aspect|Non-virtual|Virtual|
+| Aspect               | Non-virtual     | Virtual         |
+| -------------------- | --------------- | --------------- |
+| Binding time         | Compile time    | Runtime         |
+| Based on             | Static type     | Dynamic type    |
+| Uses vtable          | ❌ No            | ✅ Yes           |
+| Performance          | Slightly faster | Slight overhead |
+| Overridable          | ❌ No            | ✅ Yes           |
+| Enables polymorphism | ❌               | ✅               |
+
+## 2️⃣ Formal C++ value categories (important)
+
+Modern C++ (C++11+) splits values into:
+
+![[Screenshot 2025-12-28 at 13.05.51.png]]
+But for practical use, focus on:
+
+|Category|Example|Has identity?|Movable?|
+|---|---|---|---|
+|lvalue|`x`|✅|❌|
+|xvalue|`std::move(x)`|✅|✅|
+|prvalue|`42`, `x+1`|❌|✅|
+
+---
+
+## 3️⃣ lvalue & virtual dispatch (important insight)
+
+💡 **Virtual dispatch depends on the object’s dynamic type, not whether it’s an lvalue or rvalue.**
+
+### Example
+
+`Shape s; s.draw();       // non-polymorphic, object type = Shape`
+
+But:
+
+`Circle c; Shape& s = c;   // s is an lvalue reference s.draw();       // Circle::draw`
+
+Even though:
+
+- `s` is an **lvalue**
+    
+- Binding happens via **reference**
+    
+
+➡️ **Virtual dispatch still works**
+
+---
+
+## 4️⃣ lvalue vs rvalue affects _overload resolution_, not dispatch
+
+### Overloading on value category
+
+`class Shape { public:     virtual void info() &  { std::cout << "lvalue\n"; }     virtual void info() && { std::cout << "rvalue\n"; } };`
+
+`Shape s; s.info();                 // lvalue version  std::move(s).info();      // rvalue version`
+
+📌 This is called **ref-qualified member functions**
+
+---
+
+## 5️⃣ Behind the scenes: what changes?
+
+|Aspect|lvalue call|rvalue call|
 |---|---|---|
-|Binding time|Compile time|Runtime|
-|Based on|Static type|Dynamic type|
-|Uses vtable|❌ No|✅ Yes|
-|Performance|Slightly faster|Slight overhead|
-|Overridable|❌ No|✅ Yes|
-|Enables polymorphism|❌|✅|
+|Object lifetime|Stable|Possibly temporary|
+|Addressable|Yes|Maybe|
+|vtable lookup|Same|Same|
+|Which overload chosen|`&`|`&&`|
+
+⚠️ The **vtable pointer does NOT change**  
+Only overload selection does.
+
+---
+
+## 6️⃣ lvalue, rvalue & references
+
+### Binding rules
+
+`void f(Shape&);      // lvalue only void g(Shape&&);     // rvalue only void h(const Shape&); // both`
+
+`Shape s;  f(s);          // OK f(Shape{});    // ❌  g(s);          // ❌ g(Shape{});    // OK`
+
+---
+
+## 7️⃣ lvalue & object slicing (critical)
+
+`Circle c; Shape s = c;   // ❌ slicing`
+
+Here:
+
+- `s` is a **new Shape object**
+    
+- `Circle` part is destroyed
+    
+- Virtual dispatch no longer works
+    
+
+`s.draw(); // Shape::draw`
+
+📌 **lvalue reference avoids slicing**
+
+`Shape& s = c;  // OK`
+
+---
+
+## 8️⃣ Why `std::move` matters
+
+`Shape s; process(s);           // lvalue process(std::move(s)); // xvalue`
+
+`std::move`:
+
+- does **NOT** move anything
+    
+- just **casts lvalue → xvalue**
+    
+
+Allows:
+
+- move constructors
+    
+- rvalue-qualified overloads
+    
+
+---
+
+## 9️⃣ Real-world design guideline
+
+### Bad
+
+`void setData(Shape s); // copies + slices`
+
+### Good
+
+`void setData(const Shape& s);   // lvalue void setData(Shape&& s);        // rvalue`
+
+---
+
+## 🔟 One-sentence mental model
+
+> **lvalue = named, stable object**  
+> **rvalue = temporary, consumable object**  
+> **Virtual dispatch cares about dynamic type, not value category**
