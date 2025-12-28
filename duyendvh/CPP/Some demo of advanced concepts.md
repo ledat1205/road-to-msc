@@ -115,7 +115,14 @@ public:
 };
 ```
 
-C++
+# ⚡ Why `noexcept` matters
+
+STL containers will **prefer move over copy only if move is noexcept**.
+
+`Buffer(Buffer&&) noexcept;`
+
+Otherwise → fallback to copy.
+
 
 ```
 // ===============================================
