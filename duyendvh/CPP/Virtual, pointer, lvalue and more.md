@@ -31,7 +31,17 @@ or
 
 Not allowed:
 Shape& s2 = Rectangle(4, 6);
+Most compilers will produce an error like:
 
+`cannot bind non-const lvalue reference to an rvalue`
+
+If your compiler _accepts_ it (older or non-strict mode), then:
+
+- the temporary `Rectangle` is destroyed **at the end of the full expression**
+    
+- `s2` becomes a **dangling reference**
+    
+- using it = **undefined behavior**
 
 
 
@@ -54,7 +64,6 @@ Memory layout:
 
 📌 Diagram:
 
-`STACK              HEAP ------             ------------------- s1  --->   (ptr)   | Circle object   |                    | vtable pointer  |                    | radius = 5      |                    -------------------`
 
 ---
 
