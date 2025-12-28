@@ -23,7 +23,12 @@ So you must store Circle in:
 
 ✔ Allowed:
 
-`Shape* s1 = new Circle(5); Shape& s2 = Rectangle(4, 6);`
+`Shape* s1 = new Circle(5);`
+`const Shape& s2 = Rectangle(4, 6);`
+`Rectangle r(4, 6);
+Shape& s2 = r;    `// ✅ valid
+
+`
 
 ---
 
