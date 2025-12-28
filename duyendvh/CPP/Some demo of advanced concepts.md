@@ -178,14 +178,69 @@ Instead of exposing members in the header, you expose **only an opaque pointer**
 
 ### Header (`widget.h`)
 
+```
+#pragma once
+#include <memory>
 
+class Widget {
+public:
+    Widget();
+    ~Widget();               // must be declared
+
+    Widget(const Widget&);   // Rule of 5
+    Widget& operator=(const Widget&);
+    Widget(Widget&&) noexcept;
+    Widget& operator=(Widget&&) noexcept;
+
+    void doSomething() const;
+
+private:
+    struct Impl;                     // forward declaration
+    std::unique_ptr<Impl> impl;      // opaque pointer
+};
+
+```
 
 ---
 Implementation (`widget.cpp`)
+```
+#include "widget.h"
 
+#include <vector>
+#include <string>
+#include <map>
+#include <iostream>
 
+struct Widget::Impl {
+    std::vector<int> data;
+    std::map<std::string, int> cache;
 
----
+    void doSomething() const {
+        std::cout << "Working with hidden data\n";
+    }
+};
+
+Widget::Widget()
+    : impl(std::make_unique<Impl>()) {}
+
+Widget::~Widget() = default;
+
+Widget::Widget(const Widget& other)
+    : impl(std::make_unique<Impl>(*other.impl)) {}
+
+Widget& Widget::operator=(const Widget& other) {
+    if (this != &other)
+        impl = std::make_unique<Impl>(*other.impl);
+    return *this;
+}
+
+Widget::Widget(Widget&&) noexcept = default;
+Widget& Widget::operator=(Widget&&) noexcept = default;
+
+void Widget::doSomething() const {
+    impl->doSomething();
+}
+```
 
 # 🧠 **Why use PIMPL?**
 
@@ -230,7 +285,6 @@ Implementation (`widget.cpp`)
 
 - Deep copy `Impl`
     
-
 ### Move:
 
 - Cheap pointer transfer
