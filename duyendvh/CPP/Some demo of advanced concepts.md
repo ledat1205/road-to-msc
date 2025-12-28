@@ -148,40 +148,143 @@ public:
 };
 ```
 
-C++
 
-```
-// ===============================================
-// 4. PIMPL idiom (reduces compile time + ABI stability)
-// ===============================================
-#include <memory>
-#include <iostream>
+# 🔑 **What is PIMPL?**
 
-// widget.hpp
-class Widget {
-    struct Impl;
-    std::unique_ptr<Impl> p;
+**PIMPL** means:
 
-public:
-    Widget();
-    ~Widget();
-    void draw();
-};
+> Put a pointer in the header, and move all implementation details into a `.cpp` file.
 
-// widget.cpp
-struct Widget::Impl {
-    void draw() {
-        std::cout << "drawing widget\n";
-    }
-};
+Instead of exposing members in the header, you expose **only an opaque pointer**.
 
-Widget::Widget() : p(std::make_unique<Impl>()) {}
-Widget::~Widget() = default;
+---
 
-void Widget::draw() {
-    p->draw();
-}
-```
+# ❌ Problem Without PIMPL
+
+`// widget.h #include <vector> #include <string> #include <map>  class Widget {     std::vector<int> data;     std::map<std::string, int> cache; };`
+
+❌ Every `.cpp` including `widget.h` must:
+
+- recompile when implementation changes
+    
+- include heavy headers
+    
+- break ABI if layout changes
+    
+
+---
+
+# ✅ PIMPL Solution
+
+### Header (`widget.h`)
+
+`#pragma once #include <memory>  class Widget { public:     Widget();     ~Widget();               // must be declared      Widget(const Widget&);   // Rule of 5     Widget& operator=(const Widget&);     Widget(Widget&&) noexcept;     Widget& operator=(Widget&&) noexcept;      void doSomething() const;  private:     struct Impl;                     // forward declaration     std::unique_ptr<Impl> impl;      // opaque pointer };`
+
+---
+
+### Implementation (`widget.cpp`)
+
+`#include "widget.h"  #include <vector> #include <string> #include <map> #include <iostream>  struct Widget::Impl {     std::vector<int> data;     std::map<std::string, int> cache;      void doSomething() const {         std::cout << "Working with hidden data\n";     } };  Widget::Widget()     : impl(std::make_unique<Impl>()) {}  Widget::~Widget() = default;  Widget::Widget(const Widget& other)     : impl(std::make_unique<Impl>(*other.impl)) {}  Widget& Widget::operator=(const Widget& other) {     if (this != &other)         impl = std::make_unique<Impl>(*other.impl);     return *this; }  Widget::Widget(Widget&&) noexcept = default; Widget& Widget::operator=(Widget&&) noexcept = default;  void Widget::doSomething() const {     impl->doSomething(); }`
+
+---
+
+# 🧠 **Why use PIMPL?**
+
+|Benefit|Explanation|
+|---|---|
+|Compile-time reduction|Fewer headers included|
+|ABI stability|Header never changes layout|
+|Encapsulation|Private data truly hidden|
+|Faster builds|Changes in `.cpp` don’t recompile dependents|
+
+---
+
+# 📦 **Memory Layout with PIMPL**
+
+`Widget object (header) ┌───────────────────┐ │ unique_ptr impl   │ ───────┐ └───────────────────┘        │                               ↓                     Impl object (cpp)                     ┌────────────────┐                     │ vector, map    │                     │ real data      │                     └────────────────┘`
+
+- Extra **heap allocation**
+    
+- One extra **pointer indirection**
+    
+- Stable ABI
+    
+
+---
+
+# ⚖️ **Cost of PIMPL**
+
+|Cost|Reality|
+|---|---|
+|Heap allocation|1 extra|
+|Indirection|+1 pointer dereference|
+|Cache locality|Slightly worse|
+|Copy semantics|Must implement|
+
+👉 Often acceptable in **library / API boundaries**, not in hot loops.
+
+---
+
+# 🔁 **Copy vs Move with PIMPL**
+
+### Copy:
+
+- Deep copy `Impl`
+    
+
+### Move:
+
+- Cheap pointer transfer
+    
+
+`Widget w1; Widget w2 = std::move(w1); // no heavy copy`
+
+---
+
+# 🔄 Variants of PIMPL
+
+### 1️⃣ `unique_ptr` (recommended)
+
+✔ Ownership clear  
+✔ Move cheap  
+✔ Safer
+
+### 2️⃣ Raw pointer
+
+❌ Manual delete  
+❌ Rule of 5 complexity
+
+### 3️⃣ `shared_ptr`
+
+✔ ABI stability  
+❌ Hidden sharing can be dangerous
+
+---
+
+# 🧠 **Const-correctness in PIMPL**
+
+`void Widget::doSomething() const {     impl->doSomething(); // impl must be mutable OR method const }`
+
+If mutation is needed:
+
+`mutable std::unique_ptr<Impl> impl;`
+
+---
+
+# 📌 When SHOULD you use PIMPL?
+
+✔ Public libraries  
+✔ Large projects with heavy headers  
+✔ ABI-stable APIs  
+✔ Reducing compile times
+
+---
+
+# ❌ When NOT to use PIMPL?
+
+❌ Performance-critical inner loops  
+❌ Small private classes  
+❌ Plain-old-data structs
 
 C++
 
