@@ -280,7 +280,8 @@ But for practical use, focus on:
 
 But:
 
-`Circle c; Shape& s = c;   // s is an lvalue reference s.draw();       // Circle::draw`
+`Circle c; Shape& s = c;   // s is an lvalue reference 
+`s.draw();       // Circle::draw`
 
 Even though:
 
@@ -297,9 +298,13 @@ Even though:
 
 ### Overloading on value category
 
-`class Shape { public:     virtual void info() &  { std::cout << "lvalue\n"; }     virtual void info() && { std::cout << "rvalue\n"; } };`
+`class Shape {
+`public:     
+`virtual void info() &  { std::cout << "lvalue\n"; }     
+`virtual void info() && { std::cout << "rvalue\n"; } };`
 
-`Shape s; s.info();                 // lvalue version  std::move(s).info();      // rvalue version`
+`Shape s; s.info();        // lvalue version  
+`std::move(s).info();      // rvalue version`
 
 📌 This is called **ref-qualified member functions**
 
@@ -378,7 +383,8 @@ Allows:
 
 ### Good
 
-`void setData(const Shape& s);   // lvalue void setData(Shape&& s);        // rvalue`
+`void setData(const Shape& s);   // lvalue 
+`void setData(Shape&& s);        // rvalue`
 
 ---
 
