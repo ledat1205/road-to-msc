@@ -69,12 +69,12 @@ Memory layout:
 
 ## ✔ Case B: Using object directly (automatic allocation → stack)
 
-`Circle c1(5);     // allocated on stack  Shape& s1 = c1;   // reference to stack object`
+`Circle c1(5);     // allocated on stack  
+`Shape& s1 = c1;   // reference to stack object`
 
 📌 Diagram:
 
-`STACK ------------------------- c1  | Circle object     |     | vptr              |     | radius = 5        | ------------------------- s1  -> reference to c1`
-
+![[Screenshot 2025-12-28 at 13.19.40.png]]
 ✔ No heap involved  
 ✔ Automatic cleanup  
 ✔ Faster
