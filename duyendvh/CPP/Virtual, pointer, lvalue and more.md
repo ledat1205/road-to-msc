@@ -64,7 +64,7 @@ Memory layout:
 
 📌 Diagram:
 
-
+![[Screenshot 2025-12-28 at 13.18.40.png]]
 ---
 
 ## ✔ Case B: Using object directly (automatic allocation → stack)
@@ -78,6 +78,7 @@ Memory layout:
 ✔ No heap involved  
 ✔ Automatic cleanup  
 ✔ Faster
+
 
 But…  
 You cannot store different derived objects in the same array or the same variable unless you use a pointer/reference to the base class.
