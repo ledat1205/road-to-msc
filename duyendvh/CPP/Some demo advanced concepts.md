@@ -1,3 +1,6 @@
+Below is a **pure code-only**, **advanced OOP C++ crash sheet** for senior-level interviews.  
+All examples are minimal but cover **core advanced OOP patterns, idioms, design, memory, RAII, polymorphism, SOLID, pimpl, CRTP, move-semantics, smart pointers, multi-inheritance pitfalls, virtual destructors, rule of 5, exception safety, type-erasure**, etc.
+
 //===============================================
 // 1. Rule of 5 + RAII
 //===============================================
