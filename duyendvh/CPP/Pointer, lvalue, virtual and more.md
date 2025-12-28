@@ -25,10 +25,15 @@ So you must store Circle in:
 
 `Shape* s1 = new Circle(5);`
 `const Shape& s2 = Rectangle(4, 6);`
+or
 `Rectangle r(4, 6);
-Shape& s2 = r;    `// ✅ valid
+`Shape& s2 = r;`
 
-`
+Not allowed:
+Shape& s2 = Rectangle(4, 6);
+
+
+
 
 ---
 
