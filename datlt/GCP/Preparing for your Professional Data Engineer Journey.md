@@ -98,3 +98,10 @@ Common applications of Pub/Sub
 ![[Pasted image 20251225224853.png]]
 
 ![[Pasted image 20251225224933.png]]
+
+![[Pasted image 20251230172213.png]]
+
+dataflow is apache beam as service
+
+![[Pasted image 20251230172253.png]]
+
