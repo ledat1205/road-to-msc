@@ -105,3 +105,4 @@ dataflow is apache beam as service
 
 ![[Pasted image 20251230172253.png]]
 
+![[Pasted image 20251230172500.png]]
