@@ -34,4 +34,7 @@
 3. the new university they planning will create a lot of job opportunities
 4. there are always some problems when 2 companies merged but i think it will be worth it in the long run
 5. the increase in oil prices certainly poses a problem for us
-6. 
+6. the company had expanded and has now added children's clothing to its product range
+
+"4.3"
+	
