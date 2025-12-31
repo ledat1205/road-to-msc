@@ -27,3 +27,8 @@
 2. bright colour
 3. key issue
 4. major problem
+
+"4.2"
+1. we are going to launch an exciting new product in June
+2. the economy boomed 30 years ago
+3. 
