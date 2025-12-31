@@ -22,6 +22,7 @@
 | happily married          | they are happily married                                                            |
 | fully aware              | i am fully aware that there are serious problem ( i know well)                      |
 | blissfully unaware       | harry was blissfully unaware that he was in danger (harry had no idea at all)       |
+| burst into tears         | when she saw her exam results, Kate burst into tears                                |
 "4.1":
 1. brief chat
 2. bright colour
@@ -38,7 +39,7 @@
 
 "4.3"
 1. nostalgia
-2. tears
+2. pride
 3. anger
 4. pride
-5. 
+5. tears
