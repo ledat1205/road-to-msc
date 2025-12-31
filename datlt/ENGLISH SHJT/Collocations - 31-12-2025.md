@@ -5,4 +5,6 @@
 | brief chat     | We had a brief chat about the exams bit didnt have time to discuss them properly |
 | major problem  | Unemployment is a major problem for government at the moment                     |
 | key issue      | Improving health service is another key issue for government                     |
-| economy boomed |                                                                                  |
+| economy boomed | the economy boomed in the 1990s. Ai is boomming                                  |
+| the c          |                                                                                  |
+|                |                                                                                  |
