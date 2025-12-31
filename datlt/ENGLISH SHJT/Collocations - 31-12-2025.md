@@ -18,4 +18,6 @@
 | pulled steadily          | she pulled steadily on the rope and helped him to safety                            |
 | placed ... gently        | he placed the beautiful vase gently on the window ledge                             |
 | whispered softly         | 'i love you and want to marry you' Dylan whispered softly to madison                |
-| smiled proudly           | she smiled proudly as she looked at the po                                          |
+| smiled proudly           | she smiled proudly as she looked at the photos of her new grandson                  |
+| happily married          | they are happily married                                                            |
+|                          |                                                                                     |
