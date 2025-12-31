@@ -16,4 +16,5 @@
 | a sense of pride         | every parent feels a sense of pride when their child does well or wins something    |
 | a pang of nostalgia      | i felt a pang of nostalgia when i saw the old photos of the village where i grew up |
 | pulled steadily          | she pulled steadily on the rope and helped him to safety                            |
-| placed ... gently        | he placed                                                                           |
+| placed ... gently        | he placed the beautiful vase gently on the window ledge                             |
+|                          |                                                                                     |
