@@ -23,4 +23,7 @@
 | fully aware              | i am fully aware that there are serious problem ( i know well)                      |
 | blissfully unaware       | harry was blissfully unaware that he was in danger (harry had no idea at all)       |
 "4.1":
-1. 
+1. brief chat
+2. bright colour
+3. key issue
+4. major problem
