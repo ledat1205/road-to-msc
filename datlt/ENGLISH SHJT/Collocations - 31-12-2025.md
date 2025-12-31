@@ -21,4 +21,6 @@
 | smiled proudly           | she smiled proudly as she looked at the photos of her new grandson                  |
 | happily married          | they are happily married                                                            |
 | fully aware              | i am fully aware that there are serious problem ( i know well)                      |
-| blissfully unaware       | harry was blissfully unaware that he                                                |
+| blissfully unaware       | harry was blissfully unaware that he was in danger (harry had no idea at all)       |
+"4.1":
+1. 
