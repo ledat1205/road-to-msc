@@ -10,4 +10,6 @@
 | the company has expanded | the company has expanded and now has branches in most major cites                |
 | companies merged         | the two companies merged in 2013 and now form one very large corporation         |
 | launched the product     | the company launched the product in 2012                                         |
-| poses a problem          | the price increase poses                                                         |
+| poses a problem          | the price increase poses a problem for use (is a problem)                        |
+| created opportunities    | the internet has created opportunities for our business                          |
+| a sur                    |                                                                                  |
