@@ -38,5 +38,7 @@
 
 "4.3"
 1. nostalgia
-2. 
-3. 
+2. pride
+3. anger
+4. pride
+5. 
