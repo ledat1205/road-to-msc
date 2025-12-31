@@ -1,3 +1,3 @@
-| Collocation | Example |
-| ----------- | ------- |
-|             |         |
+| Collocation   | Example |
+| ------------- | ------- |
+| bright colour |         |
