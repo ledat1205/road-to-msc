@@ -32,4 +32,6 @@
 1. we are going to launch an exciting new product in June
 2. the economy boomed 30 years ago
 3. the new university they planning will create a lot of job opportunities
-4. there are always 
+4. there are always some problems when 2 companies merged but i think it will be worth it in the long run
+5. the increase in oil prices certainly poses a problem for us
+6. 
