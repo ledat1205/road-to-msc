@@ -43,3 +43,4 @@
 3. anger
 4. pride
 5. tears
+6. honor
