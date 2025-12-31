@@ -37,4 +37,6 @@
 6. the company had expanded and has now added children's clothing to its product range
 
 "4.3"
-	
+1. nostalgia
+2. 
+3. 
