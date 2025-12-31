@@ -13,4 +13,5 @@
 | poses a problem          | the price increase poses a problem for use (is a problem)                         |
 | created opportunities    | the internet has created opportunities for our business                           |
 | a surge of anger         | as max read the lies about him, he felt a surge of anger (a sudden angry feeling) |
-| a sense of pride         |                                                                                   |
+| a sense of pride         | every parent feels a sense of pride when their child does well or wins something  |
+| a pang of nostalgia      | i felt a pang of nost                                                             |
