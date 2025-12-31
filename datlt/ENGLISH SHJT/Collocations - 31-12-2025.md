@@ -6,5 +6,6 @@
 | major problem            | Unemployment is a major problem for government at the moment                     |
 | key issue                | Improving health service is another key issue for government                     |
 | economy boomed           | the economy boomed in the 1990s. Ai is boomming                                  |
-| the company has grown    |                                                                                  |
-| the company has expanded |                                                                                  |
+| the company has grown    | the company has grown and now employs 50 more people than last year              |
+| the company has expanded | the company has expanded and now has branches in most major cites                |
+| companies merged         | the two co                                                                       |
