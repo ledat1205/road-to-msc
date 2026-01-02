@@ -638,3 +638,480 @@ int main() {
     return 0;
 }
 ```
+
+### 10. Classes: Attributes and Constructors
+
+Focus: Member variables, member initialization lists, constructor overloading, delegating constructors, and default member initializers (C++11+).
+
+**Example: Order Management System in a High-Frequency Trading Engine**
+
+C++
+
+```
+#include <iostream>
+#include <string>
+#include <chrono>
+#include <vector>
+
+class Order {
+private:
+    std::string symbol;                // Ticker
+    double price;                      // Limit price
+    int quantity;                      // Shares/contracts
+    bool isBuy;                        // Buy or Sell
+    std::chrono::nanoseconds timestamp; // Precise entry time
+
+public:
+    // Primary constructor with member initializer list (performance-critical)
+    Order(std::string sym, double pr, int qty, bool buy)
+        : symbol(std::move(sym)),
+          price(pr),
+          quantity(qty),
+          isBuy(buy),
+          timestamp(std::chrono::high_resolution_clock::now().time_since_epoch()) {}
+
+    // Delegating constructor for market orders (price = 0)
+    Order(std::string sym, int qty, bool buy)
+        : Order(std::move(sym), 0.0, qty, buy) {}  // Delegates to primary
+
+    // Default member initializer (C++11) for optional fields
+    std::string comment = "No comment";  // Default value
+
+    void print() const {
+        std::cout << (isBuy ? "BUY" : "SELL") << " " << quantity << " " << symbol
+                  << " @ " << price << " | " << comment << " | ts: " << timestamp.count() << "ns\n";
+    }
+};
+
+int main() {
+    Order limitOrder("AAPL", 150.25, 1000, true);
+    Order marketOrder("TSLA", 500, false);  // Uses delegating constructor
+
+    limitOrder.comment = "Urgent execution";
+    limitOrder.print();
+    marketOrder.print();
+    return 0;
+}
+```
+
+This mirrors HFT order objects: fast construction, no unnecessary copies, precise timestamps.
+
+### 11. Classes: Initialization, Destructors, and Member Functions
+
+Focus: Uniform initialization, copy/move constructors, destructors (RAII), const member functions, and mutable members.
+
+**Example: Resource-Tracked File Handler in a Data Logging System**
+
+C++
+
+```
+#include <fstream>
+#include <string>
+#include <iostream>
+
+class LogFile {
+private:
+    std::ofstream file;
+    std::string path;
+    mutable int accessCount = 0;  // mutable allows const method to modify
+
+public:
+    // Uniform initialization + RAII
+    explicit LogFile(std::string p) : path(std::move(p)), file(path) {
+        if (!file.is_open()) throw std::runtime_error("Failed to open " + path);
+    }
+
+    // Copy constructor disabled (no copying open files)
+    LogFile(const LogFile&) = delete;
+
+    // Move constructor for transfer of ownership
+    LogFile(LogFile&& other) noexcept
+        : file(std::move(other.file)), path(std::move(other.path)), accessCount(other.accessCount) {
+        other.file.close();
+    }
+
+    ~LogFile() {
+        if (file.is_open()) {
+            file << "Log closed at shutdown\n";
+            std::cout << "Log file " << path << " closed.\n";
+        }
+    }
+
+    void write(const std::string& msg) const {
+        ++accessCount;
+        file << msg << '\n';
+        file.flush();  // Critical for real-time logging
+    }
+
+    int getAccessCount() const { return accessCount; }  // const method
+};
+
+int main() {
+    LogFile log("trading_errors.log");
+    log.write("Order rejected: insufficient margin");
+    std::cout << "Access count: " << log.getAccessCount() << "\n";
+
+    LogFile moved = std::move(log);  // Move semantics
+    moved.write("Log transferred to new object");
+    return 0;  // Destructor closes file safely
+}
+```
+
+This demonstrates RAII for file resources and mutable for logging stats in high-throughput systems.
+
+### 12. Classes: default, delete, Operator Overloading, explicit, Access Rights, Friends, and Structures
+
+**Example: Financial Instrument Class with Operator Overloading**
+
+C++
+
+```
+#include <iostream>
+#include <string>
+
+class Instrument {
+private:
+    std::string isin;
+    double price;
+    int volume;
+
+public:
+    Instrument(std::string i, double p, int v) : isin(std::move(i)), price(p), volume(v) {}
+
+    // Explicit constructor prevents implicit conversion
+    explicit Instrument(double p) : price(p), volume(0), isin("UNKNOWN") {}
+
+    // Deleted copy assignment (immutable after creation)
+    Instrument& operator=(const Instrument&) = delete;
+
+    // Operator overloading
+    Instrument operator+(const Instrument& other) const {
+        return Instrument(isin + "+" + other.isin, price + other.price, volume + other.volume);
+    }
+
+    bool operator==(const Instrument& other) const { return isin == other.isin; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Instrument& instr) {
+        os << instr.isin << " @ " << instr.price << " (vol: " << instr.volume << ")";
+        return os;
+    }
+
+    friend class Portfolio;  // Portfolio can access private members
+};
+
+struct Portfolio {
+    void adjust(Instrument& instr, double newPrice) {
+        instr.price = newPrice;  // Friend access
+    }
+};
+
+int main() {
+    Instrument apple("US0378331005", 150.0, 1000);
+    Instrument tesla("US88160R1014", 700.0, 500);
+
+    Instrument combined = apple + tesla;  // Operator+
+    std::cout << combined << "\n";
+
+    Portfolio port;
+    port.adjust(apple, 152.5);  // Friend access
+
+    std::cout << apple << "\n";
+    return 0;
+}
+```
+
+Used in trading platforms for instrument aggregation and access control.
+
+### 13. Inheritance: Abstract Base Classes, Access Rights, Constructors, Base Class Initializers
+
+**Example: Abstract Trading Strategy Framework**
+
+C++
+
+```
+#include <iostream>
+#include <string>
+
+class TradingStrategy {  // Abstract base class
+protected:
+    std::string name;
+    double capital;
+
+public:
+    TradingStrategy(std::string n, double c) : name(std::move(n)), capital(c) {}
+    virtual ~TradingStrategy() = default;
+
+    virtual void execute() = 0;           // Pure virtual
+    virtual double getRisk() const = 0;
+
+    void printInfo() const {
+        std::cout << "Strategy: " << name << ", Capital: " << capital << "\n";
+    }
+};
+
+class MomentumStrategy : public TradingStrategy {
+private:
+    int lookbackPeriod;
+public:
+    MomentumStrategy(std::string n, double c, int lb)
+        : TradingStrategy(std::move(n), c), lookbackPeriod(lb) {}
+
+    void execute() override {
+        std::cout << name << ": Momentum buy/sell on " << lookbackPeriod << "-day trend\n";
+    }
+
+    double getRisk() const override { return 0.15; }  // 15% risk
+};
+```
+
+Common in quantitative finance for strategy hierarchies.
+
+### 14. Inheritance: Destructor, Virtuality, override, final, and Multiple Inheritance
+
+**Example: Game Object Hierarchy with Virtual Destruction**
+
+C++
+
+```
+#include <iostream>
+#include <memory>
+#include <vector>
+
+class GameObject {
+public:
+    virtual ~GameObject() = default;  // Virtual destructor
+    virtual void update() = 0;
+};
+
+class PhysicalObject : public GameObject {
+public:
+    void update() override final { std::cout << "Physical update\n"; }
+};
+
+class Renderable final : public GameObject {
+public:
+    void update() override { std::cout << "Render update\n"; }
+};
+
+class Player : public PhysicalObject, public Renderable {  // Multiple inheritance
+public:
+    void update() override {  // Resolves diamond problem implicitly
+        PhysicalObject::update();
+        Renderable::update();
+        std::cout << "Player logic\n";
+    }
+};
+
+int main() {
+    std::vector<std::unique_ptr<GameObject>> objects;
+    objects.push_back(std::make_unique<Player>());
+    for (auto& obj : objects) obj->update();
+    return 0;
+}
+```
+
+Used in game engines (e.g., Unreal) for polymorphic object management.
+
+### 15. Templates: Functions and Classes
+
+**Example: Generic Lock-Free Queue for Real-Time Systems**
+
+C++
+
+```
+#include <atomic>
+#include <memory>
+
+template <typename T>
+class LockFreeQueue {
+private:
+    struct Node {
+        T data;
+        std::shared_ptr<Node> next;
+        Node(T val) : data(std::move(val)) {}
+    };
+
+    std::atomic<std::shared_ptr<Node>> head{nullptr};
+    std::atomic<std::shared_ptr<Node>> tail{nullptr};
+
+public:
+    void push(T value) {
+        auto newNode = std::make_shared<Node>(std::move(value));
+        auto oldTail = tail.load();
+        if (oldTail) oldTail->next = newNode;
+        tail.store(newNode);
+        if (!head.load()) head.store(newNode);
+    }
+
+    bool pop(T& value) {
+        auto oldHead = head.load();
+        if (!oldHead) return false;
+        value = std::move(oldHead->data);
+        head.store(oldHead->next);
+        return true;
+    }
+};
+```
+
+Used in real-time audio processing or robotics.
+
+### 16. Templates: Parameters and Arguments
+
+**Example: Configurable Matrix Class with Template Parameters**
+
+C++
+
+```
+template <typename T, size_t Rows, size_t Cols>
+class Matrix {
+    std::array<std::array<T, Cols>, Rows> data{};
+public:
+    T& operator()(size_t r, size_t c) { return data[r][c]; }
+    const T& operator()(size_t r, size_t c) const { return data[r][c]; }
+
+    template <typename U>
+    Matrix<U, Rows, Cols> cast() const {
+        Matrix<U, Rows, Cols> result;
+        for (size_t i = 0; i < Rows; ++i)
+            for (size_t j = 0; j < Cols; ++j)
+                result(i, j) = static_cast<U>((*this)(i, j));
+        return result;
+    }
+};
+
+int main() {
+    Matrix<double, 3, 3> m;
+    m(1, 1) = 42.0;
+    auto intMatrix = m.cast<int>();
+    std::cout << intMatrix(1, 1) << "\n";  // 42
+}
+```
+
+Used in scientific computing and computer vision.
+
+### 17. Template Specialization
+
+**Example: Specialized Formatter for Financial Types**
+
+C++
+
+```
+#include <iostream>
+#include <string>
+
+template <typename T>
+std::string format(const T& value) {
+    return std::to_string(value);
+}
+
+// Full specialization for double (money)
+template <>
+std::string format<double>(const double& value) {
+    char buf[32];
+    std::snprintf(buf, sizeof(buf), "%.2f", value);
+    return buf;
+}
+
+// Partial specialization for pointers
+template <typename T>
+std::string format<T*>(T* ptr) {
+    return ptr ? "Ptr: " + std::to_string(reinterpret_cast<uintptr_t>(ptr)) : "nullptr";
+}
+
+int main() {
+    std::cout << format(42.5678) << "\n";         // 42.57
+    std::cout << format(100) << "\n";             // "100"
+    int x = 10;
+    std::cout << format(&x) << "\n";
+}
+```
+
+Used in logging systems for pretty-printing.
+
+### 18. Type Traits
+
+**Example: Generic Container Inspector**
+
+C++
+
+```
+#include <type_traits>
+#include <vector>
+#include <array>
+
+template <typename Container>
+void inspect() {
+    using value_type = typename Container::value_type;
+
+    if constexpr (std::is_arithmetic_v<value_type>) {
+        std::cout << "Arithmetic container (e.g., numbers)\n";
+    } else if constexpr (std::is_same_v<value_type, std::string>) {
+        std::cout << "String container\n";
+    }
+
+    constexpr bool is_dynamic = !std::is_array_v<Container> && !std::is_base_of_v<std::array<value_type, std::tuple_size_v<Container>>, Container>;
+    std::cout << "Dynamic size: " << std::boolalpha << is_dynamic << "\n";
+}
+
+int main() {
+    inspect<std::vector<int>>();     // Arithmetic + dynamic
+    inspect<std::array<double, 5>>(); // Arithmetic + static
+    inspect<std::vector<std::string>>(); // String + dynamic
+}
+```
+
+Used in generic libraries and metaprogramming.
+
+### 19. Smart Pointers
+
+**Example: Scene Graph Node in a 3D Rendering Engine**
+
+C++
+
+```
+#include <memory>
+#include <vector>
+#include <iostream>
+
+class SceneNode {
+public:
+    std::string name;
+    std::weak_ptr<SceneNode> parent;  // Avoid circular references
+    std::vector<std::shared_ptr<SceneNode>> children;
+
+    explicit SceneNode(std::string n) : name(std::move(n)) {}
+
+    void addChild(std::shared_ptr<SceneNode> child) {
+        child->parent = shared_from_this();
+        children.push_back(std::move(child));
+    }
+
+    void printHierarchy(int level = 0) const {
+        std::cout << std::string(level * 2, ' ') << name << "\n";
+        for (const auto& child : children) {
+            child->printHierarchy(level + 1);
+        }
+    }
+
+    ~SceneNode() { std::cout << "Destroyed: " << name << "\n"; }
+};
+
+int main() {
+    auto root = std::make_shared<SceneNode>("Root");
+    auto model = std::make_shared<SceneNode>("Model");
+    auto light = std::make_shared<SceneNode>("Light");
+
+    root->addChild(model);
+    root->addChild(light);
+
+    root->printHierarchy();
+
+    // Weak ptr usage
+    if (auto parent = light->parent.lock()) {
+        std::cout << light->name << " parent is " << parent->name << "\n";
+    }
+
+    // Root goes out of scope → entire tree destroyed safely
+    return 0;
+}
+```
