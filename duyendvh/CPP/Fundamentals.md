@@ -985,6 +985,12 @@ int main() {
     auto intMatrix = m.cast<int>();
     std::cout << intMatrix(1, 1) << "\n";  // 42
 }
+
+Matrix m(3, 3);
+
+// 1. Non-const object → both overloads available m(0, 0) = 42; // Calls non-const version: T& int x = m(0, 0); // Can call either; non-const preferred m(1, 1) += 10; // Modification → non-const version
+
+// 2. Const object → only const version available const Matrix& cm = m; int y = cm(0, 0); // OK: calls const version // cm(0, 0) = 99; // ERROR: cannot modify through const T&
 ```
 
 Used in scientific computing and computer vision.
