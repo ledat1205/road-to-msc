@@ -17,3 +17,6 @@
 ![[Pasted image 20260103151415.png]]
 ![[Pasted image 20260103151531.png]]
 ![[Pasted image 20260103151625.png]]
+
+## Metadata managment
+![[Pasted image 20260103151831.png]]
