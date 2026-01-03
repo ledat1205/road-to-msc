@@ -15,3 +15,4 @@
 ## Storage solution options
 ![[Pasted image 20260103151253.png]]
 ![[Pasted image 20260103151415.png]]
+![[Pasted image 20260103151531.png]]
