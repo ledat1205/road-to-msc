@@ -11,3 +11,6 @@
 
 ## Data formats
 ![[Pasted image 20260103120054.png]]
+
+## Storage solution options
+![[Pasted image 20260103151253.png]]
