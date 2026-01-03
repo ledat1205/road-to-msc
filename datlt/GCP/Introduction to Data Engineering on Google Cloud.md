@@ -6,4 +6,5 @@
 
 ## Data Sources Versus Data Sinks
 ![[Pasted image 20260103115855.png]]
-
+![[Pasted image 20260103115931.png]]
+![[Pasted image 20260103115959.png]]
