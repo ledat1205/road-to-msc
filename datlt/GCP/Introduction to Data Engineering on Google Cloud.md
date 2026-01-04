@@ -60,3 +60,7 @@
 
 ## bq command line tool
 ![[Pasted image 20260104211946.png]]
+
+## bigquery data transfer service
+![[Pasted image 20260104212740.png]]
+
