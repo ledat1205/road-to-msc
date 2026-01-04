@@ -74,5 +74,7 @@
 ![[Pasted image 20260104213214.png]]
 ![[Pasted image 20260104213235.png]]
 
-## ELT pattern
+# ELT data pipeline pattern
+
+## Architecture
 ![[Pasted image 20260104222633.png]]
