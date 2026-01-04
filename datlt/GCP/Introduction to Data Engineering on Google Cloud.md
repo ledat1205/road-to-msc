@@ -78,3 +78,4 @@
 
 ## Architecture
 ![[Pasted image 20260104222633.png]]
+	![[Pasted image 20260104222840.png]]
