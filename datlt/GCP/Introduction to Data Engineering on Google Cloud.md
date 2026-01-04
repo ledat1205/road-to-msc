@@ -54,3 +54,4 @@
 
 # The extract and load data pipeline pattern
 ## Extract and load architecture
+![[Pasted image 20260104211721.png]]
