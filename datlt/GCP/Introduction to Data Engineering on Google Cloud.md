@@ -81,3 +81,6 @@
 ![[Pasted image 20260104222840.png]]
 
 ## SQL scripting and scheduling with BigQuery
+![[Pasted image 20260104222957.png]]
+![[Pasted image 20260104223027.png]]
+![[Pasted image 20260104223046.png]]
