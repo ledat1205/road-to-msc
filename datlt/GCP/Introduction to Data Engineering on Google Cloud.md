@@ -43,4 +43,7 @@
 ![[Pasted image 20260104201314.png]]
 ![[Pasted image 20260104201351.png]]
 
-## Data
+## Datastream
+![[Pasted image 20260104201456.png]]
+![[Pasted image 20260104201529.png]]
+![[Pasted image 20260104201556.png]]
