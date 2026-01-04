@@ -74,3 +74,5 @@
 ![[Pasted image 20260104213214.png]]
 ![[Pasted image 20260104213235.png]]
 
+## ELT pattern
+![[Pasted image 20260104222633.png]]
