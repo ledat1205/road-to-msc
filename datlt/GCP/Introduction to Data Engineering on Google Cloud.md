@@ -57,3 +57,6 @@
 ![[Pasted image 20260104211721.png]]
 ![[Pasted image 20260104211806.png]]
 ![[Pasted image 20260104211853.png]]
+
+## bq command line tool
+![[Pasted image 20260104211946.png]]
