@@ -64,3 +64,6 @@
 ## bigquery data transfer service
 ![[Pasted image 20260104212740.png]]
 
+## biglake 
+![[Pasted image 20260104212843.png]]
+
