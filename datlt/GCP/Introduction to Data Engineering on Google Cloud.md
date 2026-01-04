@@ -93,3 +93,6 @@
 ## Dataform
 ![[Pasted image 20260104223338.png]]
 ![[Pasted image 20260104223359.png]]
+![[Pasted image 20260104223430.png]]
+![[Pasted image 20260104223458.png]]
+![[Pasted image 20260104223529.png]]
