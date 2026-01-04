@@ -29,4 +29,7 @@
 
 # Replication and migration 
 
-## Rel
+## Replication and migration architecture
+
+![[Pasted image 20260104200947.png]]
+![[Pasted image 20260104201014.png]]
