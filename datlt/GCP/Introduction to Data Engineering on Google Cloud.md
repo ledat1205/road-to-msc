@@ -102,3 +102,5 @@
 ![[Pasted image 20260104225154.png]]
 ![[Pasted image 20260105021042.png]]
 ![[Pasted image 20260105021126.png]]
+
+# ETL data pipeline pattern
