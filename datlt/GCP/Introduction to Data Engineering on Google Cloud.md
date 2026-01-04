@@ -52,4 +52,4 @@
 ![[Pasted image 20260104201811.png]]
 ![[Pasted image 20260104201857.png]]
 
-# The extract and load data pipeline pattre
+# The extract and load data pipeline pattern
