@@ -36,3 +36,6 @@
 ![[Pasted image 20260104201033.png]]
 ![[Pasted image 20260104201109.png]]
 
+## gcloud command line tool
+
+![[Pasted image 20260104201221.png]]
