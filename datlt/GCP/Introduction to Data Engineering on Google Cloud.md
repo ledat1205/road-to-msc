@@ -89,3 +89,7 @@
 ![[Pasted image 20260104223212.png]]
 ![[Pasted image 20260104223236.png]]
 ![[Pasted image 20260104223256.png]]
+
+## Dataform
+![[Pasted image 20260104223338.png]]
+![[Pasted image 20260104223359.png]]
