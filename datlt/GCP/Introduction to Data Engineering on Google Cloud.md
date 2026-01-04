@@ -1,3 +1,4 @@
+# Data engineer tasks and components
 ## The role of data engineer
 
 ![[Pasted image 20260103115410.png]]
@@ -25,3 +26,7 @@
 ## Sharing datasets using analytics hub
 ![[Pasted image 20260104195626.png]]
 ![[Pasted image 20260104195653.png]]
+
+# Replication and migration 
+
+## Rel
