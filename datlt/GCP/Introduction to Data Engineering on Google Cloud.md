@@ -98,3 +98,4 @@
 ![[Pasted image 20260104223529.png]]
 ![[Pasted image 20260104223557.png]]
 ![[Pasted image 20260104223618.png]]
+![[Pasted image 20260104225122.png]]
