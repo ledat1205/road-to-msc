@@ -37,5 +37,7 @@
 ![[Pasted image 20260104201109.png]]
 
 ## gcloud command line tool
-
 ![[Pasted image 20260104201221.png]]
+
+## moving datasets
+![[Pasted image 20260104201314.png]]
