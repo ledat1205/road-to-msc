@@ -132,7 +132,13 @@ Even if Shape were _not_ abstract, you would lose the derived class behavior.
 
 Use smart pointers:
 
-`#include <memory>  int main() {     std::unique_ptr<Shape> s1 = std::make_unique<Circle>(5);     std::unique_ptr<Shape> s2 = std::make_unique<Rectangle>(4, 6);      s1->draw();     s2->draw(); }`
+```
+#include <memory>  
+int main() {     
+std::unique_ptr<Shape> s1 = std::make_unique<Circle>(5);     std::unique_ptr<Shape> s2 = std::make_unique<Rectangle>(4, 6);      
+s1->draw();     
+s2->draw(); }
+```
 
 - No memory leaks
     
@@ -141,9 +147,23 @@ Use smart pointers:
 - Still polymorphic
 
 
+# Dynamic/ static binding
 ## ✅ 1. Non-virtual function: static binding (compile-time)
 ```
+class A {
+public:
+    void hello() { std::cout << "A::hello\n"; }
+};
 
+class B : public A {
+public:
+    void hello() { std::cout << "B::hello\n"; }
+};
+
+int main() {
+    A* p = new B();
+    p->hello();   // ❗ calls A::hello, not B::hello
+}
 ```
 Why?
 Because hello() is not virtual, so C++ binds the function at compile time based on the type of the pointer, not the object.
