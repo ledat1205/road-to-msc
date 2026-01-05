@@ -141,119 +141,155 @@ Use smart pointers:
 - Still polymorphic
 
 
+## ✅ 1. Non-virtual function: static binding (compile-time)
 
+class A {
+public:
+    void hello() { std::cout << "A::hello\n"; }
+};
 
-### ✅ Use **non-virtual** when:
+class B : public A {
+public:
+    void hello() { std::cout << "B::hello\n"; }
+};
 
-- Behavior **must not change** in derived classes
-    
-- You want **compile-time binding**
-    
-- It’s an **implementation detail**, not part of a polymorphic interface
-    
-- High-performance or low-level code (hot paths)
-    
+int main() {
+    A* p = new B();
+    p->hello();   // ❗ calls A::hello, not B::hello
+}
+Why?
+Because hello() is not virtual, so C++ binds the function at compile time based on the type of the pointer, not the object.
 
-Example:
+✔ Pointer type = A*
+→ Call A::hello
 
-`class Shape { public:     void normalize() { /* invariant logic */ } };`
+✅ 2. Virtual function: dynamic binding (runtime)
+cpp
+￼Copy code
+class A {
+public:
+    virtual void hello() { std::cout << "A::hello\n"; }
+};
 
----
+class B : public A {
+public:
+    void hello() override { std::cout << "B::hello\n"; }
+};
 
-### ✅ Use **virtual** when:
+int main() {
+    A* p = new B();
+    p->hello();  // ✔ calls B::hello
+}
+Why?
+virtual tells C++ to check the actual object type at runtime.
 
-- You want **runtime polymorphism**
-    
-- Behavior **depends on the dynamic type**
-    
-- The base class represents an **interface / contract**
-    
-- You expect subclassing
-    
+Compiler uses a vtable (virtual function table).
 
-Example:
+✔ Object type = B
+→ Call B::hello
 
-`class Shape { public:     virtual void draw() = 0; // interface };`
+✅ 3. How virtual dispatch works (vtable)
+Memory layout:
+cpp
+￼Copy code
+A* p = new B();
+pgsql
+￼Copy code
+             HEAP
+    -----------------------
+    | B object            |
+    | vptr → vtable (B)   | → [ B::hello ]
+    -----------------------
 
-📌 **Rule of thumb**
-
-> If a function is meant to be overridden → **make it virtual**  
-> If it must never be overridden → **keep it non-virtual**
-
----
-
-## 2️⃣ How it works behind the scenes
-
-### 🔹 Non-virtual call (`type()`)
-
-`s->type();`
-
-### What the compiler does
-
-- The **static type** of `s` is `Shape*`
-    
-- `type()` is **non-virtual**
-    
-- The call target is known **at compile time**
-    
-
-The compiler emits something like:
-
-`call Shape::type`
-
-No lookup. No indirection.  
-This is called **static dispatch**.
-
----
-
-### 🔹 Virtual call (`draw()`)
-
-### Memory layout:
-![[Screenshot 2026-01-06 at 01.30.12.png]]
-
-
+             STACK
+    -----------------------
+    | p (A*)  -----------→ |
+    -----------------------
 When you call:
 
-`p->hello();`
-
+cpp
+￼Copy code
+p->hello();
 Steps:
 
-1. Look at `p` (points to B object)
-    
-2. Look at vptr inside the B object
-    
-3. Jump to B’s vtable
-    
-4. Call `B::hello`
-    
+Look at p (points to B object)
 
-This is called **dynamic dispatch**.
+Look at vptr inside the B object
 
----
+Jump to B’s vtable
 
-### Why `draw()` calls `Circle::draw`
+Call B::hello
 
-Because:
+This is called dynamic dispatch.
 
-- `s` points to a `Circle` object
-    
-- That object’s `vptr` points to **Circle’s vtable**
-    
-- `draw()` entry resolves to `Circle::draw`
-    
+✅ 4. Without virtual ⇒ no vtable
+If the function is NOT virtual:
 
----
+No vtable
 
-## 3️⃣ Key difference summarized
+Compiler uses static binding
 
-| Aspect               | Non-virtual     | Virtual         |
-| -------------------- | --------------- | --------------- |
-| Binding time         | Compile time    | Runtime         |
-| Based on             | Static type     | Dynamic type    |
-| Uses vtable          | ❌ No            | ✅ Yes           |
-| Performance          | Slightly faster | Slight overhead |
-| Overridable          | ❌ No            | ✅ Yes           |
-| Enables polymorphism | ❌               | ✅               |
+Call is decided at compile time based on pointer/reference type
+
+✅ 5. What if object is not a pointer? → static binding
+cpp
+￼Copy code
+B b;
+A a = b;     // ❗ slicing
+a.hello();   // calls A::hello
+This is object slicing:
+
+a becomes a standalone A object
+
+B data is discarded
+
+No polymorphism
+
+Even if hello() is virtual, slicing prevents polymorphic behavior.
+
+🔥 Summary Table: Which function is called?
+Code	Virtual?	Pointer type	Object type	Function called
+A* p = new B(); p->f();	❌ No	A	B	A::f
+A* p = new B(); p->f();	✔ Yes	A	B	B::f
+A a = B(); a.f();	✔ Yes	A	A (sliced)	A::f
+B b; A& ref = b; ref.f();	✔ Yes	A	B	B::f
+￼
+⭐ 6. Full example with print statements
+cpp
+￼Copy code
+class Shape {
+public:
+    void type() { std::cout << "Shape::type\n"; }
+    virtual void draw() { std::cout << "Shape::draw\n"; }
+};
+
+class Circle : public Shape {
+public:
+    void type() { std::cout << "Circle::type\n"; }
+    void draw() override { std::cout << "Circle::draw\n"; }
+};
+
+int main() {
+    Shape* s = new Circle();
+
+    s->type();   // Shape::type  (non-virtual)
+    s->draw();   // Circle::draw (virtual)
+}
+🧠 Key Rules to Remember
+✔ Non-virtual function ⇒ static binding (compile time)
+Based on pointer/reference type.
+
+✔ Virtual function ⇒ dynamic binding (runtime)
+Based on actual object type.
+
+✔ Abstract class uses virtual functions
+(usually = 0 pure virtual).
+
+✔ Object slicing kills polymorphism
+(never pass base objects by value).
+
+
+
 
 ## 2️⃣ Formal C++ value categories (important)
 
