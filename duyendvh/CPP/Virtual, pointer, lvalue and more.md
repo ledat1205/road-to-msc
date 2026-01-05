@@ -206,24 +206,28 @@ This is called **static dispatch**.
 
 ---
 
-### 🔹 Virtual call (`draw()`)
+### 🔹 Virtual call 
 
-`s->draw();`
+### Memory layout:
+![[Screenshot 2026-01-06 at 01.30.12.png]]
 
-### What actually happens
 
-Each object of a class with virtual functions contains:
+When you call:
 
-- a hidden pointer: **vptr**
+`p->hello();`
+
+Steps:
+
+1. Look at `p` (points to B object)
     
-- pointing to a **vtable**
+2. Look at vptr inside the B object
+    
+3. Jump to B’s vtable
+    
+4. Call `B::hello`
     
 
-At runtime:
-
-`load vptr from object load function pointer from vtable call through that pointer`
-
-This is **dynamic dispatch**.
+This is called **dynamic dispatch**.
 
 ---
 
