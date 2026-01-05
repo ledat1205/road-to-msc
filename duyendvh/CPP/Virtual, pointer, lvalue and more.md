@@ -147,7 +147,7 @@ s2->draw(); }
 - Still polymorphic
 
 
-# Dynamic/ static Binding
+# Dynamic/ Static Binding
 ## ✅ 1. Non-virtual function: static binding (compile-time)
 ```
 class A {
