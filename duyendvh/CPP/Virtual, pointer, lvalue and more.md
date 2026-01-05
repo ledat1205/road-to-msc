@@ -341,7 +341,8 @@ Only overload selection does.
 
 ## 7️⃣ lvalue & object slicing (critical)
 
-`Circle c; Shape s = c;   // ❌ slicing`
+`Circle c; 
+`Shape s = c;   // ❌ slicing`
 
 Here:
 
@@ -362,7 +363,8 @@ Here:
 
 ## 8️⃣ Why `std::move` matters
 
-`Shape s; process(s);           // lvalue process(std::move(s)); // xvalue`
+`Shape s; process(s);           // lvalue 
+`process(std::move(s)); // xvalue`
 
 `std::move`:
 
