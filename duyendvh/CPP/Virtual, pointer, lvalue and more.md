@@ -250,15 +250,15 @@ No polymorphism
 Even if hello() is virtual, slicing prevents polymorphic behavior.
 
 ## 🔥 Summary Table: Which function is called?
-Code	Virtual?	Pointer type	Object type	Function called
-A* p = new B(); p->f();	❌ No	A	B	A::f
-A* p = new B(); p->f();	✔ Yes	A	B	B::f
-A a = B(); a.f();	✔ Yes	A	A (sliced)	A::f
-B b; A& ref = b; ref.f();	✔ Yes	A	B	B::f
+|Code|Virtual?|Pointer type|Object type|Function called|
+|---|---|---|---|---|
+|`A* p = new B(); p->f();`|❌ No|A|B|`A::f`|
+|`A* p = new B(); p->f();`|✔ Yes|A|B|`B::f`|
+|`A a = B(); a.f();`|✔ Yes|A|A (sliced)|`A::f`|
+|`B b; A& ref = b; ref.f();`|✔ Yes|A|B|`B::f`|
 ￼
 ⭐ 6. Full example with print statements
-cpp
-￼Copy code
+```
 class Shape {
 public:
     void type() { std::cout << "Shape::type\n"; }
@@ -277,6 +277,8 @@ int main() {
     s->type();   // Shape::type  (non-virtual)
     s->draw();   // Circle::draw (virtual)
 }
+```
+
 🧠 Key Rules to Remember
 ✔ Non-virtual function ⇒ static binding (compile time)
 Based on pointer/reference type.
