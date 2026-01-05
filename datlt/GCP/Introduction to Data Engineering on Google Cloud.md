@@ -104,3 +104,4 @@
 ![[Pasted image 20260105021126.png]]
 
 # ETL data pipeline pattern
+## Architecture
