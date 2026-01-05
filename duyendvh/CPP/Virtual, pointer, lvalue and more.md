@@ -142,7 +142,6 @@ Use smart pointers:
 
 
 ## ✅ 1. Non-virtual function: static binding (compile-time)
-
 class A {
 public:
     void hello() { std::cout << "A::hello\n"; }
@@ -163,9 +162,7 @@ Because hello() is not virtual, so C++ binds the function at compile time based 
 ✔ Pointer type = A*
 → Call A::hello
 
-✅ 2. Virtual function: dynamic binding (runtime)
-cpp
-￼Copy code
+## ✅ 2. Virtual function: dynamic binding (runtime)
 class A {
 public:
     virtual void hello() { std::cout << "A::hello\n"; }
@@ -188,7 +185,7 @@ Compiler uses a vtable (virtual function table).
 ✔ Object type = B
 → Call B::hello
 
-✅ 3. How virtual dispatch works (vtable)
+## ✅ 3. How virtual dispatch works (vtable)
 Memory layout:
 cpp
 ￼Copy code
@@ -222,7 +219,7 @@ Call B::hello
 
 This is called dynamic dispatch.
 
-✅ 4. Without virtual ⇒ no vtable
+## ✅ 4. Without virtual ⇒ no vtable
 If the function is NOT virtual:
 
 No vtable
@@ -231,10 +228,8 @@ Compiler uses static binding
 
 Call is decided at compile time based on pointer/reference type
 
-✅ 5. What if object is not a pointer? → static binding
-cpp
-￼Copy code
-B b;
+## ✅ 5. What if object is not a pointer? → static binding
+```B b;
 A a = b;     // ❗ slicing
 a.hello();   // calls A::hello
 This is object slicing:
@@ -247,12 +242,12 @@ No polymorphism
 
 Even if hello() is virtual, slicing prevents polymorphic behavior.
 
-🔥 Summary Table: Which function is called?
+## 🔥 Summary Table: Which function is called?
 Code	Virtual?	Pointer type	Object type	Function called
 A* p = new B(); p->f();	❌ No	A	B	A::f
 A* p = new B(); p->f();	✔ Yes	A	B	B::f
 A a = B(); a.f();	✔ Yes	A	A (sliced)	A::f
-B b; A& ref = b; ref.f();	✔ Yes	A	B	B::f
+B b; A& ref = b; ref.f();	✔ Yes	A	B	B::f```
 ￼
 ⭐ 6. Full example with print statements
 cpp
