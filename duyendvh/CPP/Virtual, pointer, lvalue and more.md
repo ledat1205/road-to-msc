@@ -206,7 +206,7 @@ This is called **static dispatch**.
 
 ---
 
-### 🔹 Virtual call 
+### 🔹 Virtual call (`draw()`)
 
 ### Memory layout:
 ![[Screenshot 2026-01-06 at 01.30.12.png]]
