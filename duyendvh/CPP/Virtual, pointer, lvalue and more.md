@@ -329,10 +329,13 @@ Only overload selection does.
 ### Binding rules
 
 `void f(Shape&);      // lvalue only 
-void g(Shape&&);     // rvalue only`
+`void g(Shape&&);     // rvalue only`
 `void h(const Shape&); // both
 
-`Shape s;  f(s);          // OK f(Shape{});    // ❌  g(s);          // ❌ g(Shape{});    // OK`
+`Shape s;  f(s);          // OK 
+`f(Shape{});    // ❌  
+`g(s);          // ❌ 
+`g(Shape{});    // OK`
 
 ---
 
