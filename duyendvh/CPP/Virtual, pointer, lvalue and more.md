@@ -219,10 +219,6 @@ Each object of a class with virtual functions contains:
 - pointing to a **vtable**
     
 
-#### Memory layout (conceptual)
-
-`Circle object in memory: +--------------------+ | vptr --------------+-----> Circle vtable | Shape subobject    | +--------------------+  Circle vtable: [0] Circle::draw`
-
 At runtime:
 
 `load vptr from object load function pointer from vtable call through that pointer`
