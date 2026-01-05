@@ -363,7 +363,8 @@ Here:
 
 ## 8️⃣ Why `std::move` matters
 
-`Shape s; process(s);           // lvalue 
+`Shape s; 
+`process(s);           // lvalue 
 `process(std::move(s)); // xvalue`
 
 `std::move`:
