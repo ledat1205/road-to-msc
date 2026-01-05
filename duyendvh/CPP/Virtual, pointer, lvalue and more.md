@@ -190,8 +190,7 @@ Memory layout:
 cpp
 ￼Copy code
 A* p = new B();
-pgsql
-￼Copy code
+
              HEAP
     -----------------------
     | B object            |
@@ -203,35 +202,33 @@ pgsql
     | p (A*)  -----------→ |
     -----------------------
 When you call:
-
-cpp
-￼Copy code
-p->hello();
+`p->hello();`
 Steps:
 
-Look at p (points to B object)
+- Look at p (points to B object)
 
-Look at vptr inside the B object
+- Look at vptr inside the B object
 
-Jump to B’s vtable
+- Jump to B’s vtable
 
-Call B::hello
+- Call B::hello
 
-This is called dynamic dispatch.
+This is called `dynamic dispatch`.
 
 ## ✅ 4. Without virtual ⇒ no vtable
 If the function is NOT virtual:
 
-No vtable
+- No vtable
 
-Compiler uses static binding
+- Compiler uses static binding
 
-Call is decided at compile time based on pointer/reference type
+- Call is decided at compile time based on pointer/reference type
 
 ## ✅ 5. What if object is not a pointer? → static binding
 ```B b;
 A a = b;     // ❗ slicing
 a.hello();   // calls A::hello
+```
 This is object slicing:
 
 a becomes a standalone A object
@@ -247,7 +244,7 @@ Code	Virtual?	Pointer type	Object type	Function called
 A* p = new B(); p->f();	❌ No	A	B	A::f
 A* p = new B(); p->f();	✔ Yes	A	B	B::f
 A a = B(); a.f();	✔ Yes	A	A (sliced)	A::f
-B b; A& ref = b; ref.f();	✔ Yes	A	B	B::f```
+B b; A& ref = b; ref.f();	✔ Yes	A	B	B::f
 ￼
 ⭐ 6. Full example with print statements
 cpp
