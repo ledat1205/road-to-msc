@@ -142,20 +142,9 @@ Use smart pointers:
 
 
 ## ✅ 1. Non-virtual function: static binding (compile-time)
-class A {
-public:
-    void hello() { std::cout << "A::hello\n"; }
-};
+```
 
-class B : public A {
-public:
-    void hello() { std::cout << "B::hello\n"; }
-};
-
-int main() {
-    A* p = new B();
-    p->hello();   // ❗ calls A::hello, not B::hello
-}
+```
 Why?
 Because hello() is not virtual, so C++ binds the function at compile time based on the type of the pointer, not the object.
 
@@ -163,6 +152,7 @@ Because hello() is not virtual, so C++ binds the function at compile time based 
 → Call A::hello
 
 ## ✅ 2. Virtual function: dynamic binding (runtime)
+```
 class A {
 public:
     virtual void hello() { std::cout << "A::hello\n"; }
@@ -177,30 +167,30 @@ int main() {
     A* p = new B();
     p->hello();  // ✔ calls B::hello
 }
+```
 Why?
-virtual tells C++ to check the actual object type at runtime.
-
+`virtual` tells C++ to check the actual object type at runtime.
 Compiler uses a vtable (virtual function table).
-
 ✔ Object type = B
 → Call B::hello
 
 ## ✅ 3. How virtual dispatch works (vtable)
 Memory layout:
-cpp
-￼Copy code
+```
 A* p = new B();
 
-             HEAP
-    -----------------------
-    | B object            |
-    | vptr → vtable (B)   | → [ B::hello ]
-    -----------------------
+		 HEAP
+-----------------------
+| B object            |
+| vptr → vtable (B)   | → [ B::hello ]
+-----------------------
 
-             STACK
-    -----------------------
-    | p (A*)  -----------→ |
-    -----------------------
+		 STACK
+-----------------------
+| p (A*)  -----------→ |
+-----------------------
+```
+
 When you call:
 `p->hello();`
 Steps:
