@@ -115,3 +115,5 @@
 
 ## Batch processing using Dataproc
 ![[Pasted image 20260106102455.png]]
+![[Pasted image 20260106102551.png]]
+
