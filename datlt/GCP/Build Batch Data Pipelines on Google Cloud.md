@@ -29,3 +29,7 @@ The value of the pipeline is realized when it is consumed by various application
 
 ## Processing and common challenges
 **Key features of batch data processing**
+Scheduled and automated
+high throughput 
+latency
+resource optimization
