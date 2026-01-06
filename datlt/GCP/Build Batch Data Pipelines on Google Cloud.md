@@ -43,4 +43,3 @@ Complexity and maintainability: Pipelines become complicated with more sources a
 
 Reliability, error handling, and observability: Batch job failures delay reports. Pipelines need to be reliable, handle errors gracefully, and provide performance insights.
 
-## Design batch pipelines
