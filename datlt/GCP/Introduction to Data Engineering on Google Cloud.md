@@ -143,3 +143,5 @@
 ## Cloud composer
 ![[Pasted image 20260106133503.png]]
 ![[Pasted image 20260106133926.png]]
+## Cloud Run
+![[Pasted image 20260106134103.png]]
