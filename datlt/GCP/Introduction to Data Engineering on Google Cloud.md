@@ -127,3 +127,6 @@
 ![[Pasted image 20260106105830.png]]![[Pasted image 20260106105923.png]]
 ![[Pasted image 20260106110015.png]]
 ![[Pasted image 20260106110058.png]]
+
+## Bigtable and data pipeline
+![[Pasted image 20260106110252.png]]
