@@ -35,6 +35,11 @@ The value of the pipeline is realized when it is consumed by various application
 - resource optimization: dynamic scale up or down based on workload
 
 **Challenges**
-Volume Rapid data growth overwhelms old systems.
+Volume and scale: Rapid data growth overwhelms old systems. Pipelines must auto-scale for fluctuating data volumes.
 
-Pipelines must auto-scale for fluctuating data volumes.
+Data quality: Diverse data sources lead to format issues and errors. Clean, consistent data is crucial for accurate financial reporting.
+
+Complexity and maintainability: Pipelines become complicated with more sources and logic, making them hard to manage and fix.
+
+Reliability, error handling, and observability: Batch job failures delay reports. Pipelines need to be reliable, handle errors gracefully, and provide performance insights.
+
