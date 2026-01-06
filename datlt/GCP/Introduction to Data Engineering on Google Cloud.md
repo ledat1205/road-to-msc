@@ -112,3 +112,6 @@
 ![[Pasted image 20260106102130.png]]
 ![[Pasted image 20260106102210.png]]
 ![[Pasted image 20260106102304.png]]
+
+## Batch processing using Dataproc
+![[Pasted image 20260106102455.png]]
