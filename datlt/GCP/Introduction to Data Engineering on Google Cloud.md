@@ -135,3 +135,5 @@
 # Automation Techniques
 ## Automation pattern and options for pipelines
 ![[Pasted image 20260106113551.png]]
+![[Pasted image 20260106113637.png]]
+
