@@ -14,3 +14,9 @@ Components:
 **Data transformation**: Ingested data may be cleaned, validated, enriched, mapped, and/or restructured into a consistent and standardized format, before landing in the destination sink.
 
 This stage can involve various processing steps, such as filtering out irrelevant data, aggregating information, joining data from different sources, mapping, or applying business logic.
+
+**Data sink**: Throughout the pipeline, data needs to be stored. This includes:
+- Intermediate storage: Often part of the ingestion or transformation stages, this holds data temporarily as it moves through the pipeline (e.g., the landing zone in Cloud Storage).
+- Final storage: After transformation, the clean, structured data is loaded into a destination optimized for its intended use. The final destination is frequently a data warehouse (like BigQuery), a data lake (like Cloud Storage with formats like Apache Iceberg), or other analytical data stores.
+
+Downstream use
