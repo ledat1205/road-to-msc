@@ -145,3 +145,5 @@
 ![[Pasted image 20260106133926.png]]
 ## Cloud Run
 ![[Pasted image 20260106134103.png]]
+## Eventarc
+![[Pasted image 20260106134300.png]]
