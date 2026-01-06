@@ -45,3 +45,17 @@ Reliability, error handling, and observability: Batch job failures delay reports
 
 ## Dataflow design principles
 **Scalability**
+- **Distributed processing**: Dataflow inherently supports this by distributing tasks across multiple worker nodes. As illustrated in the provided image, a large dataset is broken down into smaller chunks that are then processed in parallel by different workers. Your design should leverage this by ensuring operations can be parallelized effectively.
+    
+- **Optimal batch sizing**: Determine the right volume of data to process in a single Dataflow job to balance latency and efficiency.
+    
+- **Data partitioning**: For optimal performance, especially with grouping or joining operations, consider how data is partitioned to minimize data shuffling across the network.![[Pasted image 20260106153649.png]]
+
+**Efficiency and cost-optimization**
+- **I/O optimization**: Choose efficient file formats (e.g., Avro, Parquet) for input and output, especially when dealing with Cloud Storage, to reduce read/write times and storage costs.
+    
+- **Native connectors**: Utilize Dataflow's optimized I/O transforms (e.g., TextIO, BigQueryIO) for high-throughput interaction with Google Cloud services.
+    
+- **Resource tuning**: Design your pipeline to allow for appropriate worker machine types and autoscaling settings, ensuring you have enough compute resources without over-provisioning.
+
+**Reliability and data quality**
