@@ -29,7 +29,9 @@ The value of the pipeline is realized when it is consumed by various application
 
 ## Processing and common challenges
 **Key features of batch data processing**
-Scheduled and automated
-high throughput 
-latency
-resource optimization
+- Scheduled and automated: designed for periodic execution, often triggered by a schedule (e.g., daily at midnight) or a predefined event (e.g., source file availability).
+- high throughput: efficiently process massive datasets
+- latency: 
+- resource optimization
+
+**challenges**
