@@ -130,3 +130,4 @@
 
 ## Bigtable and data pipeline
 ![[Pasted image 20260106110252.png]]
+![[Pasted image 20260106110342.png]]
