@@ -109,4 +109,5 @@
 
 ## Google Cloudu GUI tools
 ![[Pasted image 20260106102008.png]]
-
+![[Pasted image 20260106102130.png]]
+![[Pasted image 20260106102210.png]]
