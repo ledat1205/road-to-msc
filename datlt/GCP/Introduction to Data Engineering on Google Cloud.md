@@ -124,3 +124,4 @@
 ![[Pasted image 20260106103555.png]]
 ## Streaming data processing options 
 ![[Pasted image 20260106105714.png]]
+![[Pasted image 20260106105830.png]]![[Pasted image 20260106105923.png]]
