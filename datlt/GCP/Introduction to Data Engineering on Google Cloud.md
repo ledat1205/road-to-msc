@@ -137,3 +137,5 @@
 ![[Pasted image 20260106113551.png]]
 ![[Pasted image 20260106113637.png]]
 
+## Cloud scheduler and workflow
+![[Pasted image 20260106113738.png]]
