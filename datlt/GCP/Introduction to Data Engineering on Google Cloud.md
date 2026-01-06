@@ -106,3 +106,6 @@
 # ETL data pipeline pattern
 ## Architecture
 ![[Pasted image 20260105222144.png]]
+
+## Google Cloudu GUI tools
+![[Pasted image 20260106102008.png]]
