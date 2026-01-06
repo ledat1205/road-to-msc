@@ -26,3 +26,6 @@ The value of the pipeline is realized when it is consumed by various application
 **Orchestrate and monitor**: Orchestration and monitoring are essential components that wrap around the entire pipeline.
 - Orchestration involves scheduling, managing, and coordinating the various tasks within the pipeline, ensuring they run in the correct order and handle dependencies.
 - Monitoring: This involves tracking the health, performance, and data quality of the pipeline, alerting on errors, and ensuring data integrity.
+
+## Processing and common challenges
+**Key features of batch data processing**
