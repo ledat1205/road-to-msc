@@ -143,7 +143,8 @@
 ## Cloud composer
 ![[Pasted image 20260106133503.png]]
 ![[Pasted image 20260106133926.png]]
-## Cloud Run
+## Cloud Run functions
 ![[Pasted image 20260106134103.png]]
 ## Eventarc
 ![[Pasted image 20260106134300.png]]
+![[Pasted image 20260106134421.png]]
