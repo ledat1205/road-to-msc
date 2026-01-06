@@ -139,3 +139,6 @@
 
 ## Cloud scheduler and workflow
 ![[Pasted image 20260106113738.png]]
+
+## Cloud composer
+![[Pasted image 20260106133503.png]]
