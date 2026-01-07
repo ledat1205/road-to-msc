@@ -17,4 +17,8 @@ SaaS: Access software application via internet. Example: google sheets, msoffice
 
 **Analyze and Extract Value**: bigquery, looker, dataproc, dataflow, dataprep, cloud bigtable, vertex ai
 
-**Governance**: iam, dataflex, cloud logging, data catalog, data loss prevention api, vpc, org policy service, key management service  
+**Governance**: iam, dataflex, cloud logging, data catalog, data loss prevention api, vpc, org policy service, key management service 
+
+![[Pasted image 20260108025133.png]]
+
+
