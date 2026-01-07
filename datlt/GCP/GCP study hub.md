@@ -9,4 +9,6 @@ SaaS: Access software application via internet. Example: google sheets, msoffice
 ## Data life cycle
 
 Ingest: Cloud pub/sub, cloud dataflow, cloud iot core, logging, cloud storage
+	Transfer services: transfer appliance, storage transfer service, bigquery data transfer service
+
 
