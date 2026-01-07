@@ -63,3 +63,7 @@ Reliability, error handling, and observability: Batch job failures delay reports
     
 - **Error handling and dead letter queues (DLQs)**: Implement robust mechanisms to catch and route erroneous records to a DLQ (e.g., a Cloud Storage bucket or Pub/Sub topic) so that the main pipeline can continue processing valid data. The image from our discussion also demonstrates fault tolerance; if a "Worker" or a data chunk processing fails, the system (implied Dataflow runtime) can re-assign or retry the failed sub-task, ensuring the overall "Job Done" state is reached.![[Pasted image 20260106153825.png]]
 
+## Batch data validation and cleansing
+completeness: All expected data values are present, with no missing or null fields
+conformity: Checks if a single data point follows a rule, a predefined format, type, or pattern.
+consistency
