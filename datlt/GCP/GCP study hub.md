@@ -11,4 +11,6 @@ SaaS: Access software application via internet. Example: google sheets, msoffice
 **Ingest**: Cloud pub/sub, cloud dataflow, cloud iot core, logging, cloud storage
 	Transfer services: transfer appliance, storage transfer service, bigquery data transfer service
 
-**Store**: cloud storage, bigquery, cloud sql, cloud bigtable, cloud memorystore
+**Store**: cloud storage, bigquery, cloud sql, cloud bigtable, cloud memorystore, cloud spanner, filestore 
+
+**Process**: dataproc, bigquery, 
