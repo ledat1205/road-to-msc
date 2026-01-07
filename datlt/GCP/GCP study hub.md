@@ -15,4 +15,6 @@ SaaS: Access software application via internet. Example: google sheets, msoffice
 
 **Process**: dataproc, bigquery, dataflow, cloud data fusion, data loss prevention api, dataprep, cloud functions, cloud composer
 
-**Analyze and Extract Value**: bigquery, looker, dataproc, dataflow, dataprep, cloud bigtable, vert
+**Analyze and Extract Value**: bigquery, looker, dataproc, dataflow, dataprep, cloud bigtable, vertex ai
+
+**Governance**: iam, dataflex, cloud logging, data catalog
