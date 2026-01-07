@@ -21,4 +21,6 @@ SaaS: Access software application via internet. Example: google sheets, msoffice
 
 ![[Pasted image 20260108025133.png]]
 
-batch and stream
+## batch and stream
+![[Pasted image 20260108025350.png]]
+
