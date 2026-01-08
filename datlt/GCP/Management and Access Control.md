@@ -36,3 +36,6 @@ require:
 - Organize projects in local group
 - Like department
 - Inherit polices and permissions from the parent org
+![[Pasted image 20260109040306.png]]
+
+### Project name vs ID vs number
