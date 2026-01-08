@@ -14,4 +14,6 @@ require:
 1. Authenicate: `gcloud auth login`
 2. Set default project: `gcloud config set project [PROJECT_ID]`
 
-### 
+### Resource hierarchy
+
+**Project**: 
