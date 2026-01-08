@@ -46,3 +46,7 @@ require:
 - Policy admin: manages org policies, constraints, conditions
 - Viewer: View-Only
 - Browser: Read-Only
+
+### Org policies to know 
+
+- constraints/compute
