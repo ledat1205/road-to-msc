@@ -33,4 +33,6 @@ require:
 
 **Folder**:
 - Optional intermediate container
-- 
+- Organize projects in local group
+- Like department
+- Inherit polices and permissions from the parent org
