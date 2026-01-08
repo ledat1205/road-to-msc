@@ -8,4 +8,5 @@
 
 Interact with services on GCP
 
+`gcloud config configurations create [NAME]`: to create config 
 
