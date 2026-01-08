@@ -19,4 +19,7 @@ require:
 **Project**: 
 - Fundamental, lowest unit 
 - Contains all GCP resources/services
-- Distin
+- Distinct entity for billing, access management and APIs
+- Must be in project at all times
+
+Org
