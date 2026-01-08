@@ -7,6 +7,5 @@
 ### gcloud
 
 Interact with services on GCP
-
 `gcloud config configurations create [NAME]`: to create config 
-
+`gcloud config configurations activate [NAME]`: to activate config 
