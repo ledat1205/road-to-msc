@@ -51,4 +51,5 @@ require:
 
 - ``constraints/compute.resouceLocatios``: constrain resources to only operate within certain geographic regions
 - ``contraints/iam.allowedPolicyMemberDomains``: control with domain users must belong to in order to be added to IAM
-- ``contraints/compute.vmExternalIpAccess``: constrain or block VMs from having  
+- ``contraints/compute.vmExternalIpAccess``: constrain or block VMs from having external IPs 
+- ``contraints/compute.requireOsLogin``: Must use IAM to control SSH access to VMs
