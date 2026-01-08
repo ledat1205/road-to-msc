@@ -17,3 +17,6 @@ require:
 ### Resource hierarchy
 
 **Project**: 
+- Fundamental, lowest unit 
+- Contains all GCP resources/services
+- Distin
