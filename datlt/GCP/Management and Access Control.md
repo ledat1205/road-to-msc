@@ -13,4 +13,5 @@ Interact with services on GCP
 require:
 1. Authenicate: `gcloud auth login`
 2. Set default project: `gcloud config set project [PROJECT_ID]`
-3. 
+
+### 
