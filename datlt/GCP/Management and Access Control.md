@@ -27,4 +27,10 @@ require:
 - represent for entire company
 - project can exist without Org
 - centralize management of project
+- roles can be granted at this level
+
+![[Pasted image 20260109040126.png]]
+
+**Folder**:
+- Optional intermediate container
 - 
