@@ -49,4 +49,5 @@ require:
 
 ### Org policies to know 
 
-- constraints/compute
+- ``constraints/compute.resouceLocatios``: constrain resources to only operate within certain geographic regions
+- contraints/iam.allowedPolicy
