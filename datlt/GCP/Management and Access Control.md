@@ -22,4 +22,9 @@ require:
 - Distinct entity for billing, access management and APIs
 - Must be in project at all times
 
-Org
+**Organizations**:
+- top-level container 
+- represent for entire company
+- project can exist without Org
+- centralize management of project
+- 
