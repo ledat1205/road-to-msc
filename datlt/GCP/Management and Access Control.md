@@ -51,3 +51,4 @@ require:
 
 - ``constraints/compute.resouceLocatios``: constrain resources to only operate within certain geographic regions
 - ``contraints/iam.allowedPolicyMemberDomains``: control with domain users must belong to in order to be added to IAM
+- ``contraints/compute.vmExternalIpAccess``: constrain or block VMs from having  
