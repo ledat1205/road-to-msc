@@ -50,4 +50,4 @@ require:
 ### Org policies to know 
 
 - ``constraints/compute.resouceLocatios``: constrain resources to only operate within certain geographic regions
-- contraints/iam.allowedPolicy
+- ``contraints/iam.allowedPolicyMemberDomains``: control with domain users must belong to in order to be added to IAM
