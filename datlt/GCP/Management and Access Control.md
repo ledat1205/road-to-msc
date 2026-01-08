@@ -43,4 +43,6 @@ require:
 
 ### Org level roles
 - Admin: Full control
-- Policy admin: 
+- Policy admin: manages org policies, constraints, conditions
+- Viewer: View-Only
+- Browser: Read-Only
