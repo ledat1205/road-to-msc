@@ -53,3 +53,4 @@ require:
 - ``contraints/iam.allowedPolicyMemberDomains``: control with domain users must belong to in order to be added to IAM
 - ``contraints/compute.vmExternalIpAccess``: constrain or block VMs from having external IPs 
 - ``contraints/compute.requireOsLogin``: Must use IAM to control SSH access to VMs
+![[Pasted image 20260109041547.png]]
