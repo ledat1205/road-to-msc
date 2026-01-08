@@ -9,3 +9,6 @@
 Interact with services on GCP
 `gcloud config configurations create [NAME]`: to create config 
 `gcloud config configurations activate [NAME]`: to activate config 
+
+require:
+1. Authen: `gcloud auth login`
