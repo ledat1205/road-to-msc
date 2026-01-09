@@ -62,4 +62,5 @@ Principal: Entity can be granted access to GCP resources
 **Service account**: associate with services/VMs
 Important of service account:
 - crucial for secure communication between cloud and application components
-- ensure authorized resource can access to each
+- ensure authorized resource can access to each other
+- scheduled/automated process
