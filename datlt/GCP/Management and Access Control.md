@@ -69,4 +69,5 @@ Types:
 - Google-managed: google control and used by GCP services
 - User-managed: user created, custom permission
 
-Service account admin
+Service account admin to create modify user-managed service account need Service Account Admin role
+
