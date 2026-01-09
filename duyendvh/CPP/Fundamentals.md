@@ -1179,7 +1179,7 @@ Destruction happens in **reverse order**, automatically, via RAII.
 - Atomic reference counting + control block allocation
     
 
-### Use Cases
+##### Use Cases
 
 - Shared resources
     
@@ -1190,7 +1190,7 @@ Destruction happens in **reverse order**, automatically, via RAII.
 - Objects shared across async tasks
     
 
-### Pitfall ⚠️
+##### Pitfall ⚠️
 
 - **Circular references cause memory leaks**
     
@@ -1199,9 +1199,11 @@ Destruction happens in **reverse order**, automatically, via RAII.
 
 ---
 
-### Example: Scene Graph with Shared Ownership
+##### Example: Scene Graph with Shared Ownership
 
-`#include <iostream> #include <memory> #include <vector> #include <string>  class SceneNode : public std::enable_shared_from_this<SceneNode> { public:     std::string name;     std::weak_ptr<SceneNode> parent;                 // breaks cycle     std::vector<std::shared_ptr<SceneNode>> children;      explicit SceneNode(std::string n) : name(std::move(n)) {}      void addChild(std::shared_ptr<SceneNode> child) {         child->parent = shared_from_this();         children.push_back(std::move(child));     }      void printHierarchy(int level = 0) const {         std::cout << std::string(level * 2, ' ') << name << "\n";         for (const auto& child : children)             child->printHierarchy(level + 1);     }      ~SceneNode() {         std::cout << "Destroyed: " << name << "\n";     } };  int main() {     auto root  = std::make_shared<SceneNode>("Root");     auto model = std::make_shared<SceneNode>("Model");     auto light = std::make_shared<SceneNode>("Light");      root->addChild(model);     root->addChild(light);      root->printHierarchy();     // Entire graph is destroyed safely when root goes out of scope      return 0; }`
+```
+
+```
 
 ---
 
