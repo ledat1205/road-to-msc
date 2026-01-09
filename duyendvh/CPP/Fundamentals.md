@@ -1349,19 +1349,4 @@ if (auto locked_parent = light->parent.lock()) {
 - ✅ Use `std::weak_ptr` to break cycles
     
 - ❌ Do not “default to shared_ptr”
-    
 
----
-
-If you want next:
-
-- Rewrite this as **interview-ready notes**
-    
-- Add **backend-specific examples**
-    
-- Convert into a **cheat sheet**
-    
-- Explain **why shared_ptr hurts performance in hot paths**
-    
-
-Just say which one.
