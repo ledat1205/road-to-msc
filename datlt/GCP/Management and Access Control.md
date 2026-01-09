@@ -59,4 +59,5 @@ require:
 
 Principal: Entity can be granted access to GCP resources
 
-User a
+**User account**: associate with a human, used for accessing cloud services
+**Service account**: 
