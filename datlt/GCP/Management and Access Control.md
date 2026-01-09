@@ -57,3 +57,6 @@ require:
 
 ### IAM
 
+Principal: Entity can be granted access to GCP resources
+
+User a
