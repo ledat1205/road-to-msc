@@ -1324,11 +1324,10 @@ if (auto locked_parent = light->parent.lock()) {
 - Example: COM (`AddRef` / `Release`)
     
 - Used when control block allocation is unacceptable
-    
 
 ---
 
-## Summary Table
+#### Summary Table
 
 |Type|Ownership|Copyable|Movable|Auto Cleanup|Overhead|Best For|Risks|
 |---|---|---|---|---|---|---|---|
@@ -1339,7 +1338,7 @@ if (auto locked_parent = light->parent.lock()) {
 
 ---
 
-## Modern C++ Guidelines (C++17+)
+#### Modern C++ Guidelines (C++17+)
 
 - ✅ Prefer `std::unique_ptr` by default
     
