@@ -1285,13 +1285,19 @@ int main() {
 
 ##### Example: Safe Parent Access
 
-`if (auto locked_parent = light->parent.lock()) {     std::cout << "Parent exists: " << locked_parent->name << "\n"; } else {     std::cout << "Parent destroyed\n"; }`
+```
+if (auto locked_parent = light->parent.lock()) {
+    std::cout << "Parent exists: " << locked_parent->name << "\n";
+} else {
+    std::cout << "Parent destroyed\n";
+}
+```
 
 ---
 
 #### 3. Other Pointer-Like Types
 
-### References
+##### References
 
 - `T&`, `T&&`
     
@@ -1302,7 +1308,7 @@ int main() {
 - Must be initialized
     
 
-### `observer_ptr<T>` (C++23 / proposed)
+##### `observer_ptr<T>` (C++23 / proposed)
 
 - Non-owning pointer
     
@@ -1311,7 +1317,7 @@ int main() {
 - Not widely adopted yet
     
 
-### Intrusive Pointers
+##### Intrusive Pointers
 
 - Reference count stored **inside the object**
     
