@@ -60,6 +60,6 @@ require:
 Principal: Entity can be granted access to GCP resources
 **User account**: associate with a human, used for accessing cloud services
 **Service account**: associate with services/VMs
-
-Type of service account:
-
+Important of service account:
+- crucial for secure communication between cloud and application components
+- ensure authorized resource can access to each
