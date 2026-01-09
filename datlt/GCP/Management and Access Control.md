@@ -54,3 +54,6 @@ require:
 - ``contraints/compute.vmExternalIpAccess``: constrain or block VMs from having external IPs 
 - ``contraints/compute.requireOsLogin``: Must use IAM to control SSH access to VMs
 ![[Pasted image 20260109041547.png]]
+
+### IAM
+
