@@ -67,4 +67,6 @@ Important of service account:
 
 Types:
 - Google-managed: google control and used by GCP services
-- User-managed: 
+- User-managed: user created, custom permission
+
+Service account admin
