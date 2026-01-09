@@ -1202,35 +1202,76 @@ Destruction happens in **reverse order**, automatically, via RAII.
 ##### Example: Scene Graph with Shared Ownership
 
 ```
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <string>
 
+class SceneNode : public std::enable_shared_from_this<SceneNode> {
+public:
+    std::string name;
+    std::weak_ptr<SceneNode> parent;                 // breaks cycle
+    std::vector<std::shared_ptr<SceneNode>> children;
+
+    explicit SceneNode(std::string n) : name(std::move(n)) {}
+
+    void addChild(std::shared_ptr<SceneNode> child) {
+        child->parent = shared_from_this();
+        children.push_back(std::move(child));
+    }
+
+    void printHierarchy(int level = 0) const {
+        std::cout << std::string(level * 2, ' ') << name << "\n";
+        for (const auto& child : children)
+            child->printHierarchy(level + 1);
+    }
+
+    ~SceneNode() {
+        std::cout << "Destroyed: " << name << "\n";
+    }
+};
+
+int main() {
+    auto root  = std::make_shared<SceneNode>("Root");
+    auto model = std::make_shared<SceneNode>("Model");
+    auto light = std::make_shared<SceneNode>("Light");
+
+    root->addChild(model);
+    root->addChild(light);
+
+    root->printHierarchy();
+    // Entire graph is destroyed safely when root goes out of scope
+
+    return 0;
+}
 ```
 
 ---
 
-## c. `std::weak_ptr<T>` (C++11)
+#### c. `std::weak_ptr<T>` (C++11)
 
-### Ownership
+##### Ownership
 
 - **None**
     
 - Non-owning observer of a `shared_ptr`-managed object
     
 
-### Purpose
+##### Purpose
 
 - Break **reference cycles**
     
 - Allow safe observation without extending lifetime
     
 
-### Usage
+##### Usage
 
 - Call `.lock()` to temporarily obtain a `shared_ptr`
     
 - If object is destroyed → `.lock()` returns `nullptr`
     
 
-### Use Cases
+##### Use Cases
 
 - Parent pointers
     
@@ -1239,17 +1280,16 @@ Destruction happens in **reverse order**, automatically, via RAII.
 - Event listeners
     
 - Registries
-    
 
 ---
 
-### Example: Safe Parent Access
+##### Example: Safe Parent Access
 
 `if (auto locked_parent = light->parent.lock()) {     std::cout << "Parent exists: " << locked_parent->name << "\n"; } else {     std::cout << "Parent destroyed\n"; }`
 
 ---
 
-## 3. Other Pointer-Like Types
+#### 3. Other Pointer-Like Types
 
 ### References
 
