@@ -58,6 +58,8 @@ require:
 ### IAM
 
 Principal: Entity can be granted access to GCP resources
-
 **User account**: associate with a human, used for accessing cloud services
-**Service account**: 
+**Service account**: associate with services/VMs
+
+Type of service account:
+
