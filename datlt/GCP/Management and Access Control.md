@@ -72,4 +72,4 @@ Types:
 Service account admin to create modify user-managed service account need Service Account Admin role
 
 #### Roles and permissions
-Roles: control what specific actions a user or service account can perform on GCP
+Roles: control what specific actions a user or service account can perform in GCP
