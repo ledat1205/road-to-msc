@@ -1070,3 +1070,243 @@ Used in generic libraries and metaprogramming.
 
 ### 19. Smart Pointers
 
+Smart pointers **automatically manage object lifetime** using RAII.  
+They are templates provided by the standard library:
+
+- `std::unique_ptr<T>`
+- `std::shared_ptr<T>`
+- `std::weak_ptr<T>`
+    
+They replace manual `new` / `delete` and encode **ownership semantics in types**.
+
+---
+
+#### a. `std::unique_ptr<T>` (C++11)
+
+##### Ownership
+
+- **Exclusive ownership**
+    
+- Only **one** `unique_ptr` can own an object at a time
+    
+##### Transfer
+
+- **Movable** (`std::move`)
+    
+- **Not copyable**
+    
+
+### Destruction
+
+- Automatically deletes the object when:
+    
+    - The `unique_ptr` goes out of scope
+        
+    - Or `.reset()` is called
+        
+
+### Overhead
+
+- Minimal (usually same size as a raw pointer)
+    
+
+### Use Cases
+
+- Single-owner resources:
+    
+    - File handles
+        
+    - Network connections
+        
+    - Database connections
+        
+- Tree structures
+    
+- Factories
+    
+- PIMPL idiom
+    
+- Arrays: `std::unique_ptr<T[]>`
+    
+
+---
+
+### Example: Linked List with Automatic Cleanup
+
+`#include <iostream> #include <memory>  struct Node {     int value;     std::unique_ptr<Node> next;      Node(int v) : value(v) {}     ~Node() { std::cout << "Destroyed node " << value << "\n"; } };  int main() {     std::unique_ptr<Node> head = std::make_unique<Node>(1);     head->next = std::make_unique<Node>(2);     head->next->next = std::make_unique<Node>(3);      std::cout << "Chain created\n";      head = nullptr;  // Automatically destroys 3 → 2 → 1      return 0; }`
+
+### Key Point
+
+Destruction happens in **reverse order**, automatically, via RAII.
+
+---
+
+## b. `std::shared_ptr<T>` (C++11)
+
+### Ownership
+
+- **Shared ownership**
+    
+- Multiple `shared_ptr`s can point to the same object
+    
+
+### Mechanism
+
+- Uses an internal **reference-counted control block**
+    
+- Object is destroyed when reference count reaches **zero**
+    
+
+### Transfer
+
+- Copyable
+    
+- Movable
+    
+
+### Overhead
+
+- Higher than `unique_ptr`
+    
+- Atomic reference counting + control block allocation
+    
+
+### Use Cases
+
+- Shared resources
+    
+- Caches
+    
+- Scene graphs
+    
+- Objects shared across async tasks
+    
+
+### Pitfall ⚠️
+
+- **Circular references cause memory leaks**
+    
+- Must use `std::weak_ptr` to break cycles
+    
+
+---
+
+### Example: Scene Graph with Shared Ownership
+
+`#include <iostream> #include <memory> #include <vector> #include <string>  class SceneNode : public std::enable_shared_from_this<SceneNode> { public:     std::string name;     std::weak_ptr<SceneNode> parent;                 // breaks cycle     std::vector<std::shared_ptr<SceneNode>> children;      explicit SceneNode(std::string n) : name(std::move(n)) {}      void addChild(std::shared_ptr<SceneNode> child) {         child->parent = shared_from_this();         children.push_back(std::move(child));     }      void printHierarchy(int level = 0) const {         std::cout << std::string(level * 2, ' ') << name << "\n";         for (const auto& child : children)             child->printHierarchy(level + 1);     }      ~SceneNode() {         std::cout << "Destroyed: " << name << "\n";     } };  int main() {     auto root  = std::make_shared<SceneNode>("Root");     auto model = std::make_shared<SceneNode>("Model");     auto light = std::make_shared<SceneNode>("Light");      root->addChild(model);     root->addChild(light);      root->printHierarchy();     // Entire graph is destroyed safely when root goes out of scope      return 0; }`
+
+---
+
+## c. `std::weak_ptr<T>` (C++11)
+
+### Ownership
+
+- **None**
+    
+- Non-owning observer of a `shared_ptr`-managed object
+    
+
+### Purpose
+
+- Break **reference cycles**
+    
+- Allow safe observation without extending lifetime
+    
+
+### Usage
+
+- Call `.lock()` to temporarily obtain a `shared_ptr`
+    
+- If object is destroyed → `.lock()` returns `nullptr`
+    
+
+### Use Cases
+
+- Parent pointers
+    
+- Cache observers
+    
+- Event listeners
+    
+- Registries
+    
+
+---
+
+### Example: Safe Parent Access
+
+`if (auto locked_parent = light->parent.lock()) {     std::cout << "Parent exists: " << locked_parent->name << "\n"; } else {     std::cout << "Parent destroyed\n"; }`
+
+---
+
+## 3. Other Pointer-Like Types
+
+### References
+
+- `T&`, `T&&`
+    
+- Not pointers, but alias objects
+    
+- Cannot be null
+    
+- Must be initialized
+    
+
+### `observer_ptr<T>` (C++23 / proposed)
+
+- Non-owning pointer
+    
+- Signals intent clearly
+    
+- Not widely adopted yet
+    
+
+### Intrusive Pointers
+
+- Reference count stored **inside the object**
+    
+- Example: COM (`AddRef` / `Release`)
+    
+- Used when control block allocation is unacceptable
+    
+
+---
+
+## Summary Table
+
+|Type|Ownership|Copyable|Movable|Auto Cleanup|Overhead|Best For|Risks|
+|---|---|---|---|---|---|---|---|
+|`T*`|None|Yes|Yes|No|None|Legacy, non-owning|Leaks, dangling, UB|
+|`std::unique_ptr<T>`|Exclusive|No|Yes|Yes|Minimal|Trees, resources|None (if used correctly)|
+|`std::shared_ptr<T>`|Shared|Yes|Yes|Yes|Medium|Shared resources|Cycles without `weak_ptr`|
+|`std::weak_ptr<T>`|None|Yes|Yes|N/A|Medium|Observers, parent links|Expired access|
+
+---
+
+## Modern C++ Guidelines (C++17+)
+
+- ✅ Prefer `std::unique_ptr` by default
+    
+- ⚠️ Use `std::shared_ptr` **only when sharing is unavoidable**
+    
+- ❌ Avoid owning raw pointers
+    
+- ✅ Use `std::weak_ptr` to break cycles
+    
+- ❌ Do not “default to shared_ptr”
+    
+
+---
+
+If you want next:
+
+- Rewrite this as **interview-ready notes**
+    
+- Add **backend-specific examples**
+    
+- Convert into a **cheat sheet**
+    
+- Explain **why shared_ptr hurts performance in hot paths**
+    
+
+Just say which one.
