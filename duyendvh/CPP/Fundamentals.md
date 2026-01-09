@@ -1084,34 +1084,20 @@ They replace manual `new` / `delete` and encode **ownership semantics in types**
 #### a. `std::unique_ptr<T>` (C++11)
 
 ##### Ownership
-
 - **Exclusive ownership**
-    
 - Only **one** `unique_ptr` can own an object at a time
-    
 ##### Transfer
-
 - **Movable** (`std::move`)
-    
 - **Not copyable**
-    
-
-### Destruction
-
+##### Destruction
 - Automatically deletes the object when:
-    
     - The `unique_ptr` goes out of scope
-        
     - Or `.reset()` is called
-        
 
-### Overhead
-
+####  Overhead
 - Minimal (usually same size as a raw pointer)
-    
 
-### Use Cases
-
+#### Use Cases
 - Single-owner resources:
     
     - File handles
@@ -1131,9 +1117,11 @@ They replace manual `new` / `delete` and encode **ownership semantics in types**
 
 ---
 
-### Example: Linked List with Automatic Cleanup
+#### Example: Linked List with Automatic Cleanup
 
-`#include <iostream> #include <memory>  struct Node {     int value;     std::unique_ptr<Node> next;      Node(int v) : value(v) {}     ~Node() { std::cout << "Destroyed node " << value << "\n"; } };  int main() {     std::unique_ptr<Node> head = std::make_unique<Node>(1);     head->next = std::make_unique<Node>(2);     head->next->next = std::make_unique<Node>(3);      std::cout << "Chain created\n";      head = nullptr;  // Automatically destroys 3 → 2 → 1      return 0; }`
+```
+
+```
 
 ### Key Point
 
