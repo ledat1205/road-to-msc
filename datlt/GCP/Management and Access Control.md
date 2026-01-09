@@ -64,3 +64,7 @@ Important of service account:
 - crucial for secure communication between cloud and application components
 - ensure authorized resource can access to each other
 - scheduled/automated process
+
+Types:
+- Google-managed: google control and used by GCP services
+- User-managed: 
