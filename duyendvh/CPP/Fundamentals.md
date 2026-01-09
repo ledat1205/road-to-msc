@@ -932,7 +932,7 @@ private:
     };
 
     std::atomic<std::shared_ptr<Node>> head{nullptr};
-    std::atomic<std::shared_ptr<Node>> tail{nullptr}; //
+    std::atomic<std::shared_ptr<Node>> tail{nullptr}; #ensure one assignment happen at a time 
 
 public:
     void push(T value) {
