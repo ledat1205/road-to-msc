@@ -115,4 +115,4 @@ export sink to storage bucket with the coldline storage class
 archive storage cloud be an option if retrieved once a year or less
 ![[Pasted image 20260111231549.png]]
 
-Cloud M
+**Cloud Monitoring**: collect, analyze and visualize metric to monitor GCP resources (application and infra)
