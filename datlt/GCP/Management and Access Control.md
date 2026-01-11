@@ -121,4 +121,6 @@ Types of metric:
 * Built-in metrics: 
 	* infra (CPU, RAM, disk,...)
 	* application (error rates, latency, response times,...)
- 
+	* system metrics (system load, running processes)
+* Custom metrics: Business metrics 
+* external metrics: 
