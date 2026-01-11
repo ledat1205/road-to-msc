@@ -14,3 +14,4 @@ Message lifecycle
 - subscriber pull message or queue push message to subscriber
 - subscriber acknowledgment received message
 - pub/sub delete message (message retention)
+![[Pasted image 20260112043705.png]]
