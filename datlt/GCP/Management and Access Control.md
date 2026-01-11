@@ -76,3 +76,5 @@ Roles: control what specific actions a user or service account can perform in GC
 
 **Basic**: board permissions at the project level 
 **Predefined**: defined by GCP, tailored for common job functions
+**Custom**: managed by user, any permission
+
