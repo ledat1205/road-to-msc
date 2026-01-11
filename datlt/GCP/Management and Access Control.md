@@ -107,4 +107,4 @@ Core log types:
 - Audit logs: User and system activities log
 Retention: default 30 days
 
-Log s
+Log sinks: Export log to new destinations
