@@ -98,7 +98,7 @@ IAM with gcloud:
 
 ### Cloud observability suite
 
-Cloud logging: search, store and analyze log data and events from GCP resources and applications
+**Cloud Logging**: search, store and analyze log data and events from GCP resources and applications
 integrated with Cloud Monitoring for analytics and setup alerts 
 
 Core log types:
@@ -114,3 +114,5 @@ long-term retention of audit logs
 export sink to storage bucket with the coldline storage class
 archive storage cloud be an option if retrieved once a year or less
 ![[Pasted image 20260111231549.png]]
+
+Cloud M
