@@ -104,4 +104,7 @@ integrated with Cloud Monitoring for analytics and setup alerts
 Core log types:
 - Platform logs: GCP log
 - Application logs: Code log
-- Audit logs: User and sys
+- Audit logs: User and system activities log
+Retention: default 30 days
+
+Log s
