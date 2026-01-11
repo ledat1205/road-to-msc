@@ -128,4 +128,4 @@ Types of metric:
 Alert: Real-time alert can setup on any metrics
 Notification: Email, SMS, Third party (Slack,...)
 
-Monitor multiple projects: Create monitoring workspace and link project to that
+Monitor multiple projects: Create monitoring workspace and link project to it
