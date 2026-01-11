@@ -94,4 +94,8 @@ Best practice to manage multiple people with similar or identical access is usin
 IAM with gcloud:
 - `gcloud iam role copy`
 - `gcloud ___ get iam-policy`
-- 
+
+
+### Cloud observability suite
+
+Cloud logging: search, store and analyze log data and events form 
