@@ -113,3 +113,4 @@ Log sinks: Export log to new destinations
 long-term retention of audit logs
 export sink to storage bucket with the coldline storage class
 archive storage cloud be an option if retrieved once a year or less
+![[Pasted image 20260111231549.png]]
