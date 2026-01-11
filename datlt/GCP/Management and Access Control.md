@@ -109,3 +109,5 @@ Retention: default 30 days
 
 Log sinks: Export log to new destinations
 ![[Pasted image 20260111230214.png]]
+
+long-term retention of audit logs
