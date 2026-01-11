@@ -98,4 +98,5 @@ IAM with gcloud:
 
 ### Cloud observability suite
 
-Cloud logging: search, store and analyze log data and events form 
+Cloud logging: search, store and analyze log data and events from GCP resources and applications
+integrated with Cloud Monitoring for analytics and setup 
