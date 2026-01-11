@@ -90,3 +90,8 @@ Best practice to manage multiple people with similar or identical access is usin
 - create a google group
 - add relevant member to group 
 - add group to IAM with a role
+
+IAM with gcloud:
+- `gcloud iam role copy`
+- `gcloud ___ get iam-policy`
+- 
