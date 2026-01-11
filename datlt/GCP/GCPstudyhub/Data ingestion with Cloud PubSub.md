@@ -2,4 +2,4 @@
 
 **Cloud Pub/Sub**: is a global scale messaging buffer that decouples sender and receiver, Serverless 
 Use case:
-* *
+* 
