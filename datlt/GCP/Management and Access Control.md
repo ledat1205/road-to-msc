@@ -99,4 +99,9 @@ IAM with gcloud:
 ### Cloud observability suite
 
 Cloud logging: search, store and analyze log data and events from GCP resources and applications
-integrated with Cloud Monitoring for analytics and setup 
+integrated with Cloud Monitoring for analytics and setup alerts 
+
+Core log types:
+- Platform logs: GCP log
+- Application logs: Code log
+- Audit logs: User and sys
