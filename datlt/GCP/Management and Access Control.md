@@ -126,3 +126,6 @@ Types of metric:
 * External metrics
 
 Alert: Real-time alert can setup on any metrics
+Notification: Email, SMS, Third party (Slack,...)
+
+Monitor multiple projects: Create monitoring workspace and link project to that
