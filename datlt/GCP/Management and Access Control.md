@@ -78,3 +78,8 @@ Roles: control what specific actions a user or service account can perform in GC
 **Predefined**: defined by GCP, tailored for common job functions
 **Custom**: managed by user, any permission
 
+Basic Roles:
+- Owner: Full access
+- Editor: Read/write
+- Viewer: Read only
+
