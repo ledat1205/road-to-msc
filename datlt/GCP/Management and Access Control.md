@@ -108,3 +108,4 @@ Core log types:
 Retention: default 30 days
 
 Log sinks: Export log to new destinations
+![[Pasted image 20260111230214.png]]
