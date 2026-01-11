@@ -20,4 +20,5 @@ Message lifecycle
 
 Metric to monitor
 - current message volume in queue
-- oldest unack
+- oldest unacknowledged message
+- number of unacknowledged message / number of delivered message
