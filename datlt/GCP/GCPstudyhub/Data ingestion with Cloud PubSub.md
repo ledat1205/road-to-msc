@@ -3,3 +3,4 @@
 **Cloud Pub/Sub**: is a global scale messaging buffer that decouples sender and receiver, Serverless 
 Use case:![[Pasted image 20260111233733.png]]
 
+**Kafka Connector**: allow seamless integration between kafka and pub/sub
