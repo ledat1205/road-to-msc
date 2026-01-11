@@ -83,3 +83,4 @@ Basic Roles:
 - Editor: Read/write
 - Viewer: Read only
 
+**Principle of least privilege**
