@@ -85,3 +85,6 @@ Basic Roles:
 
 **Principle of least privilege**
 Always allocate the minimum necessary permissions
+
+Best practice to manage multiple people with similar or identical access is using Group
+- create a go
