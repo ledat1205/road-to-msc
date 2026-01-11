@@ -10,4 +10,5 @@ Use case:![[Pasted image 20260111233733.png]]
 
 Message lifecycle
 - create topic
-- pub
+- publisher send message to that topic
+- subscriber pull message or queue push message to subscriber
