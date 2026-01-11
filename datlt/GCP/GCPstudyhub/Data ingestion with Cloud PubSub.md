@@ -15,3 +15,5 @@ Message lifecycle
 - subscriber acknowledgment received message
 - pub/sub delete message (message retention)
 ![[Pasted image 20260112043705.png]]
+
+![[Pasted image 20260112044020.png]]
