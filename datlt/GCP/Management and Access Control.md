@@ -87,4 +87,6 @@ Basic Roles:
 Always allocate the minimum necessary permissions
 
 Best practice to manage multiple people with similar or identical access is using Group
-- create a go
+- create a google group
+- add relevant member to group 
+- add group to IAM with a role
