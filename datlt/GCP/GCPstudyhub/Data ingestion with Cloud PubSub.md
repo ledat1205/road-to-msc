@@ -22,3 +22,5 @@ Metric to monitor
 - current message volume in queue
 - oldest unacknowledged message
 - number of unacknowledged message / number of delivered message
+
+![[Pasted image 20260112045118.png]]
