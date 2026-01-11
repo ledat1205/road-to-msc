@@ -17,3 +17,7 @@ Message lifecycle
 ![[Pasted image 20260112043705.png]]
 
 ![[Pasted image 20260112044020.png]]
+
+Metric to monitor
+- current message volume in queue
+- oldest unack
