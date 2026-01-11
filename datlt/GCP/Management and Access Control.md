@@ -115,4 +115,7 @@ export sink to storage bucket with the coldline storage class
 archive storage cloud be an option if retrieved once a year or less
 ![[Pasted image 20260111231549.png]]
 
-**Cloud Monitoring**: collect, analyze and visualize metric to monitor GCP resources (application and infra)
+**Cloud Monitoring**: collect, analyze and visualize metric to monitor GCP resources (application and infra), real-time metrics and alert
+
+Types of metric:
+Built-in 
