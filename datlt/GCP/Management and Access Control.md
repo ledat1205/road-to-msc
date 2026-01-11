@@ -84,3 +84,4 @@ Basic Roles:
 - Viewer: Read only
 
 **Principle of least privilege**
+Always allocate the minimum necessary permissions
