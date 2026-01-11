@@ -118,4 +118,7 @@ archive storage cloud be an option if retrieved once a year or less
 **Cloud Monitoring**: collect, analyze and visualize metric to monitor GCP resources (application and infra), real-time metrics and alert
 
 Types of metric:
-Built-in 
+* Built-in metrics: 
+	* infra (CPU, RAM, disk,...)
+	* application (error rates, latency, response times,...)
+ 
