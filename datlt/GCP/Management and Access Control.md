@@ -123,4 +123,6 @@ Types of metric:
 	* application (error rates, latency, response times,...)
 	* system metrics (system load, running processes)
 * Custom metrics: Business metrics 
-* external metrics: 
+* External metrics
+
+Alert: Real-time alert can setup on any metrics
