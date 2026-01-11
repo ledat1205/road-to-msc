@@ -12,3 +12,5 @@ Message lifecycle
 - create topic
 - publisher send message to that topic
 - subscriber pull message or queue push message to subscriber
+- subscriber acknowledgment received message
+- pub/sub delete message (message retention)
