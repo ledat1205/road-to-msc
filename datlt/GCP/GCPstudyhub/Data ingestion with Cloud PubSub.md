@@ -6,3 +6,8 @@ Use case:![[Pasted image 20260111233733.png]]
 **Kafka Connector**: allow seamless integration between kafka and pub/sub
 ![[Pasted image 20260111233907.png]]
 
+![[Pasted image 20260112043323.png]]
+
+Message lifecycle
+- create topic
+- pub
