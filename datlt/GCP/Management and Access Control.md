@@ -73,3 +73,4 @@ Service account admin to create modify user-managed service account need Service
 
 #### Roles and permissions
 Roles: control what specific actions a user or service account can perform in GCP
+
