@@ -31,8 +31,6 @@
 
 ### 1. Introduction
 
-The introduction to C++ typically covers the basics of the language, its history, compilation model, and core syntax like classes, functions, and control structures. In industry, C++ is often used for performance-critical applications such as game engines, financial trading systems, or embedded software. A practical, complex example might involve setting up a multi-threaded application framework for a real-time data processing pipeline, like in a high-frequency trading (HFT) system where low-latency is key.
-
 **Example: Multi-Threaded Market Data Handler**
 
 In an HFT firm, you might build a basic framework to ingest market quotes from multiple exchanges, process them in parallel, and log anomalies. This introduces core C++ elements like includes, namespaces, classes, threads, and exception handling.
