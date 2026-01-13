@@ -18,3 +18,6 @@ Distributed dataset: Elements spread across multiple nodes (like idea of hdfs). 
 **ParDo**: transform applied to individual element of a PCollection
 **DoFn**: custom logic transform
 **GroupByKey (PTransform)**: 
+![[Pasted image 20260114035046.png]]
+
+**CoGroupByKey (PTransform)**
