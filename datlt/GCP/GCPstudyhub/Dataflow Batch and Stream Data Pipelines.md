@@ -15,5 +15,7 @@ Distributed dataset: Elements spread across multiple nodes (like idea of hdfs). 
 ![[Pasted image 20260113173835.png]]
 
 **PTransform**: transform pipeline
-ParDo: transform applied to individual element of a PCollection
-DoFn: 
+**ParDo**: transform applied to individual element of a PCollection
+**DoFn**: custom logic transform
+
+Side Input & Side 
