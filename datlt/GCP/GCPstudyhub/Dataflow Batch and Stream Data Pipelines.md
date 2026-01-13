@@ -14,3 +14,5 @@ Elements: an entry (a row)
 Distributed dataset: Elements spread across multiple nodes (like idea of hdfs). Each machine handles a different subset of the PCollection
 ![[Pasted image 20260113173835.png]]
 
+**PTransform**: transform pipeline
+ParDo: 
