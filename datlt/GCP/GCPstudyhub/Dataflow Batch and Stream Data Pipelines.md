@@ -8,4 +8,5 @@ Overview:
 ### Core concepts 
 
 **PCollection & Elements**
-PColletion: distribu
+PColletion: distributed dataset
+Elements: an entry (a row)
