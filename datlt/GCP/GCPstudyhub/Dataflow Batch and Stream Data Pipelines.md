@@ -11,4 +11,4 @@ Overview:
 PColletion: distributed dataset
 Elements: an entry (a row)
 
-Distributed dataset: 
+Distributed dataset: Elements spread across multiple nodes (like idea of hdfs)
