@@ -10,3 +10,5 @@ Overview:
 **PCollection & Elements**
 PColletion: distributed dataset
 Elements: an entry (a row)
+
+Distributed dataset: 
