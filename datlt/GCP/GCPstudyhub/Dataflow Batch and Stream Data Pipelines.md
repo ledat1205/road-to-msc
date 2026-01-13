@@ -15,4 +15,4 @@ Distributed dataset: Elements spread across multiple nodes (like idea of hdfs). 
 ![[Pasted image 20260113173835.png]]
 
 **PTransform**: transform pipeline
-ParDo: 
+ParDo: a Type of transform applied to individual element of PCollection
