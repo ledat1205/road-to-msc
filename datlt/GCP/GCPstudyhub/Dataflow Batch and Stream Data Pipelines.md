@@ -8,4 +8,4 @@ Overview:
 ### Core concepts 
 
 **PCollection & Elements**
-
+PColletion: distribu
