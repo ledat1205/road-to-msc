@@ -4,3 +4,8 @@ Overview:
 - auto scaling, serverless
 - integrates with Cloud Storage, Pub/Sub, BigQuery
 - connectors are available for BigTable and Kafka
+
+### Core concepts 
+
+**PCollection & Elements**
+
