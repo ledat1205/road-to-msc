@@ -34,3 +34,4 @@ Merge multiple PCollections of same type to a single PCollection
 - Sequential
 ![[Pasted image 20260114215242.png]]
 
+**Hopping windows / "sliding" windows**:
