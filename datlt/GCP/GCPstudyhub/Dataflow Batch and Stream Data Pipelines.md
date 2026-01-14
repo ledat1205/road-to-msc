@@ -26,3 +26,6 @@ Distributed dataset: Elements spread across multiple nodes (like idea of hdfs). 
 **Flatten**
 Merge multiple PCollections of same type to a single PCollection
 
+### Dataflow window
+
+**Tumbling windows / "fixed windows"**
