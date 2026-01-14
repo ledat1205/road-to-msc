@@ -28,4 +28,4 @@ Merge multiple PCollections of same type to a single PCollection
 
 ### Dataflow window
 
-**Tumbling windows / "fixed windows"**
+**Tumbling windows / "fixed" windows**: 
