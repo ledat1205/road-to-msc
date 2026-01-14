@@ -35,3 +35,5 @@ Merge multiple PCollections of same type to a single PCollection
 ![[Pasted image 20260114215242.png]]
 
 **Hopping windows / "sliding" windows**:
+* 
+![[Pasted image 20260114215420.png]]
