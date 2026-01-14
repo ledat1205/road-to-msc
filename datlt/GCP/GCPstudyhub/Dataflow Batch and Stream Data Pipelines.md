@@ -29,3 +29,8 @@ Merge multiple PCollections of same type to a single PCollection
 ### Dataflow window
 
 **Tumbling windows / "fixed" windows**: 
+- Fixed duration 
+- Non-overlapping
+- Sequential
+![[Pasted image 20260114215242.png]]
+
