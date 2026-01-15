@@ -90,5 +90,7 @@ debug step:
 **fusion**: combine several pipeline steps into one execution stage. Optimize some process but can lead to parallelization issues
 ![[Pasted image 20260115174448.png]]
 
+![[Pasted image 20260115174502.png]]
 
+**Prevent fusion**: 
 
