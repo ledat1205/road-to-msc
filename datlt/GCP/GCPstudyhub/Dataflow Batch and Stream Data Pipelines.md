@@ -73,4 +73,6 @@ should do:
 notice:
 - gaps in data
 - incomplete aggregation
-- decre
+- sharp drop throughput
+should do:
+- 
