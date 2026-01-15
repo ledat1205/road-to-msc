@@ -63,4 +63,8 @@ watermarking based on event time
 - indicators of bottlenecks:
 	- specific stage run longer than expected	
 	- data backlogs in certain stage
-	- high la
+	- high latency value in monitor dashboard
+should do:
+- inspect log
+- identify bottleneck
+- 
