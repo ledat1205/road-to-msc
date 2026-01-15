@@ -62,4 +62,5 @@ watermarking based on event time
 - increases in end-to-end or per-stage latency
 - indicators of bottlenecks:
 	- specific stage run longer than expected	
-	- 
+	- data backlogs in certain stage
+	- high la
