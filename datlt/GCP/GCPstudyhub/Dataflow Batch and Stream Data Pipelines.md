@@ -56,4 +56,5 @@ watermarking based on event time
 - conditions that determine when the aggregated results of data should be emitted 
 - ![[Pasted image 20260115083909.png]]
 
-	### Common challege
+### Common challenges
+
