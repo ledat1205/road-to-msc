@@ -41,3 +41,8 @@ Merge multiple PCollections of same type to a single PCollection
 ![[Pasted image 20260114215420.png]]
 
 **Session-based windows**
+- Dynamic
+- User-centric
+- Natural groupings
+![[Pasted image 20260115082943.png]]
+
