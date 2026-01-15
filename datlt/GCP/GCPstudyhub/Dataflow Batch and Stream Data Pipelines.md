@@ -53,4 +53,4 @@ watermarking based on event time
 ![[Pasted image 20260115083514.png]]
 
 **Trigger**
-	- conditions that detemin
+	- conditions that determine when the aggregated results of data should be emitted 
