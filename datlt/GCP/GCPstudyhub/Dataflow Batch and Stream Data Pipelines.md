@@ -79,4 +79,7 @@ should do:
 - ensure no data is dropped and isolates if the issue due to pipeline configuration or data loss
 
 debug step:
-- store incomi
+- store incoming data in cloud storage or bigquery
+- create a batch job to run that data
+- compare results with streaming pipeline
+- 
