@@ -49,3 +49,8 @@ Merge multiple PCollections of same type to a single PCollection
 **Watermarking**
 timestamps that keep track of progress in pipeline
 watermarking based on event time
+
+![[Pasted image 20260115083514.png]]
+
+**Trigger**
+	- conditions that detemin
