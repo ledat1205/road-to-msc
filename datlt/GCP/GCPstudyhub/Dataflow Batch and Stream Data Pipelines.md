@@ -58,3 +58,7 @@ watermarking based on event time
 
 ### Common challenges
 
+**Increases latency**
+- increases in end-to-end or per-stage latency
+- indicators of bottlenecks:
+	- 
