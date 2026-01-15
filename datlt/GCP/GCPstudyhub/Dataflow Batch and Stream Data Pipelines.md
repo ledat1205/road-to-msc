@@ -48,3 +48,4 @@ Merge multiple PCollections of same type to a single PCollection
 
 **Watermarking**
 timestamps that keep track of progress in pipeline
+watermarking based on event time
