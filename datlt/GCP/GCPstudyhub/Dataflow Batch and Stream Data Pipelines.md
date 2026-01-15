@@ -53,4 +53,6 @@ watermarking based on event time
 ![[Pasted image 20260115083514.png]]
 
 **Trigger**
-	- conditions that determine when the aggregated results of data should be emitted 
+- conditions that determine when the aggregated results of data should be emitted 
+- ![[Pasted image 20260115083909.png]]
+
