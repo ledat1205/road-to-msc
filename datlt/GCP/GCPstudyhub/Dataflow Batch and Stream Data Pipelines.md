@@ -78,3 +78,5 @@ should do:
 - convert streaming temporary to batch to check output 
 - ensure no data is dropped and isolates if the issue due to pipeline configuration or data loss
 
+debug step:
+- store incomi
