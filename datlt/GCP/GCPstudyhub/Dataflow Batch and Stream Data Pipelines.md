@@ -70,4 +70,7 @@ should do:
 - check resource limitation, data skew or dependencies
 
 **Missing message**:
-
+notice:
+- gaps in data
+- incomplete aggregation
+- decre
