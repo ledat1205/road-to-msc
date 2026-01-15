@@ -82,4 +82,6 @@ debug step:
 - store incoming data in cloud storage or bigquery
 - create a batch job to run that data
 - compare results with streaming pipeline
-- 
+- review streaming pipeline
+
+**out-of-order data**
