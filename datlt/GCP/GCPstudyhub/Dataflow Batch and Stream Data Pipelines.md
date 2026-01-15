@@ -85,3 +85,5 @@ debug step:
 - review streaming pipeline
 
 **out-of-order data**
+![[Pasted image 20260115174111.png]]
+
