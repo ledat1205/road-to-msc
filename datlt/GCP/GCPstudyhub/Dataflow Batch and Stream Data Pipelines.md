@@ -67,4 +67,7 @@ watermarking based on event time
 should do:
 - inspect log
 - identify bottleneck
-- 
+- check resource limitation, data skew or dependencies
+
+**Missing message**:
+
