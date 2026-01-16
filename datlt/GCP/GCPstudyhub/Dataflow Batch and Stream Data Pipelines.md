@@ -143,4 +143,7 @@ debug diagnose:
 ![[Pasted image 20260116165332.png]]
 Dead letter queue idea
 
-SideOutputs for errors
+**SideOutputs for errors**:
+![[Pasted image 20260116165500.png]]
+
+**Dataflow metrics to monitor**:
