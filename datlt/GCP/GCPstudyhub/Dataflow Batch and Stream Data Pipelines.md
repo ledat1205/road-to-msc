@@ -104,4 +104,5 @@ Firewall rules:
 in VPC, ensure firewall rules allow ingress and egress on necessasary port 
 - TCP 443 for job management and API request
 - TCP 12345 and 12346 for communication between workers and services 
-if ports are blocked, dataflow wont be able to communication with each other and with control plane 
+if ports are blocked, dataflow wont be able to communication with each other or with control plane 
+
