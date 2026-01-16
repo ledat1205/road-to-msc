@@ -158,4 +158,6 @@ Dead letter queue idea
 ### IAM
 - Only define in project-level unlike other service can setup at role-level (BigQuery)
 	- Admin: full access
-	- Developer
+	- Developer: pipeline and code, no config of machine and storage
+	- Viewer: monitor only
+	- Woker: compute enginer servce account
