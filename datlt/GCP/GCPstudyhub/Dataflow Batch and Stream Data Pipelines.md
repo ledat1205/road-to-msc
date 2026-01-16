@@ -156,4 +156,6 @@ Dead letter queue idea
 ![[Pasted image 20260116165947.png]]
 
 ### IAM
-- Only define in project level a
+- Only define in project-level unlike other service can setup at role-level (BigQuery)
+	- Admin: full access
+	- Developer
