@@ -153,4 +153,7 @@ Dead letter queue idea
 ![[Pasted image 20260116165647.png]]
 
 ### Cost optimization
+![[Pasted image 20260116165947.png]]
 
+### IAM
+- Only define in project level a
