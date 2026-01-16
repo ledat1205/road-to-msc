@@ -113,4 +113,6 @@ if ports are blocked, dataflow wont be able to communication with each other or 
 Region selection
 - must be in a single region
 - therefore, can be helpful to store data in the same region as your dataflow pipeline
-- lower latency, higher performance, lower cost 
+- lower latency, higher performance, lower cost (egress cross region charge) 
+Disk size:
+- 
