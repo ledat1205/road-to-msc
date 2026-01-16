@@ -108,3 +108,7 @@ if ports are blocked, dataflow wont be able to communication with each other or 
 
 ![[Pasted image 20260116145751.png]]
 
+### Pipeline setup
+
+Region selection
+- 
