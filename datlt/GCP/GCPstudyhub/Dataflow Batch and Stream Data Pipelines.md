@@ -147,3 +147,8 @@ Dead letter queue idea
 ![[Pasted image 20260116165500.png]]
 
 **Dataflow metrics to monitor**:
+![[Pasted image 20260116165558.png]]
+
+### Connecting to other tools
+![[Pasted image 20260116165647.png]]
+
