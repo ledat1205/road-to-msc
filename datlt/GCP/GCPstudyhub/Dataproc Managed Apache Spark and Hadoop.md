@@ -6,5 +6,7 @@
 Best practice to migrate from on-prem to cloud:
 ![[Pasted image 20260117034719.png]]
 
+Cloud Storage Connector
+
 
 
