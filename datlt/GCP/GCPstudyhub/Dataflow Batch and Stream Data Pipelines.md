@@ -132,3 +132,7 @@ Improving thoughput:
 ### Updating pipeline
 ![[Pasted image 20260116165012.png]]
 
+safeway: use drain option
+![[Pasted image 20260116165106.png]]
+
+### Errors and monitoring
