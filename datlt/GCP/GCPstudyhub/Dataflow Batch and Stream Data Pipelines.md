@@ -139,6 +139,8 @@ safeway: use drain option
 debug diagnose:
 ![[Pasted image 20260116165228.png]]
 
-Catching errors:
+**Catching errors:**
 ![[Pasted image 20260116165332.png]]
-D
+Dead letter queue idea
+
+SideOutputs for errors
