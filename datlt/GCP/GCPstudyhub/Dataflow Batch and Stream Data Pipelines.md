@@ -136,3 +136,9 @@ safeway: use drain option
 ![[Pasted image 20260116165106.png]]
 
 ### Errors and monitoring
+debug diagnose:
+![[Pasted image 20260116165228.png]]
+
+Catching errors:
+![[Pasted image 20260116165332.png]]
+D
