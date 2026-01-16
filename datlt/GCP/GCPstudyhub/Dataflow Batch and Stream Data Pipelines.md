@@ -101,4 +101,6 @@ Essential port:
 ![[Pasted image 20260116145248.png]]
 
 Firewall rules:
-in VPC 
+in VPC, ensure firewall rules allow ingress and egress on necessasary port 
+- TCP 443 for job management and API request
+- 
