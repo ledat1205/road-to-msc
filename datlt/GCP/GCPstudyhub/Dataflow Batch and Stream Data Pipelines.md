@@ -124,3 +124,9 @@ Autoscaling:
 
 Max workers:
 - limit number of wokers to control autoscaling to manage cost and performance 
+
+Improving thoughput:
+- increase number of wokers
+- change machine type
+
+### Updating pipeline
