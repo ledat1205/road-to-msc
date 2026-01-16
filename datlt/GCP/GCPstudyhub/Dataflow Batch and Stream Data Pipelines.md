@@ -95,3 +95,5 @@ debug step:
 **Preventing fusion**: 
 ![[Pasted image 20260115174636.png]]
 
+### Networking in dataflow
+
