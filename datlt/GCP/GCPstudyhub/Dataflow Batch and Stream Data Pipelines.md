@@ -97,3 +97,5 @@ debug step:
 
 ### Networking in dataflow
 
+Essential port:
+- 443 https: all dataflow jobs. Used with service control plane, API request and metadat
