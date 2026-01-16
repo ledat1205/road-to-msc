@@ -117,4 +117,6 @@ Region selection
 Disk size:
 - amount of storage for worker
 Worker type:
-- 
+![[Pasted image 20260116164614.png]]
+
+Autoscaling:
