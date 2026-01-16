@@ -130,3 +130,5 @@ Improving thoughput:
 - change machine type
 
 ### Updating pipeline
+![[Pasted image 20260116165012.png]]
+
