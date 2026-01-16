@@ -152,3 +152,5 @@ Dead letter queue idea
 ### Connecting to other tools
 ![[Pasted image 20260116165647.png]]
 
+### Cost optimization
+
