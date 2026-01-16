@@ -98,4 +98,7 @@ debug step:
 ### Networking in dataflow
 
 Essential port:
+![[Pasted image 20260116145248.png]]
 
+Firewall rules:
+in VPC 
