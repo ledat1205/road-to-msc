@@ -120,3 +120,7 @@ Worker type:
 ![[Pasted image 20260116164614.png]]
 
 Autoscaling:
+![[Pasted image 20260116164726.png]]
+
+Max workers:
+- limit number of wokers to control autoscaling to manage cost and performance 
