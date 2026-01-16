@@ -9,6 +9,8 @@ Best practice to migrate from on-prem to cloud:
 Cloud Storage Connector
 ![[Pasted image 20260117034901.png]]
 
+BigQuery Connector
+![[Pasted image 20260117035209.png]]
 
 
 
