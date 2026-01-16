@@ -92,5 +92,6 @@ debug step:
 
 ![[Pasted image 20260115174502.png]]
 
-**Prevent fusion**: 
+**Preventing fusion**: 
+![[Pasted image 20260115174636.png]]
 
