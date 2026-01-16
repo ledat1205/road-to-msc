@@ -24,4 +24,4 @@ Distributed dataset: Elements spread across multiple nodes (like idea of hdfs). 
 ![[Pasted image 20260114035200.png]]
 
 **Flatten**
-
+![[Pasted image 20260114035318.png]]
