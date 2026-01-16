@@ -12,5 +12,9 @@ Cloud Storage Connector
 BigQuery Connector
 ![[Pasted image 20260117035209.png]]
 
+Connecting to BigTable
+![[Pasted image 20260117035251.png]]
+
+
 
 
