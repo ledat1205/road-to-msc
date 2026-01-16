@@ -115,4 +115,6 @@ Region selection
 - therefore, can be helpful to store data in the same region as your dataflow pipeline
 - lower latency, higher performance, lower cost (egress cross region charge) 
 Disk size:
+- amount of storage for worker
+Worker type:
 - 
