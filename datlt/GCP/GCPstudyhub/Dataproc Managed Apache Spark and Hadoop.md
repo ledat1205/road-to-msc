@@ -31,6 +31,8 @@ Main config:
 Preemptible node
 ![[Pasted image 20260118045833.png]]
 
+Grace decomissioning
+![[Pasted image 20260118045942.png]]
 
-
-
+ Optimization:
+ 
