@@ -28,6 +28,7 @@ Main config:
 **Cluster mode**:
 ![[Pasted image 20260118045703.png]]
 
-#
+Preemptible node
+
 
 
