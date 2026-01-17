@@ -29,6 +29,8 @@ Main config:
 ![[Pasted image 20260118045703.png]]
 
 Preemptible node
+![[Pasted image 20260118045833.png]]
+
 
 
 
