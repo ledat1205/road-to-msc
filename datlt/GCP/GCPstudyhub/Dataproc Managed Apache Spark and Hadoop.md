@@ -22,5 +22,10 @@ Main config:
 - disk type and size
 - local ssd size
 - preemptible node
+- staging bucket
+![[Pasted image 20260118045527.png]]
+
+**Cluster mode**:
+
 
 
