@@ -19,5 +19,8 @@ Connecting to BigTable
 Main config:
 - region and zone
 - cluster mode 
+- disk type and size
+- local ssd size
+- preemptible node
 
 
