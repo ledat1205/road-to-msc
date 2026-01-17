@@ -26,6 +26,8 @@ Main config:
 ![[Pasted image 20260118045527.png]]
 
 **Cluster mode**:
+![[Pasted image 20260118045703.png]]
 
+#
 
 
