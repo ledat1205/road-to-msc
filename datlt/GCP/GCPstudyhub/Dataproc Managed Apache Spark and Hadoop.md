@@ -15,6 +15,9 @@ BigQuery Connector
 Connecting to BigTable
 ![[Pasted image 20260117035251.png]]
 
-
+### Cluster setup
+Main config:
+- region and zone
+- cluster mode 
 
 
