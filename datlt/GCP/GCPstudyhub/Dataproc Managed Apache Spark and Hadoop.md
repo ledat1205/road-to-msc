@@ -34,5 +34,7 @@ Preemptible node
 Grace decomissioning
 ![[Pasted image 20260118045942.png]]
 
- Optimization:
- ![[Pasted image 20260118050117.png]]
+ Optimization:![[Pasted image 20260118050117.png]]
+
+![[Pasted image 20260118050229.png]]
+
