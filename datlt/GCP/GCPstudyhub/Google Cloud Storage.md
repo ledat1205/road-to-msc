@@ -20,4 +20,9 @@ used to manage the transition of objects to different storage classes or their d
 ![[Pasted image 20260118152204.png]]
 
 ### Object versioning
+![[Pasted image 20260118152326.png]]
+
+gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
+
+
 
