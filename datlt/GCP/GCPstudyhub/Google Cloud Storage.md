@@ -17,3 +17,7 @@ Archive storage special case
 
 ### Lifecycle rules
 used to manage the transition of objects to different storage classes or their deletion based on specific condition
+![[Pasted image 20260118152204.png]]
+
+### Object versioning
+
