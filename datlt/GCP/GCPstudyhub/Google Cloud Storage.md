@@ -33,4 +33,6 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 - save cost (always start at Standard class)
 
 ### Recovery Point Objective (RPO)
+![[Pasted image 20260118153218.png]]
+
 
