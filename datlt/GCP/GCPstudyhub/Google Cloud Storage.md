@@ -39,6 +39,8 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 - implement a failover to at least a second region and replicate data more often than your company's RPO. Ex: RPO is 30 minutes, replicate data every 15 minutes
 
 **Approach**: Multi region setup
+![[Pasted image 20260118153647.png]]
+
 
 
 
