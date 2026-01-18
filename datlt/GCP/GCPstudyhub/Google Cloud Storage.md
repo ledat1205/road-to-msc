@@ -67,4 +67,8 @@ migrate from on-prem or to/from other cloud service
 
 ![[Pasted image 20260118155403.png]]
 
+### cmd
+![[Pasted image 20260118155546.png]]
 
+Partition files during upload
+![[Pasted image 20260118155634.png]]
