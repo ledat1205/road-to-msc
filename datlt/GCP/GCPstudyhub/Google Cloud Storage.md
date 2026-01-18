@@ -24,5 +24,6 @@ used to manage the transition of objects to different storage classes or their d
 
 gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 
+### Retention policies
 
 
