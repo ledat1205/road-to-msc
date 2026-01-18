@@ -10,4 +10,7 @@ Blob storage
 ![[Pasted image 20260118151506.png]]
 
 Archive storage special case
+![[Pasted image 20260118151758.png]]
+
+### Location options
 
