@@ -53,5 +53,6 @@ Common roles:
 **Signed URLs**
 ![[Pasted image 20260118154330.png]]
 
+**Hosting Static website**:
 
 
