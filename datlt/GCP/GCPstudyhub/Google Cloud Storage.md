@@ -38,4 +38,7 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 - maximum acceptable amount of data loss, measured in time, when a disaster/outage occurs
 - implement a failover to at least a second region and replicate data more often than your company's RPO. Ex: RPO is 30 minutes, replicate data every 15 minutes
 
+**Approach**: Multi region setup
+
+
 
