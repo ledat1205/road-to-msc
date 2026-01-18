@@ -45,5 +45,6 @@ If RPO need to < 1 hour:
 ![[Pasted image 20260118153843.png]]
 
 ### GCS Access
+![[Pasted image 20260118154059.png]]
 
 
