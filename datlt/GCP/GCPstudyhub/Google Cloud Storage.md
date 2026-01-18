@@ -75,3 +75,7 @@ Partition files during upload
 ![[Pasted image 20260118155650.png]]
 
 ### Compression and decompressive transcoding
+![[Pasted image 20260118155819.png]]
+
+![[Pasted image 20260118155859.png]]
+
