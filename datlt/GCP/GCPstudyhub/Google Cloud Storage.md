@@ -62,5 +62,7 @@ Common roles:
 ### Storage transfer service
 migrate from on-prem or to/from other cloud service
 - automate ongoing or scheduled transfer
-- high bandwidth and stable conncetio
+- high bandwidth and stable connection (at least 100 mbps, 1gbps is preferred)
+- up to hundreds of TB 
+
 
