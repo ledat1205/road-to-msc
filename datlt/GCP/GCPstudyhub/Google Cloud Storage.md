@@ -41,7 +41,9 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 **Approach**: Multi region setup
 ![[Pasted image 20260118153647.png]]
 
-
+If RPO need to < 1 hour:
 ![[Pasted image 20260118153843.png]]
+
+### GCS Access
 
 
