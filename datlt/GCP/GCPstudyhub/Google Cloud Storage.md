@@ -57,5 +57,8 @@ Common roles:
 ![[Pasted image 20260118154555.png]]
 
 ### Transfer appliance
+![[Pasted image 20260118154824.png]]
 
+### Storage transfer service
+migrate from on-prem
 
