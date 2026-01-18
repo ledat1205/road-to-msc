@@ -56,5 +56,6 @@ Common roles:
 **Hosting Static website**:
 ![[Pasted image 20260118154555.png]]
 
+### Transfer appliance
 
 
