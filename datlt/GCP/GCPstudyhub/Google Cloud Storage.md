@@ -65,4 +65,6 @@ migrate from on-prem or to/from other cloud service
 - high bandwidth and stable connection (at least 100 mbps, 1gbps is preferred)
 - up to hundreds of TB 
 
+![[Pasted image 20260118155403.png]]
+
 
