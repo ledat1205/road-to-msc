@@ -47,4 +47,6 @@ If RPO need to < 1 hour:
 ### GCS Access
 ![[Pasted image 20260118154059.png]]
 
+Common roles:
+
 
