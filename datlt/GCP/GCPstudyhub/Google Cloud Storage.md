@@ -51,5 +51,7 @@ Common roles:
 ![[Pasted image 20260118154218.png]]
 
 **Signed URLs**
+![[Pasted image 20260118154330.png]]
+
 
 
