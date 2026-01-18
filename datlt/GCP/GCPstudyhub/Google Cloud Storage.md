@@ -30,4 +30,4 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 ### Autoclass
 - Automatically transitions objects based on access pattern
 - must be enable 
-- 
+- save cost
