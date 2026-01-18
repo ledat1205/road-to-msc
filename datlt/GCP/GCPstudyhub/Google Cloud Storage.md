@@ -48,5 +48,8 @@ If RPO need to < 1 hour:
 ![[Pasted image 20260118154059.png]]
 
 Common roles:
+![[Pasted image 20260118154218.png]]
+
+**Signed URLs**
 
 
