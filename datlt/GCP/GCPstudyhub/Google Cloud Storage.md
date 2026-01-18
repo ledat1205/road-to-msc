@@ -27,5 +27,7 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 ### Retention policies
 ![[Pasted image 20260118152547.png]]
 
-
-
+### Autoclass
+- Automatically transitions objects based on access pattern
+- must be enable 
+- 
