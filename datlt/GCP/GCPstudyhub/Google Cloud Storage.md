@@ -79,3 +79,5 @@ Partition files during upload
 
 ![[Pasted image 20260118155859.png]]
 
+### integration with other GCP services
+![[Pasted image 20260118160054.png]]
