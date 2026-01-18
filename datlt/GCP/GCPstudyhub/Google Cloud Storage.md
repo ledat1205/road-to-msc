@@ -54,5 +54,7 @@ Common roles:
 ![[Pasted image 20260118154330.png]]
 
 **Hosting Static website**:
+![[Pasted image 20260118154555.png]]
+
 
 
