@@ -35,4 +35,6 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 ### Recovery Point Objective (RPO)
 ![[Pasted image 20260118153218.png]]
 
+- maximum acceptable amount of data loss, measured in time, when a disaster/outage occurs
+- implement a failover 
 
