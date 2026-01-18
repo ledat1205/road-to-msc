@@ -16,4 +16,4 @@ Archive storage special case
 ![[Pasted image 20260118151917.png]]
 
 ### Lifecycle rules
-
+used to manage the tra
