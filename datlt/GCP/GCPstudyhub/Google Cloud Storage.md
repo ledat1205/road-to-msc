@@ -31,3 +31,6 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 - Automatically transitions objects based on access pattern
 - must be enable 
 - save cost (always start at Standard class)
+
+### Recovery Point Objective (RPO)
+
