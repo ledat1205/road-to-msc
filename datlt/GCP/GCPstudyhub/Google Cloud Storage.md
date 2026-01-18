@@ -60,5 +60,6 @@ Common roles:
 ![[Pasted image 20260118154824.png]]
 
 ### Storage transfer service
-migrate from on-prem
+migrate from on-prem or to/from other cloud service
+- 
 
