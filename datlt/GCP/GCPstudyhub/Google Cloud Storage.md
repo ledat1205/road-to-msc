@@ -16,4 +16,4 @@ Archive storage special case
 ![[Pasted image 20260118151917.png]]
 
 ### Lifecycle rules
-used to manage the tra
+used to manage the transition of objects to different storage classes or their deletion based on specific condition
