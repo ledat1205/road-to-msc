@@ -61,5 +61,6 @@ Common roles:
 
 ### Storage transfer service
 migrate from on-prem or to/from other cloud service
-- 
+- automate ongoing or scheduled transfer
+- high bandwidth and stable conncetio
 
