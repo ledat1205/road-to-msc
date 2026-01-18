@@ -42,5 +42,6 @@ gsutil cmd to enable:  `gsutil versioning set on gs://[BUCKET_NAME]`
 ![[Pasted image 20260118153647.png]]
 
 
+![[Pasted image 20260118153843.png]]
 
 
