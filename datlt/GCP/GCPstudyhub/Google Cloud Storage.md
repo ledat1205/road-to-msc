@@ -9,3 +9,5 @@ Blob storage
 ### Storage class
 ![[Pasted image 20260118151506.png]]
 
+Archive storage special case
+
