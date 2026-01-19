@@ -3,4 +3,5 @@ Memory divided into a few different segments:
 - bss segment (the uninitialized data segment): where zero-initialized global and static variables are stored
 - data segment (the initialized data segment): where initialized global and static variables are stored 
 - the heap: dynamic allocated variables are allocated from
-- the call stack: function parameters, local variables,
+- the call stack: function parameters, local variables, and other function-related information are stored
+
