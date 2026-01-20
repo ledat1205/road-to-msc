@@ -35,5 +35,8 @@ BigQuery Streaming API and Storage write API
 
 ![[Pasted image 20260121033308.png]]
 
+### Spark-Bigquery Connector
+![[Pasted image 20260121033410.png]]
+
 
 
