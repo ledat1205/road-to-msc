@@ -42,5 +42,7 @@ BigQuery Streaming API and Storage write API
 external table is table that data is stored on GCS and user Bigquery to query on that data (without move data to bigquery)
 ![[Pasted image 20260121033649.png]]
 
+![[Pasted image 20260121033807.png]]
+
 
 
