@@ -44,5 +44,8 @@ external table is table that data is stored on GCS and user Bigquery to query on
 
 ![[Pasted image 20260121033807.png]]
 
+![[Pasted image 20260121033916.png]]
+
+### Dataset config
 
 
