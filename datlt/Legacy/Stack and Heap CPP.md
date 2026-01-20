@@ -13,3 +13,10 @@ The heap has advantages and disadvantages:
 - Dynamically allocated memory must be accessed through a pointer. Dereferencing a pointer is slower than accessing a variable directly.
 - Because the heap is a big pool of memory, large arrays, structures, or classes can be allocated here.
 
+**The call stack**
+The stack has advantages and disadvantages:
+
+- Allocating memory on the stack is comparatively fast.
+- Memory allocated on the stack stays in scope as long as it is on the stack. It is destroyed when it is popped off the stack.
+- All memory allocated on the stack is known at compile time. Consequently, this memory can be accessed directly through a variable.
+- Because the stack is relatively small, it is generally not a good idea to do anything that eats up lots of stack space. This includes allocating or copying large arrays or other memory-intensive structures.
