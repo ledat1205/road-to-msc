@@ -47,5 +47,6 @@ external table is table that data is stored on GCS and user Bigquery to query on
 ![[Pasted image 20260121033916.png]]
 
 ### Dataset config
+Region and Multi Region
 
 
