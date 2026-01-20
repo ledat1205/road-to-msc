@@ -53,3 +53,4 @@ Region and Multi Region
 ### Data encryption
 ![[Pasted image 20260121034302.png]]
 
+### Backing up
