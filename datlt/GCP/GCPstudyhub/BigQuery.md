@@ -29,6 +29,9 @@ faster and large data operations
 Schedule transfer
 
 BigQuery Streaming API and Storage write API
-BigQuery Streaming API:
-	- 
+![[Pasted image 20260121033019.png]]
+
+![[Pasted image 20260121033033.png]]
+
+
 
