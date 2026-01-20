@@ -39,5 +39,5 @@ BigQuery Streaming API and Storage write API
 ![[Pasted image 20260121033410.png]]
 
 ### External Tables and Federated Queries
-
+external table is table that data is stored on GCS and user Bigquery to query on that data (wi)
 
