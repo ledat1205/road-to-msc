@@ -25,3 +25,7 @@ Resource Hierachy
 faster and large data operations
 
 **BigQuery Data Transfer Service**
+![[Pasted image 20260121032809.png]]
+Schedule transfer
+
+BigQuery Streaming API and 
