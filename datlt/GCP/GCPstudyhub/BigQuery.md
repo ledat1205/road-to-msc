@@ -38,5 +38,6 @@ BigQuery Streaming API and Storage write API
 ### Spark-Bigquery Connector
 ![[Pasted image 20260121033410.png]]
 
+### External Tables and Federated Queries
 
 
