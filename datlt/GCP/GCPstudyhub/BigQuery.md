@@ -11,7 +11,7 @@ Resource Hierachy
 
 ### importing data
 
-Web UI:
+**Web UI**:
 - Local update, GCS, Drive, BigTable, Azure Blob, AWS s3 
 - file types:
 	- JSONL
@@ -21,3 +21,7 @@ Web UI:
 	- ORC
 - Adjust schema and table setting during the import
 
+**bq command line**:
+faster and large data operations
+
+Biq
