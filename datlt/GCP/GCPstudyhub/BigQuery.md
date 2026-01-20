@@ -24,4 +24,4 @@ Resource Hierachy
 **bq command line**:
 faster and large data operations
 
-Biq
+**BigQuery Data Transfer Service**
