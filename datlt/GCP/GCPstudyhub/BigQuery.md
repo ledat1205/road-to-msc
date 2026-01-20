@@ -6,3 +6,4 @@ Access:
 - bq command line 
 - Client libs
 
+Resource Hierachy
