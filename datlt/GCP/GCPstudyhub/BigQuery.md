@@ -54,3 +54,5 @@ Region and Multi Region
 ![[Pasted image 20260121034302.png]]
 
 ### Backing up
+![[Pasted image 20260121034624.png]]
+
