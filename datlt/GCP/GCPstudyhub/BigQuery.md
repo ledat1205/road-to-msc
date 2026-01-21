@@ -56,3 +56,4 @@ Region and Multi Region
 ### Backing up
 ![[Pasted image 20260121034624.png]]
 
+### referential integrity
