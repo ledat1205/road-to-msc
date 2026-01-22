@@ -106,4 +106,7 @@ Capacity-based pricing
 Metric to monitor
 ![[Pasted image 20260122173537.png]]
 
+Control Query Quota to control cost
+![[Pasted image 20260122173722.png]]
+
 
