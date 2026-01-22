@@ -114,3 +114,5 @@ Control Query Quota to control cost
 Logging
 ![[Pasted image 20260122174116.png]]
 
+![[Pasted image 20260122174434.png]]
+
