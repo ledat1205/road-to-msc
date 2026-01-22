@@ -57,4 +57,4 @@ Region and Multi Region
 ![[Pasted image 20260121034624.png]]
 
 ### referential integrity
-the principle foreign
+the principle foreign key values must always correspond to valid entries in the parent table, ensure data consistency
