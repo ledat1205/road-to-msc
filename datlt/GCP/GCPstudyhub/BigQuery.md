@@ -64,4 +64,7 @@ Normalization:
 - when data integrity and update efficiency are more important than query speed
 - system where maintaining consistent, accurate data is a priority
 
-Denormaliz
+Denormalization:
+- query performance is primary concern 
+- read-heavy systems with large datasets where JOINs are a bottleneck
+	
