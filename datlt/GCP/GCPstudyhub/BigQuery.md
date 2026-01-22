@@ -57,3 +57,4 @@ Region and Multi Region
 ![[Pasted image 20260121034624.png]]
 
 ### referential integrity
+the principle foreign
