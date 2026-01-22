@@ -69,3 +69,5 @@ Denormalization:
 - read-heavy systems with large datasets where JOINs are a bottleneck
 
 ### Partitioning
+![[Pasted image 20260122110842.png]]
+
