@@ -109,4 +109,5 @@ Metric to monitor
 Control Query Quota to control cost
 ![[Pasted image 20260122173722.png]]
 
+![[Pasted image 20260122173854.png]]
 
