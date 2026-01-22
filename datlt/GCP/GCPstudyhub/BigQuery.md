@@ -74,4 +74,4 @@ Denormalization:
 Can set partition expiration: allow to automatically delete partitions once they reach the expiration age
 
 ### Advanced Query Management
-**Standard Views**:
+**Standard Views**: like a view in other database, store query and run when query the view
