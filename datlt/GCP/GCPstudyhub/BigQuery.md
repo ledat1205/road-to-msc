@@ -86,3 +86,7 @@ Can set partition expiration: allow to automatically delete partitions once they
 ![[Pasted image 20260122140638.png]]
 
 ### Compute cost
+
+Query cost:
+- charge for bytes read during query execution
+- 
