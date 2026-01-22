@@ -58,3 +58,7 @@ Region and Multi Region
 
 ### referential integrity
 the principle foreign key values must always correspond to valid entries in the parent table, ensure data consistency
+
+### ### Normalization and Denormalization
+Normalization:
+- when data integrity and update efficiency
