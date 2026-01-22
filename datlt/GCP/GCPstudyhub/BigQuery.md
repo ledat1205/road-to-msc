@@ -91,3 +91,5 @@ Query cost:
 - charge for bytes read during query execution
 - also charge for data storage (active, long-term) but separate from running query
 Estimate query size 
+- dry run using bq command line tool
+- UI preview
