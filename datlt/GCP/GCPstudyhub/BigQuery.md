@@ -93,3 +93,8 @@ Query cost:
 Estimate query size 
 - dry run using bq command line tool
 - UI preview
+
+BigQuery slots: resource to execute query, Google fully management, dynamic scale
+![[Pasted image 20260122172853.png]]
+
+
