@@ -67,4 +67,5 @@ Normalization:
 Denormalization:
 - query performance is primary concern 
 - read-heavy systems with large datasets where JOINs are a bottleneck
-	
+
+### Partitioning
