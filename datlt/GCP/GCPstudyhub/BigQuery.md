@@ -83,3 +83,5 @@ Can set partition expiration: allow to automatically delete partitions once they
 ### Storage Types
 ![[Pasted image 20260122140531.png]]
 
+![[Pasted image 20260122140638.png]]
+
