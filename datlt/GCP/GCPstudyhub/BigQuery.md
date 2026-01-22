@@ -75,4 +75,5 @@ Can set partition expiration: allow to automatically delete partitions once they
 
 ### Advanced Query Management
 **Standard Views**: like a view in other database, store query and run when query the view
-**Materialize Views**
+**Materialize Views**: pre-compute data
+Authorized Views
