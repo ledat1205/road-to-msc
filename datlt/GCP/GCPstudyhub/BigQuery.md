@@ -72,3 +72,6 @@ Denormalization:
 ![[Pasted image 20260122110842.png]]
 
 Can set partition expiration: allow to automatically delete partitions once they reach the expiration age
+
+### Advanced Query Management
+**Standard Views**:
