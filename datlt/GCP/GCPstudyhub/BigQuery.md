@@ -119,3 +119,4 @@ Logging
 View error jobs in Job explorer
 
 ### BigQuery Role
+![[Pasted image 20260122174734.png]]
