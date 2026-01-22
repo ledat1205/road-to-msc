@@ -101,4 +101,6 @@ Pricing Models
 ![[Pasted image 20260122173152.png]]
 
 Capacity-based pricing
+![[Pasted image 20260122173435.png]]
 
+Metric to monitor
