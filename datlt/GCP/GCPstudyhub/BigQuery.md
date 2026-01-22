@@ -79,3 +79,5 @@ Can set partition expiration: allow to automatically delete partitions once they
 **Authorized Views**: security mechanism that allow user query on specific data
 
 **User-Defined Function**: write custom function using JS or SQL and call in your query
+
+### Storage Types
