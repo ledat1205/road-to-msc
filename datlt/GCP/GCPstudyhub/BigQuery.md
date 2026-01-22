@@ -97,4 +97,7 @@ Estimate query size
 BigQuery slots: resource to execute query, Google fully management, dynamic scale
 ![[Pasted image 20260122172853.png]]
 
+Pricing Models
+![[Pasted image 20260122173152.png]]
+
 
