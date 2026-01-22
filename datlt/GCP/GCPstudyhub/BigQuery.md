@@ -81,3 +81,5 @@ Can set partition expiration: allow to automatically delete partitions once they
 **User-Defined Function**: write custom function using JS or SQL and call in your query
 
 ### Storage Types
+![[Pasted image 20260122140531.png]]
+
