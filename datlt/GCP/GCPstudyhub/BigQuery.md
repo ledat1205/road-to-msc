@@ -104,3 +104,6 @@ Capacity-based pricing
 ![[Pasted image 20260122173435.png]]
 
 Metric to monitor
+![[Pasted image 20260122173537.png]]
+
+
