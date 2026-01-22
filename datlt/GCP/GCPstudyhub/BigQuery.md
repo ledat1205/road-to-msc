@@ -89,4 +89,4 @@ Can set partition expiration: allow to automatically delete partitions once they
 
 Query cost:
 - charge for bytes read during query execution
-- 
+- also charge for data storage (active, long-term) but separate from running query
