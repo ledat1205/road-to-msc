@@ -120,3 +120,5 @@ View error jobs in Job explorer
 
 ### BigQuery Role
 ![[Pasted image 20260122174734.png]]
+
+![[Pasted image 20260122175124.png]]
