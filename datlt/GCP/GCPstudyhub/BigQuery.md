@@ -100,4 +100,5 @@ BigQuery slots: resource to execute query, Google fully management, dynamic scal
 Pricing Models
 ![[Pasted image 20260122173152.png]]
 
+Capacity-based pricing
 
