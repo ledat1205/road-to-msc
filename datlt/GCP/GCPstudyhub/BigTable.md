@@ -3,4 +3,4 @@
 
 ### Command line tools
 interact with BigTable data through `cbt`(Cloud BigTable) or `HBase shell`
-interact with infra 
+interact with infra through `gcloud`
