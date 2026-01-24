@@ -19,3 +19,6 @@ Prod:
 - replication 
 - throughput guarantee
 
+Cluster location  
+![[Pasted image 20260125051032.png]]
+
