@@ -16,4 +16,6 @@ Development:
 Prod:
 - 1+ cluster
 - 3+ nodes per cluster
-- 
+- replication 
+- throughput guarantee
+
