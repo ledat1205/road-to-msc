@@ -22,3 +22,5 @@ Prod:
 Cluster location  
 ![[Pasted image 20260125051032.png]]
 
+![[Pasted image 20260125051041.png]]
+
