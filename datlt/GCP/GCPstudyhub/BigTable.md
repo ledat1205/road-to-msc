@@ -8,4 +8,12 @@ interact with infra through `gcloud`
 ### instance config
 
 Development:
-	- 1 Node
+- 1 Node total
+- Low cost
+- No replication
+- No throughput guarantee
+
+Prod:
+- 1+ cluster
+- 3+ nodes per cluster
+- 
