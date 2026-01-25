@@ -19,3 +19,4 @@ This topic assesses his maintenance of 50+ DAGs with Python/PySpark/SQL, ensurin
 9. **Question**: What testing strategies did you use for Airflow DAGs before production? **Expected Answer**: Unit tests with pytest-airflow, mocking tasks. Integration: LocalExecutor in dev, DAG validation (airflow dags test). CI with GitLab.
 10. **Question**: How would you version-control and deploy updates to your 50+ DAGs without downtime? 
 	**Expected Answer**: Git for DAG files, deployed via sync to Airflow server. Used image tags in Kubernetes for rolling updates. Pause/resume DAGs during deploy.
+
