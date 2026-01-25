@@ -1,12 +1,12 @@
 # TIKI
 ## RECOMMENDATION
 
-#### 1. **Optimizing Related Products Recommendations (Model-Inferred, Up to 100 per Product)**
+#### 1. **Optimizing Related Products Recommendations (Model-Inferred, Up to 1000 per Product)**
 
 - **Rationale**: Daily training outputs semantic similarities (from titles) and co-view lists. To serve fast, precompute these as graphs or lists, but update incrementally for real-time co-views (e.g., from user sessions). This avoids full DB scans per request.
 - **Technical Implementation**:
     - **Data Modeling**: In ScyllaDB, store as a graph-like structure using wide rows. E.g., table product_relations with product_id as partition key, and clustering columns for related products sorted by relevance score (from model or co-view count).
-        - Schema: CREATE TABLE product_relations (product_id uuid PRIMARY KEY, related_products frozen<map<uuid, float>>); (map limits to 100 entries, float for similarity scores).
+        - Schema: CREATE TABLE product_relations (product_id uuid PRIMARY KEY, related_products frozen<map<uuid, float>>); (map limits to 1000 entries, float for similarity scores).
     - **Batch Loading**: Daily training job (e.g., Spark or Airflow) writes semantic lists to Scylla. For co-views, use Flink to aggregate real-time views from event streams (Kafka), updating scores with exponential decay (e.g., recent views weigh more).
         - Flink Operator: Use keyed state (ProcessFunction) to maintain a priority queue (top-100) per product, evicting low-score items.
     - **Online Updates**: Flink consumes view events, increments co-view counts, and writes deltas to Redis (as sorted sets: ZADD product:rel:123 score1 related1 score2 related2) with TTL=1 day, and async to Scylla for persistence.
