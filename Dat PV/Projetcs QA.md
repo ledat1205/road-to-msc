@@ -121,7 +121,8 @@
 	**Expected Answer**: Glue schema inference + manual overrides in catalog. Backward-compatible changes (add columns nullable). Used dynamic frames for flexible schema.
 5. **Question**: Compare BigQuery and ClickHouse based on your experience. When would you choose one over the other? 
 	**Expected Answer**: BigQuery: serverless, great for ad-hoc BI, columnar but expensive at scale. ClickHouse: self-managed, cheaper storage, faster for high-ingestion OLAP. Chose ClickHouse for cost (30% lower) and write-heavy ML feature serving.
-6. **Question**: Describe any cost optimization techniques you applied in AWS Glue or S3.**Expected Answer**: S3 Intelligent-Tiering / Glacier for cold data. Glue job bookmarks + incremental loads. Right-sized DPUs. Reduced costs via partitioning and compression.
+6. **Question**: Describe any cost optimization techniques you applied in AWS Glue or S3.
+	**Expected Answer**: S3 Intelligent-Tiering / Glacier for cold data. Glue job bookmarks + incremental loads. Right-sized DPUs. Reduced costs via partitioning and compression.
 7. **Question**: How would you ingest real-time data into a cloud data lake (e.g., from Kafka)?
 	**Expected Answer**: Kafka Connect → S3 Sink (parquet) or MSK + Glue streaming ETL. Hudi/Delta for upserts if needed.
 8. **Question**: What monitoring did you set up for Glue jobs and S3 data pipelines?
