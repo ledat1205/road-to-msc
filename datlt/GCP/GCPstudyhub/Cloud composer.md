@@ -5,3 +5,5 @@ Cloud Composer API: Manage infrastructure
 Airflow API: Manage workflow 
 
 ### Architecture
+Simple: Airflow + K8s (GKE) + Cloud Storage
+
