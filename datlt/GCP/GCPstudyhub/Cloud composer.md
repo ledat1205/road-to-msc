@@ -28,3 +28,7 @@ Integrate with other services on GCP: because composer is airflow so its not onl
 `BigQueryInsertJobOperator`
 
 **IAM**:
+- Composer Admin: full control
+- Composer Developer: deploy, modify DAGs
+- Composer Viewer: read configurations
+- 
