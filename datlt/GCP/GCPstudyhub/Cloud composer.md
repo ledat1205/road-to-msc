@@ -35,3 +35,5 @@ Integrate with other services on GCP: because composer is airflow so its not onl
 - Composer environment and storage accessor: access bucket 
 
 **Cloud Functions**:
+- most abstracted and lightweight of GPC's compute services
+- serverless execution environment
