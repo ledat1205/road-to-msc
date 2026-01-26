@@ -39,4 +39,5 @@ salting:
 ![[Pasted image 20260126132842.png]]
 
 ### Garbage collection policie
-Like TTL 
+Like TTL, way to clear unuse row
+
