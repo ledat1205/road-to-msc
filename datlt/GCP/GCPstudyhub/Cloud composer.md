@@ -55,3 +55,5 @@ sources:
 Use with YAML
 
 Compare:
+![[Pasted image 20260126154646.png]]
+
