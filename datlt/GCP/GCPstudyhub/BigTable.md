@@ -27,3 +27,6 @@ Cluster location
 ### Bigtable schema
 ![[Pasted image 20260126132109.png]]
 
+Hotspotting 
+![[Pasted image 20260126132256.png]]
+
