@@ -105,19 +105,27 @@
 	**Expected Answer**: Sealed Secrets or external-secrets operator pulling from HashiCorp Vault / AWS SSM. No plaintext in manifests. Mounted as volumes or envFrom.
 8. **Question**: How did you handle rolling updates or canary deployments for data services on K8s? 
 	**Expected Answer**: Deployment with maxSurge=25%, maxUnavailable=0 for zero-downtime. Service with sessionAffinity if needed. For Spark jobs: Treated as Jobs/CronJobs with concurrencyPolicy=Replace.
-9. **Question**: Discuss any Istio or service mesh usage you had (or would consider) for observability in data pipelines. **Expected Answer**: (Likely none at Zalo, but reasoned) Would use for mTLS, traffic shifting, golden metrics (latency, error rate). Kiali + Jaeger for tracing Kafka → Spark calls.
-10. **Question**: How do you compare Slurm job scheduling vs. Kubernetes for ML training workloads? Trade-offs from your experience. **Expected Answer**: Slurm: Better raw GPU utilization, simpler for batch/HPC, lower overhead. K8s: Better for microservices, auto-scaling, unified platform. Trade-off: Slurm faster for large jobs, K8s more flexible for hybrid (CPU + GPU) clusters.
+9. **Question**: Discuss any Istio or service mesh usage you had (or would consider) for observability in data pipelines. 
+	**Expected Answer**: (Likely none at Zalo, but reasoned) Would use for mTLS, traffic shifting, golden metrics (latency, error rate). Kiali + Jaeger for tracing Kafka → Spark calls.
+10. **Question**: How do you compare Slurm job scheduling vs. Kubernetes for ML training workloads? Trade-offs from your experience. 
+	**Expected Answer**: Slurm: Better raw GPU utilization, simpler for batch/HPC, lower overhead. K8s: Better for microservices, auto-scaling, unified platform. Trade-off: Slurm faster for large jobs, K8s more flexible for hybrid (CPU + GPU) clusters.
 
 ### Topic 6: Cloud Infrastructure and Data Lakes (AWS/GCP)
 
-1. **Question**: Describe the architecture of the automated ELT pipeline you built with AWS Glue and PySpark. **Expected Answer**: S3 as landing → Glue Crawler → Catalog → Glue Job (PySpark) for transformations → Parquet in refined zone. Triggered by S3 events or Airflow. Reduced manual prep from days to hours.
+1. **Question**: Describe the architecture of the automated ELT pipeline you built with AWS Glue and PySpark. 
+	**Expected Answer**: S3 as landing → Glue Crawler → Catalog → Glue Job (PySpark) for transformations → Parquet in refined zone. Triggered by S3 events or Airflow. Reduced manual prep from days to hours.
 2. **Question**: How did you implement the Bronze/Silver/Gold layers in your AWS data lake? **Expected Answer**: Bronze: raw JSON/CSV as-is. Silver: cleaned, deduped, typed Parquet. Gold: aggregated, business-ready. Delta Lake or Iceberg for ACID if needed (though not mentioned, likely Parquet + partitioning).
-3. **Question**: What partitioning and file format strategies did you use in Glue/S3 to achieve good performance? **Expected Answer**: Partition by date/source, Parquet with Snappy compression. Hive-style partitioning. Glue bookmarks for incremental processing.
-4. **Question**: How did you handle schema evolution in your AWS Glue ETL jobs? **Expected Answer**: Glue schema inference + manual overrides in catalog. Backward-compatible changes (add columns nullable). Used dynamic frames for flexible schema.
-5. **Question**: Compare BigQuery and ClickHouse based on your experience. When would you choose one over the other? **Expected Answer**: BigQuery: serverless, great for ad-hoc BI, columnar but expensive at scale. ClickHouse: self-managed, cheaper storage, faster for high-ingestion OLAP. Chose ClickHouse for cost (30% lower) and write-heavy ML feature serving.
-6. **Question**: Describe any cost optimization techniques you applied in AWS Glue or S3. **Expected Answer**: S3 Intelligent-Tiering / Glacier for cold data. Glue job bookmarks + incremental loads. Right-sized DPUs. Reduced costs via partitioning and compression.
-7. **Question**: How would you ingest real-time data into a cloud data lake (e.g., from Kafka)? **Expected Answer**: Kafka Connect → S3 Sink (parquet) or MSK + Glue streaming ETL. Hudi/Delta for upserts if needed.
-8. **Question**: What monitoring did you set up for Glue jobs and S3 data pipelines? **Expected Answer**: CloudWatch metrics (job duration, errors), Glue job logs to CloudWatch Logs. Alerts on failed jobs or high DPU usage.
+3. **Question**: What partitioning and file format strategies did you use in Glue/S3 to achieve good performance? 
+	**Expected Answer**: Partition by date/source, Parquet with Snappy compression. Hive-style partitioning. Glue bookmarks for incremental processing.
+4. **Question**: How did you handle schema evolution in your AWS Glue ETL jobs? 
+	**Expected Answer**: Glue schema inference + manual overrides in catalog. Backward-compatible changes (add columns nullable). Used dynamic frames for flexible schema.
+5. **Question**: Compare BigQuery and ClickHouse based on your experience. When would you choose one over the other? 
+	**Expected Answer**: BigQuery: serverless, great for ad-hoc BI, columnar but expensive at scale. ClickHouse: self-managed, cheaper storage, faster for high-ingestion OLAP. Chose ClickHouse for cost (30% lower) and write-heavy ML feature serving.
+6. **Question**: Describe any cost optimization techniques you applied in AWS Glue or S3.**Expected Answer**: S3 Intelligent-Tiering / Glacier for cold data. Glue job bookmarks + incremental loads. Right-sized DPUs. Reduced costs via partitioning and compression.
+7. **Question**: How would you ingest real-time data into a cloud data lake (e.g., from Kafka)?
+	**Expected Answer**: Kafka Connect → S3 Sink (parquet) or MSK + Glue streaming ETL. Hudi/Delta for upserts if needed.
+8. **Question**: What monitoring did you set up for Glue jobs and S3 data pipelines?
+	**Expected Answer**: CloudWatch metrics (job duration, errors), Glue job logs to CloudWatch Logs. Alerts on failed jobs or high DPU usage.
 9. **Question**: Did you use AWS Lake Formation or similar for governance? If not, how did you handle access control? **Expected Answer**: (Likely basic) IAM roles for Glue service, S3 bucket policies. Column-level security via Glue Data Catalog if advanced.
 10. **Question**: How would you design a multi-cloud or hybrid cloud data lake strategy based on your GCP + AWS experience? **Expected Answer**: Standardize on open formats (Parquet, Delta), use MinIO/S3-compatible for abstraction. Airflow or Dagster for orchestration across clouds. Avoid lock-in on proprietary features.
 
