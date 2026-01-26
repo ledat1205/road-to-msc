@@ -14,4 +14,5 @@ Hosting a pipeline
 ### Trigger DAG in Composer
 - schedule 
 - trigger via API
-- 
+- manual, on-demand
+
