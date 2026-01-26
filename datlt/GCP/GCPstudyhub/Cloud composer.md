@@ -49,4 +49,6 @@ sources:
 
 **Cloud Workflow**:
 - fully-managed service that allow you to orchestrate and automate the execution of GCP services and HTTP-based APIs in a reliable, scalable and serverless manner
-- squen 
+- sequencing and execution of multiple cloud tasks 
+- built-in mechanism for managing failures and retries
+- visual graphical interface
