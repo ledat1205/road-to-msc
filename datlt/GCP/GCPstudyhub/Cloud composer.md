@@ -8,4 +8,4 @@ Airflow API: Manage workflow
 Simple: Airflow + K8s (GKE) + Cloud Storage
 
 Hosting a pipeline
-
+- upload file to specific bucket. bucket name format <region>-composer-
