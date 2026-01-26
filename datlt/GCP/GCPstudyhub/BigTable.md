@@ -30,3 +30,6 @@ Cluster location
 Hotspotting 
 ![[Pasted image 20260126132256.png]]
 
+Row key best practice:
+- reverse domain name. ex: com.google.www
+- timestamps at the end of the row 
