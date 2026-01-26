@@ -32,4 +32,5 @@ Hotspotting
 
 Row key best practice:
 - reverse domain name. ex: com.google.www
-- timestamps at the end of the row 
+- timestamps at the end of the row key, or reversed. 
+- string identifiers
