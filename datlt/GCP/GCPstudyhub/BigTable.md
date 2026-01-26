@@ -38,4 +38,5 @@ Row key best practice:
 salting:
 ![[Pasted image 20260126132842.png]]
 
-### Garb
+### Garbage collection policie
+Like TTL 
