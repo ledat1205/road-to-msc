@@ -42,3 +42,8 @@ Integrate with other services on GCP: because composer is airflow so its not onl
 - GCP version of AWS Lambda
 
 Types of trigger:
+sources:
+- changes in cloud storage
+- new message in pub/sub
+- http request
+
