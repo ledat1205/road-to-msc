@@ -37,3 +37,6 @@ Integrate with other services on GCP: because composer is airflow so its not onl
 **Cloud Functions**:
 - most abstracted and lightweight of GPC's compute services
 - serverless execution environment
+- event-driven code 
+- auto scaling 
+- GCP version of AWS Lambda
