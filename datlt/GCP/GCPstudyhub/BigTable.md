@@ -24,3 +24,4 @@ Cluster location
 
 ![[Pasted image 20260125051041.png]]
 
+### Bigtable schema
