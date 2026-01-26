@@ -7,3 +7,5 @@ Airflow API: Manage workflow
 ### Architecture
 Simple: Airflow + K8s (GKE) + Cloud Storage
 
+Hosting a pipeline
+
