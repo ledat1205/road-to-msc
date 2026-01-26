@@ -132,11 +132,15 @@
 
 ### Topic 7: CI/CD Pipelines and Automation (GitLab/GitHub Actions)
 
-1. **Question**: Describe your CI/CD setup for deploying Airflow DAGs and data pipeline code at Zalo. **Expected Answer**: GitLab repo → .gitlab-ci.yml with stages: lint, test, deploy. DAG validation, unit tests (pytest), then rsync or kubectl apply to Airflow namespace.
+1. **Question**: Describe your CI/CD setup for deploying Airflow DAGs and data pipeline code at Zalo. 
+	**Expected Answer**: GitLab repo → .gitlab-ci.yml with stages: lint, test, deploy. DAG validation, unit tests (pytest), then rsync or kubectl apply to Airflow namespace.
 2. **Question**: How did you ensure zero-downtime or safe deployment of DAG changes? **Expected Answer**: New DAG version with different ID or tag. Parallel run old/new, switch traffic via Airflow variables or tags. Pause old DAG after validation.
-3. **Question**: What automated tests did you run in CI for data pipelines? **Expected Answer**: Unit tests for transformations (Great Expectations or custom), schema validation, backfill simulation on small data.
-4. **Question**: How did you handle secrets in GitLab CI/CD pipelines? **Expected Answer**: GitLab CI/CD variables (masked/protected), injected as env vars. No commits of creds.
-5. **Question**: Describe a blue-green or canary deployment pattern you used for APIs or data services. **Expected Answer**: For REST APIs: Two K8s deployments, Istio or ingress traffic split. For data: Shadow mode (run new pipeline in parallel, compare outputs).
+3. **Question**: What automated tests did you run in CI for data pipelines? 
+	**Expected Answer**: Unit tests for transformations (Great Expectations or custom), schema validation, backfill simulation on small data.
+4. **Question**: How did you handle secrets in GitLab CI/CD pipelines? 
+	**Expected Answer**: GitLab CI/CD variables (masked/protected), injected as env vars. No commits of creds.
+5. **Question**: Describe a blue-green or canary deployment pattern you used for APIs or data services. 
+	**Expected Answer**: For REST APIs: Two K8s deployments, Istio or ingress traffic split. For data: Shadow mode (run new pipeline in parallel, compare outputs).
 6. **Question**: How did you automate Docker image builds and pushes in your pipeline? **Expected Answer**: GitLab runner with Docker-in-Docker, build → tag with commit SHA → push to registry. Multi-stage builds for smaller images.
 7. **Question**: What quality gates did you enforce before production deployment? **Expected Answer**: Code coverage >80%, no lint errors (black, flake8), DAG parse success, manual approval for prod.
 8. **Question**: How did you rollback a bad deployment in your CI/CD flow? **Expected Answer**: Git tag rollback, redeploy previous image. For DAGs: Revert commit or disable new DAG.
