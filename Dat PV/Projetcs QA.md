@@ -127,8 +127,10 @@
 	**Expected Answer**: Kafka Connect → S3 Sink (parquet) or MSK + Glue streaming ETL. Hudi/Delta for upserts if needed.
 8. **Question**: What monitoring did you set up for Glue jobs and S3 data pipelines?
 	**Expected Answer**: CloudWatch metrics (job duration, errors), Glue job logs to CloudWatch Logs. Alerts on failed jobs or high DPU usage.
-9. **Question**: Did you use AWS Lake Formation or similar for governance? If not, how did you handle access control? **Expected Answer**: (Likely basic) IAM roles for Glue service, S3 bucket policies. Column-level security via Glue Data Catalog if advanced.
-10. **Question**: How would you design a multi-cloud or hybrid cloud data lake strategy based on your GCP + AWS experience? **Expected Answer**: Standardize on open formats (Parquet, Delta), use MinIO/S3-compatible for abstraction. Airflow or Dagster for orchestration across clouds. Avoid lock-in on proprietary features.
+9. **Question**: Did you use AWS Lake Formation or similar for governance? If not, how did you handle access control? 
+	**Expected Answer**: (Likely basic) IAM roles for Glue service, S3 bucket policies. Column-level security via Glue Data Catalog if advanced.
+10. **Question**: How would you design a multi-cloud or hybrid cloud data lake strategy based on your GCP + AWS experience? 
+	**Expected Answer**: Standardize on open formats (Parquet, Delta), use MinIO/S3-compatible for abstraction. Airflow or Dagster for orchestration across clouds. Avoid lock-in on proprietary features.
 
 ### Topic 7: CI/CD Pipelines and Automation (GitLab/GitHub Actions)
 
@@ -142,7 +144,11 @@
 5. **Question**: Describe a blue-green or canary deployment pattern you used for APIs or data services. 
 	**Expected Answer**: For REST APIs: Two K8s deployments, Istio or ingress traffic split. For data: Shadow mode (run new pipeline in parallel, compare outputs).
 6. **Question**: How did you automate Docker image builds and pushes in your pipeline? **Expected Answer**: GitLab runner with Docker-in-Docker, build → tag with commit SHA → push to registry. Multi-stage builds for smaller images.
-7. **Question**: What quality gates did you enforce before production deployment? **Expected Answer**: Code coverage >80%, no lint errors (black, flake8), DAG parse success, manual approval for prod.
-8. **Question**: How did you rollback a bad deployment in your CI/CD flow? **Expected Answer**: Git tag rollback, redeploy previous image. For DAGs: Revert commit or disable new DAG.
-9. **Question**: Did you use infrastructure-as-code (Terraform) for any cloud resources? If not, why? **Expected Answer**: (Likely not primary) Focused on app-level CI/CD. If used, Terraform for Glue jobs/catalog, but manual for some.
-10. **Question**: How would you improve your current CI/CD for faster feedback loops in a robotics data platform team? **Expected Answer**: Add preview environments (namespace per MR), faster unit tests, parallel stages, caching Docker layers, GitLab Auto DevOps features.
+7. **Question**: What quality gates did you enforce before production deployment? 
+	**Expected Answer**: Code coverage >80%, no lint errors (black, flake8), DAG parse success, manual approval for prod.
+8. **Question**: How did you rollback a bad deployment in your CI/CD flow? 
+	**Expected Answer**: Git tag rollback, redeploy previous image. For DAGs: Revert commit or disable new DAG.
+9. **Question**: Did you use infrastructure-as-code (Terraform) for any cloud resources? If not, why? 
+	**Expected Answer**: (Likely not primary) Focused on app-level CI/CD. If used, Terraform for Glue jobs/catalog, but manual for some.
+10. **Question**: How would you improve your current CI/CD for faster feedback loops in a robotics data platform team? 
+	**Expected Answer**: Add preview environments (namespace per MR), faster unit tests, parallel stages, caching Docker layers, GitLab Auto DevOps features.
