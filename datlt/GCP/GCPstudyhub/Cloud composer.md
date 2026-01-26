@@ -48,4 +48,4 @@ sources:
 - http request
 
 **Cloud Workflow**:
-- fully-managed service 
+- fully-managed service that allow you to orchestrate and automate the execution of GCP services and HTTP-based APIs in a reliable, scalable and serverless maner
