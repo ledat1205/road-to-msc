@@ -11,4 +11,7 @@ Hosting a pipeline
 - upload file to specific bucket. bucket name format `<region>-composer-<environment-name>-<project-id>-<random-characters>`
 - composer will constantly checks for updates to the environment bucket
 
-
+### Trigger DAG in Composer
+- schedule 
+- trigger via API
+- 
