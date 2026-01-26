@@ -36,3 +36,5 @@ Row key best practice:
 - string identifiers
 
 salting:
+![[Pasted image 20260126132842.png]]
+
