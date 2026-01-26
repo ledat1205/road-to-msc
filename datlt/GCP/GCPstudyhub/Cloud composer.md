@@ -18,4 +18,6 @@ Hosting a pipeline
 
 can leverage trigger via API with cloud functions to perform event-based trigger
 
-Integrate with other services on GCP: because composer is airflow so it 
+Integrate with other services on GCP: because composer is airflow so its not only integrate with GCP, but also interact with multi-cloud platform
+
+
