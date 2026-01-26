@@ -101,10 +101,11 @@
 	**Expected Answer**: Strimzi Kafka Operator (preferred for production). Custom CRDs for Kafka/KafkaConnect/ZooKeeper. PersistentVolumeClaims with storageClass for data durability. Monitoring via Prometheus + Grafana dashboards from Strimzi.
 6. **Question**: Describe resource management and quotas you applied in K8s for mixed workloads (Spark, Airflow, etc.). 
 7. **Expected Answer**: Namespaces with ResourceQuota (CPU, memory, pods). LimitRange for defaults. PriorityClass for critical pipelines. Node selectors/taints for GPU nodes.
-8. **Question**: What was your approach to secret management in Kubernetes during your time at Zalo? **Expected Answer**: Sealed Secrets or external-secrets operator pulling from HashiCorp Vault / AWS SSM. No plaintext in manifests. Mounted as volumes or envFrom.
-9. **Question**: How did you handle rolling updates or canary deployments for data services on K8s? **Expected Answer**: Deployment with maxSurge=25%, maxUnavailable=0 for zero-downtime. Service with sessionAffinity if needed. For Spark jobs: Treated as Jobs/CronJobs with concurrencyPolicy=Replace.
-10. **Question**: Discuss any Istio or service mesh usage you had (or would consider) for observability in data pipelines. **Expected Answer**: (Likely none at Zalo, but reasoned) Would use for mTLS, traffic shifting, golden metrics (latency, error rate). Kiali + Jaeger for tracing Kafka → Spark calls.
-11. **Question**: How do you compare Slurm job scheduling vs. Kubernetes for ML training workloads? Trade-offs from your experience. **Expected Answer**: Slurm: Better raw GPU utilization, simpler for batch/HPC, lower overhead. K8s: Better for microservices, auto-scaling, unified platform. Trade-off: Slurm faster for large jobs, K8s more flexible for hybrid (CPU + GPU) clusters.
+8. **Question**: What was your approach to secret management in Kubernetes during your time at Zalo?
+9. **Expected Answer**: Sealed Secrets or external-secrets operator pulling from HashiCorp Vault / AWS SSM. No plaintext in manifests. Mounted as volumes or envFrom.
+10. **Question**: How did you handle rolling updates or canary deployments for data services on K8s? **Expected Answer**: Deployment with maxSurge=25%, maxUnavailable=0 for zero-downtime. Service with sessionAffinity if needed. For Spark jobs: Treated as Jobs/CronJobs with concurrencyPolicy=Replace.
+11. **Question**: Discuss any Istio or service mesh usage you had (or would consider) for observability in data pipelines. **Expected Answer**: (Likely none at Zalo, but reasoned) Would use for mTLS, traffic shifting, golden metrics (latency, error rate). Kiali + Jaeger for tracing Kafka → Spark calls.
+12. **Question**: How do you compare Slurm job scheduling vs. Kubernetes for ML training workloads? Trade-offs from your experience. **Expected Answer**: Slurm: Better raw GPU utilization, simpler for batch/HPC, lower overhead. K8s: Better for microservices, auto-scaling, unified platform. Trade-off: Slurm faster for large jobs, K8s more flexible for hybrid (CPU + GPU) clusters.
 
 ### Topic 6: Cloud Infrastructure and Data Lakes (AWS/GCP)
 
