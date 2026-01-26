@@ -16,3 +16,5 @@ Hosting a pipeline
 - trigger via API
 - manual, on-demand
 
+can leverage trigger via API with cloud functions to perform event-based trigger
+
