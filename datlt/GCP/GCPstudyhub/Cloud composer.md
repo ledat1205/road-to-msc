@@ -31,4 +31,5 @@ Integrate with other services on GCP: because composer is airflow so its not onl
 - Composer Admin: full control
 - Composer Developer: deploy, modify DAGs
 - Composer Viewer: read configurations
-- 
+- Composer Users: run and schedule DAGs
+- Composer environment and storage accessor: access bucket 
