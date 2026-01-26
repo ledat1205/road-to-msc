@@ -22,3 +22,8 @@ Integrate with other services on GCP: because composer is airflow so its not onl
 
 **BigQuery Operator**:
 - execute jobs
+- manage tables
+- manage datasets
+- validate data
+`BigQueryInsertJobOperator`
+
