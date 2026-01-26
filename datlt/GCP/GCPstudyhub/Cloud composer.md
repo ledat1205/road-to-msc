@@ -18,3 +18,4 @@ Hosting a pipeline
 
 can leverage trigger via API with cloud functions to perform event-based trigger
 
+Integrate with other services on GCP
