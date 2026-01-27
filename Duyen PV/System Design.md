@@ -1,83 +1,148 @@
-#### 1. **Latency and Throughput Basics**
 
-- **Memory Hierarchy Latencies** (critical for estimating bottlenecks):
-    - L1 cache reference: ~1 ns
-    - RAM access: ~100 ns
-    - SSD read: ~100 μs (1,000x slower than RAM)
-    - HDD seek: ~10 ms (100x slower than SSD)
-    - Network round-trip (same data center): ~500 μs
-    - Cross-data center (e.g., US-East to US-West): ~50–100 ms
-    - Cross-continent (e.g., US to Europe): ~150 ms
-- **Network Speeds**:
-    - 1 Gbps = 125 MB/s theoretical max (real-world ~100 MB/s)
-    - 10 Gbps = 1.25 GB/s
-    - Typical cloud bandwidth: 1–5 Gbps per VM instance
-- **Common Throughput**:
-    - HTTP request: ~1–10 ms processing time on a single server
-    - API p99 latency goal: <100 ms for user-facing, <1 s for batch
-    - QPS per server: 100–1k for complex apps (e.g., web server with DB calls); 10k+ for simple (e.g., static cache hits)
+### 0. Approach to System Design Interviews (Start Here Every Time)
 
-#### 2. **Scalability and Sizing Estimates**
+1. **Clarify requirements** — Ask about functional (e.g., post tweet, shorten URL) and non-functional (scale: DAU/QPS, latency, availability, consistency, cost) needs. Probe edge cases (e.g., peak traffic, offline support).
+2. **Estimate scale** — Use back-of-the-envelope calculations (your section 2) to size QPS, storage, bandwidth.
+3. **High-level design** — Draw major components (client → load balancer → app servers → cache → DB → queue → storage).
+4. **Deep dive** — Discuss bottlenecks, trade-offs, APIs, data models, scaling strategies.
+5. **Address non-functionals** — Availability, reliability, security, monitoring.
+6. **Iterate** — Handle follow-ups (e.g., "What if traffic 10x?").
 
-- **User Scale Calculations** (back-of-the-envelope):
-    - Daily Active Users (DAU) to QPS: QPS = (DAU × queries per user per day) / (86,400 seconds). E.g., 1M DAU × 10 queries/day = ~115 QPS peak (assume 2x for peak).
-    - Data growth: 1M users generating 1 KB/day/user = ~1 TB/year (before compression/replication).
-    - Storage: 1 TB = 10^12 bytes; plan for 3x replication factor in distributed systems.
-- **Storage Sizes**:
-    - Text: 1 page ~4 KB; tweet ~1 KB; email ~10 KB; HD image ~5 MB; 1 min video ~100 MB.
-    - Logs: 1 server generates ~1–10 GB/day; robotics telemetry (sensors): 1–100 GB/hour per device.
-- **Sharding/Replication**:
-    - Shards: Aim for 1–10 GB per shard in DBs like Cassandra/Mongo for manageability.
-    - Replication factor: 3 (common for high availability); quorum reads/writes (e.g., write to 2/3, read from 2/3).
-    - Horizontal scaling limit: ~1k nodes/cluster before coordination overhead kills performance.
+**Tip**: Use RESHADED framework (Requirements → Estimation → Storage → High-level → API → Detailed → Evaluate → Distinctive). Think aloud, balance trade-offs, and draw diagrams.
 
-#### 3. **Database and Storage Choices (Building on Your Table)**
+### 1. Latency and Throughput Basics
 
-- **When to Choose What** (based on data type/requirements):
-    - **Relational (SQL)**: Structured data, transactions, joins. Use for user accounts, inventories. Avoid for >10k QPS without sharding. ACID compliant.
-    - **Key-Value (NoSQL)**: Unstructured/simple lookups (e.g., sensor IDs to values in robotics). Redis for caching (sub-ms gets), DynamoDB for managed.
-    - **Document (NoSQL)**: Semi-structured (JSON-like), flexible schemas. Mongo for configs/logs; good for robotics metadata.
-    - **Wide-Column**: Time-series/high writes (e.g., Cassandra for IoT/sensor streams in robotics—handles 100k+ writes/sec).
-    - **Graph**: Relationships (e.g., Neo4j for robotics path-planning/social graphs). Queries: 1–10 ms for small graphs.
-    - **Time-Series**: InfluxDB/Prometheus for metrics (e.g., robot vitals). Ingest: 100k–1M points/sec.
-    - **OLAP**: Analytics on big data (e.g., ClickHouse for robot fleet logs). Avoid for OLTP.
-- **Key Trade-offs**:
-    - SQL: Strong consistency, but scales vertically (add CPU/RAM).
-    - NoSQL: Eventual consistency, scales horizontally.
-    - CAP: In partitions, SQL picks CP (consistent but unavailable); NoSQL often AP (available but inconsistent).
-- **Benchmarks to Recall**:
-    - MySQL: Max connections ~10k; innodb buffer pool ~75% of RAM.
-    - Redis: 100k+ ops/sec single-threaded; use pipelines for batch.
-    - Kafka (queues): 1M+ msgs/sec throughput; partitions for parallelism.
+Your numbers are spot-on (aligned with updated Jeff Dean-style lists).
 
-#### 4. **Caching and Optimization**
+**Elaboration**:
 
-- **Cache Hit Rates**: Aim for 90–99%; eviction policies: LRU (least recently used) common.
-- **Redis/Memcached**: ~1 ms latency; 10–100 GB typical size; use for hot data (e.g., robot state in real-time systems).
-- **CDN**: Reduces latency by 50–90% for static assets; e.g., CloudFront hits <50 ms globally.
-- **Indexing**: Speeds reads 10–100x but slows writes 2–5x; B-tree default for SQL.
+- Every hop adds latency—aim for <200–300 ms end-to-end for user-facing (feels instant); <100 ms p99 for APIs.
+- Network is often the biggest bottleneck for global systems.
+- Throughput limited by slowest component (e.g., DB write vs. network).
 
-#### 5. **Messaging and Queues**
+**Examples**:
 
-- **When to Use**: Decouple services, handle bursts (e.g., robot commands queue).
-    - RabbitMQ: Reliable delivery, ~10k msgs/sec.
-    - Kafka: High-throughput pub-sub, 100k–1M msgs/sec; partitions = parallelism (e.g., 1k partitions for scale).
-    - SQS: Managed, ~ unlimited throughput but ~10 ms latency.
-- **Patterns**: At-least-once vs. exactly-once delivery; idempotency for retries.
+- **URL Shortener**: Redirect latency goal <100 ms → use CDN + in-memory cache (Redis) for 99% hit rate.
+- **Twitter/X**: Timeline read <200 ms → fanout-on-write for celebrities (pre-compute), cache timelines in Redis.
+- **Robotics**: Control loop <10 ms → edge computing (process sensor data on-device) vs. cloud (150 ms cross-continent round-trip unacceptable for real-time path planning).
+- **Instagram**: Photo feed <300 ms → CDN for media, Memcached for metadata.
 
-#### 6. **Availability, Reliability, and Monitoring**
+**Network Speeds**:
 
-- **Uptime SLAs**:
-    - 99% = 7.3 hours downtime/month
-    - 99.9% = 43 min/month
-    - 99.99% = 4.3 min/month (goal for critical systems like robotics control)
-- **Failure Rates**: Assume 1% of requests fail; use circuit breakers (Hystrix-like) to prevent cascades.
-- **Load Balancing**: Round-robin default; health checks every 10–30s.
-- **Monitoring**: Prometheus for metrics; p50/p99 latencies; error rates <0.1%.
+- Real-world: 1 Gbps VM → ~100 MB/s after overhead.
+- Example: Netflix streams 4K (~25 Mbps) → needs edge caching to avoid backbone saturation.
 
-#### 7. **Security and Edge Cases**
+### 2. Scalability and Sizing Estimates
 
-- **Auth**: JWT tokens (stateless); OAuth for third-party.
-- **Rate Limiting**: 100–1k reqs/user/min; token bucket algorithm.
-- **Data Privacy**: GDPR/CCPA—anon data where possible.
-- **Robotics-Specific (Since Mentioned)**: Real-time constraints (e.g., ROS for pub-sub, <10 ms latency); edge computing for low-latency (e.g., process sensor data on-device to avoid cloud round-trips).
+**Elaboration**:
+
+- Always start with QPS/storage estimates to justify choices (sharding, replication).
+- Assume 3x replication for durability, 2–3x peak for headroom.
+- Peak factor: 2–5x average QPS.
+
+**Examples**:
+
+- **Twitter/X** — 500M tweets/day = ~6k avg QPS, peak ~30–50k. With 300M DAU × 200 queries/day → ~700k QPS peak → needs heavy sharding + caching.
+- **URL Shortener** — 100M new URLs/month (~40 QPS avg), 1B reads/month (~12k QPS) → 100–200 servers + Redis cache.
+- **Robotics fleet** — 10k robots × 100 sensor readings/sec = 1M writes/sec → use time-series DB (Cassandra) + Kafka for buffering.
+- Storage: Instagram — 1B photos/year × 5 MB = ~5 PB/year → S3-like blob store + metadata in NoSQL.
+
+**Sharding/Replication**:
+
+- Shard by user_id (consistent hashing) to avoid hotspots.
+- Replication factor 3: quorum write (2/3), read (2/3) for availability.
+
+### 3. Database and Storage Choices
+
+**Elaboration**:
+
+- Choose based on read/write ratio, consistency needs, data model.
+- SQL for strong consistency/transactions; NoSQL for scale/availability.
+
+**Examples**:
+
+- **User accounts/inventory** — PostgreSQL/MySQL (ACID, joins).
+- **Twitter/X timeline** — Hybrid: Cassandra (wide-column for time-series tweets) + Redis (hot timelines).
+- **Robotics sensor data** — Cassandra/InfluxDB (high-write time-series, 100k+ writes/sec).
+- **Instagram feeds** — Redis (pre-computed), Cassandra (storage), DynamoDB (metadata).
+- **URL Shortener** — Key-value (Redis/DynamoDB) for short-to-long mapping + bloom filter for existence checks.
+- Trade-off: SQL vertical scale → NoSQL horizontal + eventual consistency.
+
+### 4. Caching and Optimization
+
+**Elaboration**:
+
+- Cache hot data (80/20 rule) → 90–99% hit rate reduces DB load 10–100x.
+- Invalidation: write-through (consistent but slow), cache-aside (lazy, stale risk).
+
+**Examples**:
+
+- **Twitter/X** — Cache user timelines, profiles in Redis → sub-ms reads.
+- **Netflix** — CDN + edge cache for videos → <50 ms global latency.
+- **Robotics** — Redis for real-time robot state (location, battery) → <1 ms access.
+- Indexing: B-tree speeds reads 10–100x but slows writes → avoid over-indexing.
+
+### 5. Messaging and Queues
+
+**Elaboration**:
+
+- Decouple for bursts, async processing, durability.
+- At-least-once + idempotency for retries.
+
+**Examples**:
+
+- **Uber** — Ride requests → Kafka for high-throughput pub-sub.
+- **Amazon order fulfillment** — SQS/RabbitMQ for decoupling payment → shipping.
+- **Robotics** — ROS topics (pub-sub) or Kafka for command queues → handle bursts without blocking control loop.
+- Kafka: 1M+ msgs/sec with partitions for parallelism.
+
+### 6. Availability, Reliability, and Monitoring
+
+**Elaboration**:
+
+- 99.99% = 4.3 min downtime/month → critical for robotics control.
+- Use circuit breakers, retries with backoff, health checks.
+
+**Examples**:
+
+- **Netflix** — Chaos engineering + multi-region failover.
+- **Robotics** — Redundant edge nodes, quorum voting for control decisions.
+- Monitoring: Prometheus + Grafana → alert on p99 >200 ms or error >0.1%.
+
+### 7. Security and Edge Cases
+
+**Elaboration**:
+
+- Stateless JWT/OAuth, rate limiting (token bucket), encryption.
+
+**Examples**:
+
+- **Instagram** — OAuth for login, rate limit uploads.
+- **Robotics** — Secure ROS topics, rate limit commands to prevent overload.
+
+### 8. Common Patterns (Add These to Your Toolbox)
+
+- **Fanout-on-write** — Pre-compute feeds (Twitter celebrities).
+- **Fanout-on-read** — Lazy load (inactive users).
+- **CQRS** — Separate read/write models for scale.
+- **Event sourcing** — Store events, replay state (audit trail).
+- **Consistent hashing** — Minimize reshuffling on shard changes.
+- **Bloom filter** — Space-efficient existence checks (URL shortener).
+- **CDN** — Static/media delivery.
+
+### 9. Common System Design Questions (Quick Key Points)
+
+- **URL Shortener** — Base62 encoding, DB for mapping, cache hot URLs, handle collisions, analytics.
+- **Twitter/X** — Fanout, timeline cache, sharding by user, eventual consistency for likes/retweets.
+- **Instagram** — Feed generation (hybrid fanout), media in S3 + CDN, ranking ML.
+- **Uber** — Geohashing/quadtree for nearby drivers, WebSocket for real-time, Kafka for events.
+- **Robotics fleet** — Edge processing, time-series DB, pub-sub for commands, low-latency priority.
+
+### 10. Modern Considerations (2026+)
+
+- Microservices + service mesh (Istio) for observability.
+- Serverless (Lambda) for bursty workloads.
+- AI integration: agentic systems, real-time ML inference.
+- Global scale: multi-region, geo-partitioning.
+
+**Pitfalls to Avoid** — Skipping requirements, no trade-offs, overengineering, ignoring monitoring/security.
