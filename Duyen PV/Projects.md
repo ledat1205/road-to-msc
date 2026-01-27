@@ -137,16 +137,6 @@ This design balances real-time freshness, scale (30M pids, 5M masters), cost eff
 
 
 ## Analytics Engine
-# Migrating E-commerce Analytics from GCP Batch to Real-Time Streaming on FPT: Lessons from Scaling Druid and ClickHouse
-
-**Duyen – Senior Data Engineer** _Ho Chi Minh City, January 2026_
-
-In late 2024 – early 2025, I led the complete overhaul of our e-commerce analytics platform — moving from a GCP-centric batch-oriented stack (BigQuery + Dataflow + Airflow) to a real-time streaming architecture built around Apache Kafka, Apache Druid, and ClickHouse running on FPT infrastructure.
-
-The system processes billions of events daily: user tracking (page views, add-to-cart, checkout steps), ad impressions & clicks, affiliate referrals, marketing campaign performance, revenue & refund streams — the kind of high-velocity, high-cardinality data that is both extremely valuable and extremely expensive to analyze in real time.
-
-This post describes **why we migrated**, **how we architected the new system**, **the hardest technical challenges we actually faced**, and **how we achieved 3× query throughput with 30% lower infrastructure cost** (storage + CPU + memory).
-
 ### Why We Had to Change
 
 The old GCP setup worked well until mid-2024, when several pain points became business blockers:
@@ -283,9 +273,6 @@ Business impact was felt quickly:
 3. **Dual engine is powerful but expensive** — if I had to pick one today I’d lean ClickHouse for most e-commerce use-cases (faster ad-hoc, simpler operations).
 4. **Chaos test from week 1** — we found many replication & failover edge cases only after injecting failures.
 5. **Document ingestion specs religiously** — schema evolution across Kafka → Druid/ClickHouse is painful without it.
-
-
-
 
 # TMA
 
