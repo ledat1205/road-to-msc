@@ -1,4 +1,3 @@
-
 #### 1. **Latency and Throughput Basics**
 
 - **Memory Hierarchy Latencies** (critical for estimating bottlenecks):
