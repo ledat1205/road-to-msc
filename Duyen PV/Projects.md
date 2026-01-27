@@ -106,7 +106,7 @@ Real-time intra-day trends (flash sales, promotions) require fresh top-sold prod
 4. Union, deduplicate masters, limit  
 **Latency target**: <100 ms (Druid queries dominate)  
 
-## 3. Rerank / Filter Layer
+### 3. Rerank / Filter Layer
 
 **Rationale**  
 Long candidate list (semantic + best-sellers + expanded) must be adapted for business rules: out-of-stock filtering, ad bidding, flash sale boosts, widget-specific prioritization.
@@ -121,7 +121,7 @@ Long candidate list (semantic + best-sellers + expanded) must be adapted for bus
   - Final sort + top-K (heap)  
 **Latency**: <5 ms for 1000 candidates  
 
-## 4. System-Wide Architecture & Optimizations
+### 4. System-Wide Architecture & Optimizations
 
 - **Streaming Layer**: Apache Flink (RocksDBStateBackend for keyed state, async I/O for Redis/Scylla lookups)  
 - **Serving Cache & Hot Features**: Redis Cluster (sharded, TTL, pub/sub for invalidations)  
@@ -130,7 +130,7 @@ Long candidate list (semantic + best-sellers + expanded) must be adapted for bus
 - **Monitoring**: Prometheus (Flink backpressure, Redis hit rate >95%, Druid query latency)  
 - **Micro-batch Experiments**: Airflow orchestrates incremental retraining (e.g., only new/changed products) every 1–4 hours  
 
-## 5. A/B Testing & Validation (Amplitude)
+### 5. A/B Testing & Validation (Amplitude)
 
 - Variants: baseline batch vs. streaming + category decay vs. different rerank weights  
 - Bucketing: random 50/50 or segmented (new vs. returning users)  
@@ -139,11 +139,10 @@ Long candidate list (semantic + best-sellers + expanded) must be adapted for bus
 
 This design balances real-time freshness, scale (30M pids, 5M masters), cost efficiency, and cold-start protection while keeping serving latency low and predictable.
 
-Let me know which section you'd like to expand, add diagrams for, or refine further (e.g., Flink job topology, Scylla schema tuning, Redis memory estimation).
-
-
 
 ## Analytics Engine
+
+
 
 
 
