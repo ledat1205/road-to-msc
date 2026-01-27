@@ -125,7 +125,7 @@ For your client edge kits and cloud backend.
     - Taobao's real-time data warehouse using Flink + message queues + OLAP (similar to your streaming layer).
     - Blog: [How Taobao uses Apache Fluss (Incubating) for Real-Time Processing in Search and RecSys](https://fluss.apache.org/blog/taobao-practice)
 - **Netflix Real-Time Recommendation & Streaming Architecture** Netflix's system handles real-time updates via event streams (Kafka-like), distributed processing, and hybrid offline/online computation. Great for understanding candidate generation, reranking, and session context (analogous to your dynamic categories/views).
-    - Netflix Tech Blog series: [How and Why Netflix Built a Real-Time Distributed Graph](https://netflixtechblog.com/how-and-why-netflix-built-a-real-time-distributed-graph-part-1-ingesting-and-processing-data-streams-at-internet-scale) (focus on ingesting/processing streams at scale).
+    - Netflix Tech Blog series: https://netflixtechblog.com/how-and-why-netflix-built-a-real-time-distributed-graph-part-1-ingesting-and-processing-data-80113e124acc (focus on ingesting/processing streams at scale).
     - Older foundational: [Netflix System Architectures for Personalization and Recommendation](https://netflixtechblog.com/system-architectures-for-personalization-and-recommendation-e081aa94b5d8) (Cassandra storage + Spark/Flink-like processing).
     - Modern insights often reference Kafka for events and low-latency serving.
 - **Tripadvisor Real-Time Personalization with ScyllaDB** Directly relevant to ScyllaDB usage for real-time personalization at massive scale (similar to your storage layer).
