@@ -1,4 +1,81 @@
+## To learn by heart
+### 1. Time & Scale Basics
 
+- Seconds in a day: **86,400** (≈ 10^5) → use for QPS = (DAU × actions/day) / 86,400
+- Seconds in a year: **31.5 million** (≈ 3×10^7)
+- Peak factor: **2–5× average QPS** (common assumption: 3× for headroom)
+- Queries per user per day (typical apps): **10–100** (Twitter ≈ 200, simple app ≈ 10)
+- Peak QPS rule: **Average × 3–5** (Twitter 500M tweets/day → ~6k avg → 20–50k peak)
+
+### 2. Latency Numbers (Memorize Order of Magnitude)
+
+- L1 cache: **0.5–1 ns**
+- RAM: **100 ns** (≈ 10^2 ns)
+- SSD read: **10–100 μs** (≈ 10^5 ns = 0.1 ms)
+- Network (same DC): **0.5–1 ms** (≈ 500 μs)
+- Network (cross-region US): **50–100 ms**
+- Network (cross-continent): **150–250 ms**
+- Disk seek (HDD): **4–10 ms**
+- HTTP request (simple): **1–10 ms** processing
+- Goal p99 user-facing: **<100–200 ms**
+- Real-time robotics/control loop: **<10 ms**
+
+### 3. Throughput & Bandwidth
+
+- 1 Gbps = **125 MB/s** theoretical (real ≈ **100 MB/s**)
+- 10 Gbps = **1.25 GB/s** (real ≈ **1 GB/s**)
+- Typical cloud VM bandwidth: **1–5 Gbps**
+- Redis single-thread: **100k–200k ops/sec**
+- Kafka partition: **10k–100k msgs/sec** per partition
+- Cassandra write: **100k+ writes/sec** per node (wide-column)
+- QPS per server (complex app with DB): **100–1,000**
+- QPS per server (cache-hit/simple): **5k–20k+**
+
+### 4. Data Size & Growth
+
+- 1 KB ≈ tweet / short message
+- 4 KB ≈ web page / article
+- 10 KB ≈ email
+- 1–5 MB ≈ HD photo / compressed image
+- 50–200 MB ≈ 1 min 1080p video
+- 1 GB = **10^9 bytes**
+- 1 TB = **10^12 bytes**
+- Replication factor: **3×** (standard for durability/HA)
+- Data growth example: 1M users × 1 KB/day = **1 GB/day** → **~1 TB/year** (before replication/compression)
+
+### 5. Storage & Sharding Rules
+
+- Shard size target: **1–10 GB** per shard (Cassandra/Mongo)
+- Max nodes per cluster (practical): **~1,000** (coordination overhead)
+- Cache hit rate goal: **90–99%**
+- Redis cluster size: **10–100 GB** typical
+
+### 6. Uptime & Reliability
+
+- 99% = **3.65 days/year** downtime (≈ 7.3 h/month)
+- 99.9% = **8.76 hours/year** (≈ 43 min/month)
+- 99.99% = **52.6 min/year** (≈ 4.3 min/month) — critical systems target
+- 99.999% (“five 9s”) = **5.26 min/year**
+
+### 7. Quick Calculation Formulas
+
+- QPS from DAU: **QPS ≈ (DAU × actions/day) / 86,400**
+    - Example: 10M DAU × 50 actions/day = 500M / 86,400 ≈ **5,800 avg QPS** → peak **15–30k**
+- Storage/year: **users × bytes/user/day × 365 × replication**
+    - Example: 1M users × 10 KB/day × 365 ≈ **3.65 TB/year** raw → **~11 TB** with 3× replication
+- Bandwidth for reads: **QPS × response size**
+    - Example: 10k QPS × 10 KB response = **100 MB/s** → needs ~1 Gbps link
+
+### 8. Fast Rules of Thumb
+
+- “10× rule”: Every level slower than previous (L1 → RAM → SSD → network → disk)
+- Cache reduces load **10–100×** if hit rate high
+- Sharding: divide by **user_id hash** or **time** (time-series)
+- Replication: **write to 2/3**, **read from 2/3** for quorum
+- Assume **1–2% request failure** → need circuit breakers/retries
+
+
+## Guides
 ### 0. Approach to System Design Interviews (Start Here Every Time)
 
 1. **Clarify requirements** — Ask about functional (e.g., post tweet, shorten URL) and non-functional (scale: DAU/QPS, latency, availability, consistency, cost) needs. Probe edge cases (e.g., peak traffic, offline support).
