@@ -145,6 +145,75 @@ The old GCP setup worked well until mid-2024, when several pain points became bu
 - **Cost scaling poorly** As daily events crossed 1.5–2 million, BigQuery storage + query costs grew faster than revenue. We were paying a premium for managed convenience we no longer needed at full price.
 - **Limited tuning surface** High-cardinality dimensions (user_id + device + campaign_id + geo + …) caused query explosions and slot contention. We couldn’t fine-tune partitioning, rollups, or ingestion compression the way we needed.
 
+### Simple Example: E-commerce Analytics
+
+Imagine a table with ~2 billion rows of user events:
+
+|event_time|user_id|device_type|campaign_id|geo_country|action|revenue|
+|---|---|---|---|---|---|---|
+|2026-01-27 10:00|uuid-1234-abcd|mobile|camp-XYZ|VN|add_to_cart|0|
+|2026-01-27 10:01|uuid-5678-efgh|desktop|camp-ABC|US|purchase|49.99|
+|... (billions more rows)|...|...|...|...|...|...|
+
+Typical cardinalities in your data:
+
+- user_id: **extremely high** (~ tens to hundreds of millions unique users) → very high cardinality
+- geo_country: **low** (~200–250 unique countries)
+- campaign_id: **medium-high** (~10k–500k campaigns running at once)
+- device_type: **very low** (~5–10 values: mobile, desktop, tablet, …)
+- action: **low** (~10–20: view, add_to_cart, purchase, …)
+
+#### Bad (Explosive) Query – Causes "query explosion" + slot contention
+
+SQL
+
+```
+-- Druid or ClickHouse style
+SELECT
+  user_id,
+  geo_country,
+  campaign_id,
+  device_type,
+  COUNT(*) AS events,
+  SUM(revenue) AS total_revenue
+FROM user_events
+WHERE event_time >= '2026-01-01'
+GROUP BY user_id, geo_country, campaign_id, device_type
+```
+
+**What happens internally?**
+
+- The GROUP BY key has **cardinality ≈ #unique users × #countries × #campaigns × #devices** → Potentially **hundreds of millions to billions** of unique combinations (even if many are sparse).
+- Druid must build huge hash tables / aggregation buffers per segment → memory spikes, segments fan out across many Historical nodes → query reads from hundreds/thousands of segments → **slot contention** on brokers.
+- ClickHouse builds massive aggregation states in memory → can hit max_rows_to_group_by limit or OOM if not using GROUP BY with SETTINGS group_by_two_level_threshold.
+- Result: Query takes 30–120+ seconds, consumes huge RAM/CPU, blocks other queries (contention), or fails.
+
+#### Good (Controlled) Version – Much Faster, Less Contention
+
+SQL
+
+```
+-- Better approach
+SELECT
+  geo_country,              -- low cardinality first
+  device_type,
+  campaign_id,
+  COUNT(DISTINCT user_id) AS unique_users,   -- approximate with HLL if exact not needed
+  COUNT(*) AS events,
+  SUM(revenue) AS total_revenue
+FROM user_events
+WHERE event_time >= '2026-01-01'
+  AND campaign_id IN ('camp-XYZ', 'camp-ABC')   -- strong early filter
+GROUP BY geo_country, device_type, campaign_id
+```
+
+**Why this is better:**
+
+- Grouping on **low-to-medium cardinality** columns first → fewer unique groups (e.g., 250 countries × 10 devices × 100 active campaigns = ~250k groups instead of billions).
+- Early filtering on campaign_id skips most data.
+- Using **approximate distinct** (Druid's APPROX_COUNT_DISTINCT_DS_THETA(user_id) or ClickHouse uniqCombined64(user_id)) avoids materializing every user_id.
+- Result: Query runs in 1–5 seconds, reads far fewer segments/parts, uses 5–20× less memory, leaves slots free for other users.
+
 We decided to keep two complementary engines:
 
 - **Druid** — for time-series aggregations with high-cardinality dimensions (campaign performance, user segments, revenue attribution)
