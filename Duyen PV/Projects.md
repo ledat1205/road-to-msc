@@ -155,12 +155,10 @@ Both would ingest from the same Kafka topics in real time.
 
 ### New Architecture at a Glance
 
-text
-
 ```
 [Web/App/Backend Services]
          ↓ (producers)
-      Kafka (Confluent / self-hosted on FPT VMs)
+      Kafka (self-hosted on FPT VMs)
          ↓ (exactly-once consumers)
    ┌───────────────┴───────────────┐
    │                               │
