@@ -1,3 +1,41 @@
+## ANALYTICAL ENGINE
+
+### Core Official Documentation (Start Here for Architecture & Tuning)
+
+#### Apache Druid
+
+- **Ingestion Overview (Streaming + Batch)**: [https://druid.apache.org/docs/latest/ingestion](https://druid.apache.org/docs/latest/ingestion) Explains Kafka supervisor setup, real-time ingestion (event-by-event vs. micro-batch), segment handoff, and tuning for low-latency queries on streaming data. Key for migration: how streaming enables sub-second freshness while batch handles historical backfill.
+- **Kafka Indexing Service (Supervisor Setup)**: [https://druid.apache.org/docs/latest/ingestion/kafka-ingestion](https://druid.apache.org/docs/latest/ingestion/kafka-ingestion) Detailed spec for Kafka supervisors, tuning maxRowsInMemory, intermediateHandoffPeriod, tasks per Middle Manager, and exactly-once semantics. Essential for high-throughput ingestion without duplicates.
+- **Performance Tuning & Best Practices**: [https://druid.apache.org/docs/latest/operations/performance-faq.html](https://druid.apache.org/docs/latest/operations/performance-faq.html) Covers query throughput optimization, resource allocation (Historical/MiddleManager sizing), compaction strategies, tiered storage, and cost-saving tips like local SSDs.
+- **Druid on Kubernetes (Operator & Helm)**: [https://druid.apache.org/docs/latest/operations/kubernetes.html](https://druid.apache.org/docs/latest/operations/kubernetes.html) + Imply's Druid Operator docs[](https://github.com/druid-io/druid-operator) Guides for running distributed clusters on K8s, autoscaling, pod disruption budgets, and resource requests/limits.
+
+#### ClickHouse
+
+- **Kafka Integration (Table Engine + Kafka Connect Sink)**: [https://clickhouse.com/docs/integrations/kafka](https://clickhouse.com/docs/integrations/kafka) Official guide for Kafka table engine (push-based), materialized views for transformation, and the Kafka Connect Sink for scalable, exactly-once ingestion. Covers trade-offs vs. Druid's native streaming.
+- **Real-Time Ingestion & Materialized Views**: [https://clickhouse.com/docs/engines/table-engines/integrations/kafka](https://clickhouse.com/docs/engines/table-engines/integrations/kafka) How to stream from Kafka topics → Kafka engine table → MergeTree/ReplacingMergeTree for dedup and analytics. Includes batch size tuning (e.g., aim for 1,000+ rows per insert) and async inserts.
+- **Performance & Optimization Guide**: [https://clickhouse.com/docs/optimize](https://clickhouse.com/docs/optimize) Deep dive into merge tree tuning, compression codecs, asynchronous inserts, projection, and resource usage for high-throughput queries on streaming data.
+- **ClickHouse on Kubernetes**: [https://clickhouse.com/docs/en/operations/kubernetes/](https://clickhouse.com/docs/en/operations/kubernetes/) Official operator, Helm charts, StatefulSet configs, resource requests, and scaling patterns for distributed clusters.
+#### Apache Kafka (Core for Both)
+
+- **Kafka Connect for Sinks/Sources**: [https://kafka.apache.org/documentation/#connect](https://kafka.apache.org/documentation/#connect) Especially the ClickHouse Kafka Connect Sink: [https://github.com/ClickHouse/clickhouse-kafka-connect](https://github.com/ClickHouse/clickhouse-kafka-connect) For reliable, scalable streaming from Kafka to both engines.
+
+### Migration-Focused Blogs & Case Studies (Real-World Throughput & Cost Wins)
+
+- **Confluent's Scaling Druid on Kubernetes (Telemetry Pipeline)**: [https://www.confluent.io/blog/scaling-apache-druid-for-real-time-cloud-analytics-at-confluent](https://www.confluent.io/blog/scaling-apache-druid-for-real-time-cloud-analytics-at-confluent) Migration to Druid + Kafka, tuning MiddleManager capacity (from 1 to 10 tasks), switching to local-storage instances (i3.2xlarge), reducing nodes by 90%, costs by 60%, and improving p50 latency by 66%. Very close to your 3× throughput + 30% cost story.
+- **Lyft's Druid Deprecation & ClickHouse Adoption**: [https://eng.lyft.com/druid-deprecation-and-clickhouse-adoption-at-lyft-120af37651fd](https://eng.lyft.com/druid-deprecation-and-clickhouse-adoption-at-lyft-120af37651fd) + Follow-up on ClickHouse Cloud: [https://clickhouse.com/blog/lyft-analytics-clickhouse-cloud](https://clickhouse.com/blog/lyft-analytics-clickhouse-cloud) Why they migrated from Druid to ClickHouse for sub-second analytics, lower ops cost, simpler infra, and handling Kafka/Kinesis streams. Includes batch + real-time hybrid patterns.
+- **AMP's Batch-to-Streaming Migration with ClickHouse Cloud**: [https://clickhouse.com/blog/amp-clickhouse-oss-to-clickhouse-cloud](https://clickhouse.com/blog/amp-clickhouse-oss-to-clickhouse-cloud) Shift from batch to real-time Kafka streaming, using ReplacingMergeTree, async inserts, and Kinesis Firehose buffering to avoid small-batch bottlenecks—achieved faster ingestion and reliability.
+- **Tinybird: Streaming Kafka to ClickHouse (Production Patterns)**: [https://www.tinybird.co/blog/stream-kafka-to-clickhouse](https://www.tinybird.co/blog/stream-kafka-to-clickhouse) + Exactly-Once Guide: [https://www.tinybird.co/blog/kafka-to-clickhouse-exactly-once](https://www.tinybird.co/blog/kafka-to-clickhouse-exactly-once) Practical setup, gotchas (merge parts, small inserts), and high-scale patterns for real-time ingestion.
+- **DZone: Kafka + Flink + Druid Architecture**: [https://dzone.com/articles/building-a-real-time-data-architecture-with-apache](https://dzone.com/articles/building-a-real-time-data-architecture-with-apache) End-to-end real-time pipeline migration example, with Druid as the analytics sink from Kafka.
+- **Must read on Clickhouse Optimization**:  https://www.mux.com/blog/latency-and-throughput-tradeoffs-of-clickhouse-kafka-table-engine
+- **Monitoring Clickhouse**: https://altinity.com/blog/building-a-diy-prometheus-http-endpoint-in-clickhouse
+
+
+### Comparisons & Architectural Trade-offs (Druid vs. ClickHouse)
+
+- **Tinybird: ClickHouse vs. Druid (Ingestion, Scaling, Ops)**: [https://www.tinybird.co/blog/clickhouse-vs-druid](https://www.tinybird.co/blog/clickhouse-vs-druid) Head-to-head on real-time ingestion (Druid native event-by-event vs. ClickHouse micro-batch/Kafka engine), query performance, Kubernetes ops, and when to choose each.
+- **Imply: Druid vs. ClickHouse Challenges**: [https://imply.io/druid-vs-clickhouse](https://imply.io/druid-vs-clickhouse) Druid's advantages in true streaming (exactly-once, sub-second availability) vs. ClickHouse workarounds.
+- **DoubleCloud / CelerData Comparisons**: [https://double.cloud/comparison/druid-vs-clickhouse](https://double.cloud/comparison/druid-vs-clickhouse) + [https://celerdata.com/glossary/clickhouse-vs-apache-druid](https://celerdata.com/glossary/clickhouse-vs-apache-druid) Ingestion models, scaling, cost, and why hybrid batch + streaming favors one over the other.
+- **StarTree: Pinot/Druid/ClickHouse Comparison**: [https://startree.ai/resources/a-tale-of-three-real-time-olap-databases](https://startree.ai/resources/a-tale-of-three-real-time-olap-databases) Kafka integration depth, batch vs. streaming support, and cost/throughput trade-offs.
 ### Faster-Whisper + CTranslate2 (Core for STT in C++)
 
 CTranslate2 is the fast C++/Python inference engine behind Faster-Whisper. Start here for model conversion and C++ usage.
