@@ -181,10 +181,7 @@ The system is divided into an Asynchronous Media Bridge that acts as the traffic
 - The Bridge (C++): A multi-threaded service that subscribes to MQTT and pipes those chunks into a gRPC bidirectional stream.
     
 - Egress (gRPC): The AI Service (Faster-Whisper) receives the stream and returns transcribed text segments.
-    
-
 ---
-
 ### 2. Implementation Guidelines (Local Reproduction)
 
 #### Step 1: Environment & Prerequisites
@@ -194,7 +191,6 @@ You need a C++20 build environment.
 - Hardware: NVIDIA GPU with CUDA 12.x and cuDNN 8.x.
     
 - Libraries: * CTranslate2 (Inference Engine)
-    
 
 - Paho MQTT C++ (Client for audio ingress)
     
