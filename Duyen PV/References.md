@@ -28,7 +28,6 @@
 - **Kafka EngineClickhouse Optimization**:  https://www.mux.com/blog/latency-and-throughput-tradeoffs-of-clickhouse-kafka-table-engine
 - **Monitoring Clickhouse**: https://altinity.com/blog/building-a-diy-prometheus-http-endpoint-in-clickhouse
 
-
 ### Comparisons & Architectural Trade-offs (Druid vs. ClickHouse)
 
 - **Tinybird: ClickHouse vs. Druid (Ingestion, Scaling, Ops)**: [https://www.tinybird.co/blog/clickhouse-vs-druid](https://www.tinybird.co/blog/clickhouse-vs-druid) Head-to-head on real-time ingestion (Druid native event-by-event vs. ClickHouse micro-batch/Kafka engine), query performance, Kubernetes ops, and when to choose each.
