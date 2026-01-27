@@ -129,7 +129,7 @@ For your client edge kits and cloud backend.
     - Older foundational: [Netflix System Architectures for Personalization and Recommendation](https://netflixtechblog.com/system-architectures-for-personalization-and-recommendation-e081aa94b5d8) (Cassandra storage + Spark/Flink-like processing).
     - Modern insights often reference Kafka for events and low-latency serving.
 - **Tripadvisor Real-Time Personalization with ScyllaDB** Directly relevant to ScyllaDB usage for real-time personalization at massive scale (similar to your storage layer).
-    - Resource: [Inside Tripadvisor’s Real-Time Personalization with ScyllaDB + AWS](https://resources.scylladb.com/scylladb-user-stories/inside-tripadvisor-s-real-time-personalization-with-scylla-aws) (video + details on low-latency reads/writes).
+    - Resource: https://resources.scylladb.com/ai-ml/inside-tripadvisor-s-real-time-personalization-with-scylladb-aws (video + details on low-latency reads/writes).
 - **Grab (Ride-Hailing/E-commerce) with ScyllaDB** Uses Scylla for real-time counters and high-throughput event processing (billions/day), applicable to your online feature updates.
     - Blog: [Grab App at Scale with ScyllaDB](https://www.scylladb.com/2021/06/23/grab-app-at-scale-with-scylla/)
 - **DoorDash Gigascale ML Feature Store with Redis** Excellent for Redis as online feature store for real-time ML inference (tens of millions reads/sec), mirroring your caching for user sessions/categories/boosts.
