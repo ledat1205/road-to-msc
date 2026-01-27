@@ -1,4 +1,3 @@
-## ANALYTICAL ENGINE
 
 ### Core Official Documentation (Start Here for Architecture & Tuning)
 
@@ -37,6 +36,7 @@
 - **Imply: Druid vs. ClickHouse Challenges**: [https://imply.io/druid-vs-clickhouse](https://imply.io/druid-vs-clickhouse) Druid's advantages in true streaming (exactly-once, sub-second availability) vs. ClickHouse workarounds.
 - **DoubleCloud / CelerData Comparisons**: [https://double.cloud/comparison/druid-vs-clickhouse](https://double.cloud/comparison/druid-vs-clickhouse) + [https://celerdata.com/glossary/clickhouse-vs-apache-druid](https://celerdata.com/glossary/clickhouse-vs-apache-druid) Ingestion models, scaling, cost, and why hybrid batch + streaming favors one over the other.
 - **StarTree: Pinot/Druid/ClickHouse Comparison**: [https://startree.ai/resources/a-tale-of-three-real-time-olap-databases](https://startree.ai/resources/a-tale-of-three-real-time-olap-databases) Kafka integration depth, batch vs. streaming support, and cost/throughput trade-offs.
+
 ### Faster-Whisper + CTranslate2 (Core for STT in C++)
 
 CTranslate2 is the fast C++/Python inference engine behind Faster-Whisper. Start here for model conversion and C++ usage.
