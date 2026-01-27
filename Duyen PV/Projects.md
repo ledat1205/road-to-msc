@@ -50,6 +50,55 @@ The design accounts for an Amazon-like structure: ~5M master_ids (unique product
         ```
     - **Trade-offs**: Category-level loses product granularity but scales better; hybrid possible for hot items.
 
+    ### How to leverage scylladb
+    - **Keep Frozen Map + Smart Batch Design (Safer Short-Term Fix, No Schema Change)**
+    - **Do not** write an UPDATE for masters that have no new inference.
+    - **Only write** for masters that the model actually processed (i.e., had recent activity or were force-included).
+    - Implementation:
+        - In your daily training job:
+            - First, query a "hot masters" source (e.g., Druid rollup of recent interactions, or Flink-maintained Redis set of active masters in last 3 months).
+            - Run inference **only** on that subset.
+            - Then, **only** UPDATE those master_ids:
+                
+                ```
+                UPDATE master_semantic_relations
+                SET related_masters = {uuid1: 0.92, uuid2: 0.85, ...}  -- full new map
+                WHERE master_id = ?;
+                ```
+                
+        - **Inactive masters** are never touched → old frozen map stays forever.
+    - **Advantages**:
+        - No schema migration needed.
+        - Frozen maps are more compact and faster to read (single cell).
+    - **Trade-offs**:
+        - You must reliably filter the batch to skip inactive masters.
+        - If model logic changes (e.g., you start inferring cold items), you risk overwriting old data unless you add merge logic.
+- **Hybrid: Add a Version / Timestamp Column for Safe Overwrite + Fallback** Add columns:
+    
+    cql
+    
+    ```
+    CREATE TABLE master_semantic_relations (
+        master_id uuid PRIMARY KEY,
+        related_masters frozen<map<uuid, float>>,
+        inference_ts timestamp,          -- when this map was last computed
+        inference_source text            -- e.g., 'daily-batch-v2', 'fallback-old'
+    );
+    ```
+    
+    - Batch writes inference_ts = now() only for newly inferred masters.
+    - In serving layer (Go):
+        - Always read the row.
+        - If inference_ts is very old (e.g., >3 months), log/alert, but still serve the old map.
+        - Optionally, trigger background refresh for cold items if business rules allow.
+- **Cleanup Strategy (Optional Long-Term Hygiene)**
+    - Run a periodic job (e.g., weekly Airflow):
+        - Scan masters with very old last_interaction_ts (from Druid or separate table).
+        - If inference_ts is stale, either:
+            - Delete the row (DELETE FROM master_semantic_relations WHERE master_id = ?) → fallback to default/fallback recs in Go.
+            - Or keep forever if cold-start protection is critical.
+    - Use Scylla's TTL on the row if acceptable (e.g., INSERT ... USING TTL 7776000 for 90 days), but TTL on maps is per-row, not per-entry.
+
 #### 2. **Optimizing Best-Seller Recommendations in Current User Categories (1-10 Categories, Dynamic)**
 - **Rationale**: Categories are dynamic per session; best-sellers reflect real-time sales/views (intra-day trends like flash sales). Use Druid for 5-min rollups of top sold products per category. Expand via current viewed category + co-view related categories (weekly updated). For homepage diversity, incorporate user's recent interested categories with time-based decay.
 - **Technical Implementation**:
