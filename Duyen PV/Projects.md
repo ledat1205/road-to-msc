@@ -1,3 +1,4 @@
+# TIKI
 ## RECOMMENDATION
 
 #### 1. **Optimizing Related Products Recommendations (Model-Inferred, Up to 1000 per Product)**
@@ -132,6 +133,8 @@
     - **Scaling**: Redis sharding for hot keys; Flink dynamic scaling on event rate.
     - **End-to-End**: Full pipeline: Event -> Flink (1-5s) -> Redis/Scylla (<1ms) -> Go serve (<5ms total).
 
+
+## Analytics Engine
 
 # TMA
 
