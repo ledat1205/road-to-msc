@@ -1,85 +1,154 @@
-#### MySQL (with InnoDB Engine)
+### 1. Overview & Architectural Comparison
 
-MySQL is a relational database primarily used for OLTP (Online Transaction Processing) workloads like web applications. Its default InnoDB engine emphasizes reliability and concurrency.
+These databases fall into different categories:
 
-- **Storage Organization**: InnoDB uses clustered indexes based on primary keys, where data is stored in B-tree structures. This minimizes I/O for primary key lookups. Data is organized in tablespaces (system, undo for rollbacks, temporary), supporting file-per-table for isolation. It includes compression, foreign keys for integrity, and row-based storage, making it efficient for row-oriented access but less so for analytics.
-- **Query Executor**: Employs row-level locking and MVCC (Multi-Version Concurrency Control) for consistent reads without blocking. Queries are optimized for primary key access, with support for full-text search and geospatial indexes. It uses an adaptive hash index for faster reads.
-- **Throughput**: High for read-heavy OLTP via in-memory buffer pools (caching data/indexes), change buffers (batching inserts), and adaptive hashing. However, it's optimized for simpler queries; complex analytics can bottleneck due to row-oriented scanning.
-- **Scalability**: Supports replication (master-slave) for read scaling and up to 64TB storage. High concurrency via MVCC and row-locking, but vertical scaling is limited; horizontal via sharding or clustering tools like Vitess.
+- **Relational OLTP** → MySQL (InnoDB), PostgreSQL (heap-based)
+- **Columnar OLAP / Analytics** → Druid (segment-based), ClickHouse (MergeTree), BigQuery (Capacitor)
+- **Distributed Wide-Column / Key-Value NoSQL** → ScyllaDB/Cassandra (LSM-tree), HBase (LSM on HDFS)
 
-#### PostgreSQL
+| Database             | Type                | Storage Paradigm               | Key Storage Engine / Format                     | Write Strategy                         | Read Optimization                     | Concurrency & Scalability              | Primary Use Case                    |
+| -------------------- | ------------------- | ------------------------------ | ----------------------------------------------- | -------------------------------------- | ------------------------------------- | -------------------------------------- | ----------------------------------- |
+| MySQL                | Relational OLTP     | Row-oriented, clustered B+tree | InnoDB (default)                                | WAL → buffer pool → change buffer      | Clustered PK, buffer pool caching     | MVCC row-locking, replication/sharding | Transactional apps, web services    |
+| PostgreSQL           | Object-Relational   | Row-oriented heap              | Heap + heapam (default)                         | Append-only MVCC → WAL                 | Indexes → heap via TID, parallel exec | True MVCC, extensions (Citus)          | Complex queries, mixed OLTP/OLAP    |
+| Druid                | Columnar OLAP       | Immutable columnar segments    | Segment-based (time-partitioned)                | Ingest → roll-up → immutable seg       | Column prune + bitmap/inverted idx    | Immutable, distributed services        | Time-series aggregations, real-time |
+| ClickHouse           | Columnar OLAP       | Columnar LSM (parts)           | MergeTree family                                | Insert → small part → background merge | Sparse PK index + marks/granules      | Background merges, multi-master repl   | High-speed OLAP, analytics          |
+| ScyllaDB / Cassandra | Wide-Column NoSQL   | LSM-tree wide-column           | SSTables + Memtables (shard-per-core in Scylla) | Commit log → Memtable → SSTable        | Bloom + cache + multi-SSTable merge   | Shard-per-core (Scylla), linear scale  | High-throughput distributed KV      |
+| BigQuery             | Columnar Serverless | Columnar (nested/repeated)     | Capacitor (proprietary)                         | Ingest → Capacitor → Colossus          | Columnar prune + compression          | Serverless auto-scaling                | Petabyte-scale analytics            |
+| HBase                | Column-Family NoSQL | Column-family LSM on HDFS      | HFiles + MemStore                               | WAL → MemStore → HFile                 | Block cache + bloom + multi-HFile     | Region splitting, Hadoop-integrated    | Sparse big data, random access      |
 
-PostgreSQL is an object-relational database, excelling in complex queries, data integrity, and mixed OLTP/OLAP workloads. It's more feature-rich than MySQL.
+### 2. Deep Dive: Storage Engines
 
-- **Storage Organization**: Heap-based storage (non-clustered), where tables are stored as unordered heaps with separate indexes (B-tree by default). Uses tablespaces for distributing objects across filesystems, supporting partitioning for large tables. It handles diverse data types (e.g., JSON, geospatial) and is row-oriented, but with extensions for columnar via add-ons like cstore_fdw.
-- **Query Executor**: Process-per-connection model for better isolation. Advanced query optimizer with parallel execution, indexing techniques (e.g., GiST, GIN for complex types), and MVCC without read-write locks, allowing high concurrency for writes. Supports window functions, CTEs, and extensions for custom logic.
-- **Throughput**: Better for write-heavy and complex queries due to MVCC and partitioning. Handles large datasets with parallel queries, but may be slower for simple reads compared to MySQL. Extensions like TimescaleDB boost time-series performance.
-- **Scalability**: Horizontal via partitioning, sharding (e.g., Citus extension), and replication. Log-shipping for reliability, table partitioning for performance. Better for growing datasets than MySQL, with seamless handling of concurrency.
+**MySQL (InnoDB)**
 
-Key differences from MySQL: PostgreSQL is ACID-compliant across all features, better for writes and complex queries, while MySQL (InnoDB) is faster for reads and simpler setups but requires specific engines for ACID.
+- Row-oriented with clustered primary key index (data stored in B+tree leaves).
+- On-disk: Tablespaces (.ibd files), redo/undo logs, doublewrite buffer.
+- In-memory: Buffer pool (caches data/indexes), change buffer (defers secondary index updates), adaptive hash index.
+- Write path: WAL-first → buffer pool → background flush.
+- Read path: B+tree traversal; secondary indexes → PK lookup.
+- Concurrency: MVCC via undo + row locks.
+- Maintenance: Purge old versions, adaptive flushing.
 
-#### Apache Druid
+**PostgreSQL (Heap-based)**
 
-Druid is a columnar database optimized for real-time analytics and time-series data, like logs or events.
+- Unordered heap files (8KB pages), separate secondary indexes (TID pointers).
+- On-disk: Heap files, visibility map, FSM.
+- In-memory: Shared buffers (no dedicated change buffer).
+- Write path: Append new tuple versions (MVCC) → WAL.
+- Read path: Index → TID → heap fetch.
+- Concurrency: True MVCC (readers never block writers).
+- Maintenance: Autovacuum to reclaim space and freeze tuples.
 
-- **Storage Organization**: Columnar format with data segmented by time and dimensions, stored in immutable segments. Uses deep storage (e.g., S3, HDFS) for persistence, with compression and indexing (inverted indexes) for fast scans. Data is pre-aggregated during ingestion.
-- **Query Executor**: Distributed query layer with Brokers routing to Historical nodes (holding segments). Supports SQL-like queries with aggregations, joins (limited), and approximate algorithms. Pre-fetching and multi-level indexing enable sub-second responses.
-- **Throughput**: High for aggregations on large datasets (billions of rows/sec), but struggles with complex joins or updates. Handles high concurrency via shared-nothing architecture.
-- **Scalability**: Horizontal, cloud-friendly with independent services (e.g., add Historical nodes for data, Brokers for queries). Uses ZooKeeper for coordination. Linear scaling, but complex topology (multi-server clusters).
+**Druid**
 
-Differences from MySQL/PostgreSQL: Columnar vs. row-oriented; optimized for OLAP analytics with pre-aggregation, not transactions. Less flexible for ad-hoc queries, but faster for scans.
+- Immutable, time-partitioned columnar segments with dictionary encoding, bitmap indexes.
+- On-disk: Deep storage (S3/HDFS/local).
+- In-memory: Memory-mapped segments on Historicals.
+- Write path: Ingestion → pre-aggregation → publish immutable segment.
+- Read path: Broker → Historicals scan needed columns + indexes.
+- Maintenance: Background compaction merges small segments.
 
-#### ClickHouse
+**ClickHouse (MergeTree family)**
 
-ClickHouse is a columnar OLAP database for fast analytics on large datasets.
+- Strictly columnar per-column files, parts sorted by primary key (ORDER BY).
+- On-disk: Parts (.bin data, .mrk marks, .idx primary index), high compression.
+- In-memory: Insert buffers.
+- Write path: Inserts → small parts → background LSM-style merges.
+- Read path: Sparse PK index → granule skipping → vectorized column reads.
+- Maintenance: Continuous background merges, TTL, deduplication variants.
 
-- **Storage Organization**: Column-wise storage, reading only needed columns to reduce I/O. High compression, with parts merged in background. Supports materialized views for pre-computation.
-- **Query Executor**: Leverages columnar storage for vectorized execution of filters, aggregations, and joins (adaptive: hash for small, merge for large). SQL-compatible with sampling and approximate functions for speed.
-- **Throughput**: Extremely high (e.g., >1B rows/sec) for analytical queries due to minimal data transfer and optimizations.
-- **Scalability**: Distributed with asynchronous multi-master replication for redundancy. Scales horizontally across nodes.
+**ScyllaDB / Cassandra**
 
-Differences from Druid: More general OLAP focus with dynamic processing; Druid emphasizes time-series and pre-aggregation.
+- LSM-tree: SSTables (immutable), Memtables.
+- ScyllaDB: Shard-per-core (shared-nothing per CPU core), O_DIRECT I/O.
+- On-disk: SSTables + commit log.
+- In-memory: Memtables per shard, row cache, bloom filters.
+- Write path: Commit log → Memtable → flush to SSTable.
+- Read path: Memtable + bloom → index → merge multiple SSTables.
+- Maintenance: Compaction (Leveled/TimeWindow best for most).
 
-#### ScyllaDB / Cassandra
+**BigQuery (Capacitor)**
 
-Both are wide-column NoSQL databases for distributed, high-availability workloads. ScyllaDB is a performance-optimized rewrite of Cassandra.
+- Columnar format supporting nested/repeated fields.
+- On-disk: Colossus FS, high compression (RLE, dictionary).
+- Write path: Batch/streaming ingest → Capacitor files.
+- Read path: Dremel tree → scan compressed columns only.
+- Maintenance: Fully managed (automatic).
 
-- **Storage Organization** (Cassandra): Data distributed via hash partitioning in a ring topology. Wide-column model with partition keys; stored in SSTables (immutable files) with MemTables for writes. Replication across nodes/data centers.
-- **Query Executor** (Cassandra): Any node as coordinator, using gossip for discovery. CQL queries (SQL-like) with consistency levels (e.g., QUORUM). Scans, gets, but limited joins.
-- **Throughput** (Cassandra): High for reads/writes via load balancing; tunable consistency affects it.
-- **Scalability** (Cassandra): Linear horizontal via adding nodes; vNodes for even distribution.
-- ScyllaDB: Similar data model/CQL, but shard-per-core architecture (shared-nothing per CPU core) eliminates Java GC pauses, maximizes utilization. Storage in SSTables, but optimized I/O schedulers.
-- Differences/Optimizations in ScyllaDB: 2-5x higher throughput, lower latencies, faster scaling (e.g., 7x faster bootstrap). Shard-aware drivers direct queries efficiently. Better for massive OPS without tuning.
+**HBase**
 
-#### Google BigQuery
+- Column-family LSM: HFiles on HDFS per store (column family).
+- On-disk: HFiles, WAL.
+- In-memory: MemStore per region/column family, block cache.
+- Write path: WAL → MemStore → flush to HFile.
+- Read path: Merge MemStore + HFiles (bloom/block cache).
+- Maintenance: Minor/major compactions, region splitting.
 
-BigQuery is a serverless, columnar analytics database for big data.
+### 3. Performance Tuning: Industry Best Practices (2025–2026)
 
-- **Storage Organization**: Columnar (Capacitor format) with separation from compute; data replicated across zones. Supports ACID, ingestion via batch/streaming.
-- **Query Executor**: Massively parallel distributed engine; ANSI SQL with ML integrations. Dynamic resource allocation.
-- **Throughput**: Seconds for TBs, minutes for PBs; high concurrency without provisioning.
-- **Scalability**: Serverless auto-scaling; no manual management.
+**MySQL (InnoDB)**
 
-Differences from ClickHouse: Cloud-native, no resource contention; ClickHouse is on-premise with integrated storage/compute.
+- innodb_buffer_pool_size: 60–80% RAM (dedicated server).
+- innodb_log_file_size: 1–4GB for high writes.
+- innodb_flush_log_at_trx_commit=2 (performance) vs. 1 (durability).
+- innodb_io_capacity: Match SSD IOPS.
+- innodb_file_per_table=ON, disable query cache (MySQL 8+).
+- Monitor: SHOW ENGINE INNODB STATUS, Percona Toolkit.
+- Recent insights (2025–2026): MySQL 9.5/Percona excels in stability/scalability; use innodb_dedicated_server=ON for auto-tuning.
+- Resources: Percona "MySQL 101 Parameters" (2025 updates), Releem guide.
 
-#### Apache HBase
+**PostgreSQL**
 
-HBase is a column-family NoSQL database on Hadoop for massive, sparse data.
+- shared_buffers: 25–40% RAM.
+- work_mem / maintenance_work_mem: 4–64MB (per-op caution).
+- effective_cache_size: 50–75% RAM.
+- WAL: max_wal_size larger, checkpoint_completion_target=0.9.
+- Autovacuum: Aggressive for high-update tables.
+- Parallelism: Enable max_parallel_workers.
+- Monitor: pg_stat_statements, EXPLAIN (ANALYZE, BUFFERS).
+- Recent insights (2025): Use pgBadger, timescaledb-tune for time-series; focus on parallel workers and history-based optimizations.
+- Resources: Mydbops "PostgreSQL Parameter Tuning 2025", Percona tuning guide.
 
-- **Storage Organization**: Column-oriented with regions (horizontal partitions) split by row keys. Each region has stores per column family: MemStore (in-memory) + HFiles (immutable on HDFS). WAL for durability.
-- **Query Executor**: Clients query via gets/puts/scans; RegionServers handle with scanners merging MemStore/HFiles. Filters and coprocessors for server-side logic.
-- **Throughput**: Optimized with caches (block/off-heap), compactions, bulk loads. High for random access.
-- **Scalability**: Horizontal via region splitting/balancing; integrates with HDFS/YARN for massive scale.
+**ClickHouse**
 
-### Comparison Table
+- Primary/ORDER BY: Low-cardinality first for skipping.
+- index_granularity: Lower for point queries.
+- Merges: Tune concurrency ratio, use projections/materialized views.
+- Inserts: Batch large, async.
+- Monitor: system.parts, query logs, EXPLAIN.
+- Recent insights (2026): Definitive guide emphasizes "read less data" via ORDER BY design (up to 100× gains); projections for 20×+ speedups.
+- Resources: ClickHouse "Definitive Guide to Query Optimization (2026)", official query optimization docs.
 
-| Database   | Type                | Storage Organization                                         | Query Executor                                                | Throughput Considerations                             | Scalability                                   | Key Use Cases & Differences                         |
-| ---------- | ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------- | --------------------------------------------------- |
-| MySQL      | Relational (OLTP)   | Row-oriented, clustered B-tree indexes, tablespaces          | Row-level locking, MVCC, hash indexes                         | High for reads; buffer pools for caching              | Replication, up to 64TB; high concurrency     | Web apps; simpler than PostgreSQL for reads         |
-| PostgreSQL | Object-Relational   | Row-oriented, heap-based with separate indexes, partitioning | Process-per-connection, parallel optimizer, MVCC              | Better for writes/complex queries; parallel execution | Horizontal sharding/partitioning, replication | Analytics/mixed workloads; more features than MySQL |
-| Druid      | Columnar OLAP       | Columnar segments, time-partitioned, deep storage            | Distributed brokers/historicals, SQL-like with approximations | Sub-second for aggregations; high concurrency         | Horizontal services, linear                   | Time-series; pre-agg vs. relational ad-hoc          |
-| ClickHouse | Columnar OLAP       | Column-wise, high compression, merges                        | Vectorized, adaptive joins, sampling                          | >1B rows/sec for analytics                            | Multi-master replication                      | General OLAP; dynamic vs. Druid's time-focus        |
-| Cassandra  | Wide-Column NoSQL   | Partitioned SSTables, MemTables, ring topology               | Coordinator nodes, CQL, consistency levels                    | Tunable, high for distributed reads/writes            | Linear horizontal, vNodes                     | Distributed apps; base for ScyllaDB                 |
-| ScyllaDB   | Wide-Column NoSQL   | Similar to Cassandra, but shard-per-core SSTables            | Similar to Cassandra, shard-aware drivers                     | 2-5x Cassandra; low latency                           | Faster scaling (7x+), linear                  | High-perf Cassandra alternative; no GC              |
-| BigQuery   | Columnar Serverless | Columnar, separated from compute, replicated                 | Parallel distributed SQL engine                               | Fast on massive data; auto-optimized                  | Serverless auto-scaling                       | Big data analytics; cloud vs. on-prem               |
-| HBase      | Column-Family NoSQL | Regions with MemStore/HFiles on HDFS                         | Scans/gets with filters/coprocessors                          | High random access; caches/compactions                | Horizontal region splitting                   |                                                     |
+**Druid**
+
+- Segment size: 500MB–1GB (tune segmentGranularity).
+- Compaction: Always-on to merge small segments.
+- Historicals: Heap ~0.5GiB × cores; druid.processing.numThreads = cores–1.
+- Queries: Approximations, caching; increase replicas/numThreads for concurrency.
+- Resources: Official "Basic Cluster Tuning", Imply tuning guides.
+
+**ScyllaDB / Cassandra**
+
+- Compaction: Leveled (read-heavy), TimeWindow (time-series).
+- Schema: Even partition keys, avoid large partitions.
+- Drivers: Shard-aware (Scylla).
+- Scylla-specific: Monitor shard balance; auto-tunes heavily.
+- Recent insights (2025): Production Readiness Guidelines; compaction strategies table for workloads.
+- Resources: ScyllaDB "Tips and Tricks for Maximizing Performance", Production Readiness docs.
+
+**BigQuery**
+
+- Minimize scanned bytes: Project columns, filter early, avoid SELECT *.
+- Partition/clustering: Date + high-filter columns.
+- Materialized views, BI Engine caching.
+- Use APPROX functions, history-based optimizations (2025+).
+- Monitor: Query explanation, bytes processed.
+- Resources: Google Cloud "Optimizing Query Performance", "Optimize Query Computation".
+
+**HBase**
+
+- Heap: 16–36GB (G1GC preferred).
+- hfile.block.cache.size: 40–60%.
+- Regions/RS: 50–200, pre-split tables.
+- Compaction: FIFO/Exploring strategies.
+- Avoid hotspots: Salting keys, load balancing.
+- Resources: Apache/Cloudera tuning guides, recent Medium series on hotspots/compaction.
