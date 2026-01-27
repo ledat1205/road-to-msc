@@ -1,5 +1,6 @@
 ### BOOKS
 
+
 ### Apache Druid
 
 - **Ingestion Overview (Streaming + Batch)**: [https://druid.apache.org/docs/latest/ingestion](https://druid.apache.org/docs/latest/ingestion) Explains Kafka supervisor setup, real-time ingestion (event-by-event vs. micro-batch), segment handoff, and tuning for low-latency queries on streaming data. Key for migration: how streaming enables sub-second freshness while batch handles historical backfill.
