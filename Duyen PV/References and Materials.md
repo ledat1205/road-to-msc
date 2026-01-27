@@ -1,5 +1,4 @@
-
-### Core Official Documentation (Start Here for Architecture & Tuning)
+### BOOKS
 
 #### Apache Druid
 
