@@ -15,6 +15,7 @@
 - **Real-Time Ingestion & Materialized Views**: [https://clickhouse.com/docs/engines/table-engines/integrations/kafka](https://clickhouse.com/docs/engines/table-engines/integrations/kafka) How to stream from Kafka topics → Kafka engine table → MergeTree/ReplacingMergeTree for dedup and analytics. Includes batch size tuning (e.g., aim for 1,000+ rows per insert) and async inserts.
 - **Performance & Optimization Guide**: [https://clickhouse.com/docs/optimize](https://clickhouse.com/docs/optimize) Deep dive into merge tree tuning, compression codecs, asynchronous inserts, projection, and resource usage for high-throughput queries on streaming data.
 - **ClickHouse on Kubernetes**: [https://clickhouse.com/docs/en/operations/kubernetes/](https://clickhouse.com/docs/en/operations/kubernetes/) Official operator, Helm charts, StatefulSet configs, resource requests, and scaling patterns for distributed clusters.
+- **Data Ingestion Handbook (PostHog)**: – Kafka Engine tips, skipping broken messages, dead-letter queues for resilience: https://posthog.com/handbook/engineering/clickhouse/data-ingestion
 #### Apache Kafka (Core for Both)
 
 - **Kafka Connect for Sinks/Sources**: [https://kafka.apache.org/documentation/#connect](https://kafka.apache.org/documentation/#connect) Especially the ClickHouse Kafka Connect Sink: [https://github.com/ClickHouse/clickhouse-kafka-connect](https://github.com/ClickHouse/clickhouse-kafka-connect) For reliable, scalable streaming from Kafka to both engines.
