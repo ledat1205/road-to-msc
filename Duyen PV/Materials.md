@@ -26,7 +26,7 @@
 - **AMP's Batch-to-Streaming Migration with ClickHouse Cloud**: [https://clickhouse.com/blog/amp-clickhouse-oss-to-clickhouse-cloud](https://clickhouse.com/blog/amp-clickhouse-oss-to-clickhouse-cloud) Shift from batch to real-time Kafka streaming, using ReplacingMergeTree, async inserts, and Kinesis Firehose buffering to avoid small-batch bottlenecks—achieved faster ingestion and reliability.
 - **Tinybird: Streaming Kafka to ClickHouse (Production Patterns)**: [https://www.tinybird.co/blog/stream-kafka-to-clickhouse](https://www.tinybird.co/blog/stream-kafka-to-clickhouse) + Exactly-Once Guide: [https://www.tinybird.co/blog/kafka-to-clickhouse-exactly-once](https://www.tinybird.co/blog/kafka-to-clickhouse-exactly-once) Practical setup, gotchas (merge parts, small inserts), and high-scale patterns for real-time ingestion.
 - **DZone: Kafka + Flink + Druid Architecture**: [https://dzone.com/articles/building-a-real-time-data-architecture-with-apache](https://dzone.com/articles/building-a-real-time-data-architecture-with-apache) End-to-end real-time pipeline migration example, with Druid as the analytics sink from Kafka.
-- **Must read on Clickhouse Optimization**:  https://www.mux.com/blog/latency-and-throughput-tradeoffs-of-clickhouse-kafka-table-engine
+- **Kafka EngineClickhouse Optimization**:  https://www.mux.com/blog/latency-and-throughput-tradeoffs-of-clickhouse-kafka-table-engine
 - **Monitoring Clickhouse**: https://altinity.com/blog/building-a-diy-prometheus-http-endpoint-in-clickhouse
 
 
