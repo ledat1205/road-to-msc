@@ -1,8 +1,6 @@
 # TIKI
 ## Recommendation
 
-# Optimized E-Commerce Recommendation System Implementation
-
 This document outlines the detailed technical implementation and optimizations for an e-commerce product recommendation system, leveraging Apache Flink for streaming processing, Redis for low-latency caching, ScyllaDB for durable storage, Apache Druid for real-time analytics rollups, and a Go backend for serving. The system handles high concurrency (1,000 req/sec), reduces latency to seconds, and incorporates hybrid batch/streaming with daily training. Key features include semantic product relations, category-based expansions, best-seller rankings, reranking/filtering, and user interest decay.
 
 The design accounts for an Amazon-like structure: ~5M master_ids (unique products) and ~30M seller-specific pids. Mappings between master_id and pid are maintained for resolution, with deduplication at master_id level to ensure clean recommendation lists.
@@ -184,6 +182,8 @@ The design accounts for an Amazon-like structure: ~5M master_ids (unique product
     - **Execution**: Run tests 1-2 weeks, use Amplitude dashboards for significance (t-tests). Integrate with serving: If variant=B, apply new logic.
     - **Examples**: Test decay rates for user recent cats (e.g., 1-day vs. 7-day TTL); rerank flash sale boosts (1.5x vs. 2.5x).
     - **Trade-offs**: Overhead in code (variant flags); ensure statistical power with large samples.
+
+
 
 
 ## Analytics Engine
