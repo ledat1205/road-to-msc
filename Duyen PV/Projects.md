@@ -1,5 +1,5 @@
 # TIKI
-## RECOMMENDATION
+## Recommendation
 
 #### 1. **Optimizing Related Products Recommendations (Model-Inferred, Up to 1000 per Product)**
 
