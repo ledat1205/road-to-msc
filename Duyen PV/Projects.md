@@ -1,103 +1,136 @@
 # TIKI
 ## Recommendation
 
+# Optimized E-Commerce Recommendation System Implementation
+
+This document outlines the detailed technical implementation and optimizations for an e-commerce product recommendation system, leveraging Apache Flink for streaming processing, Redis for low-latency caching, ScyllaDB for durable storage, Apache Druid for real-time analytics rollups, and a Go backend for serving. The system handles high concurrency (1,000 req/sec), reduces latency to seconds, and incorporates hybrid batch/streaming with daily training. Key features include semantic product relations, category-based expansions, best-seller rankings, reranking/filtering, and user interest decay.
+
+The design accounts for an Amazon-like structure: ~5M master_ids (unique products) and ~30M seller-specific pids. Mappings between master_id and pid are maintained for resolution, with deduplication at master_id level to ensure clean recommendation lists.
+
 #### 1. **Optimizing Related Products Recommendations (Model-Inferred, Up to 1000 per Product)**
 
-- **Rationale**: Daily training outputs semantic similarities (from titles) and co-view lists. To serve fast, precompute these as graphs or lists, but update incrementally for real-time co-views (e.g., from user sessions). This avoids full DB scans per request.
+- **Rationale**: Daily training outputs semantic similarities (from titles/embeddings) at master_id level. For dynamic signals, shift from product-level co-views (too voluminous at 30M pids) to category-level co-occurrences (thousands of categories, more tractable). This precomputes relations for fast serving, avoiding on-the-fly DB scans, while enabling expansion via co-viewed categories.
 - **Technical Implementation**:
-    - **Data Modeling**: In ScyllaDB, store as a graph-like structure using wide rows. E.g., table product_relations with product_id as partition key, and clustering columns for related products sorted by relevance score (from model or co-view count).
-        - Schema: CREATE TABLE product_relations (product_id uuid PRIMARY KEY, related_products frozen<map<uuid, float>>); (map limits to 1000 entries, float for similarity scores).
-    - **Batch Loading**: Daily training job (e.g., Spark or Airflow) writes semantic lists to Scylla. For co-views, use Flink to aggregate real-time views from event streams (Kafka), updating scores with exponential decay (e.g., recent views weigh more).
-        - Flink Operator: Use keyed state (ProcessFunction) to maintain a priority queue (top-100) per product, evicting low-score items.
-    - **Online Updates**: Flink consumes view events, increments co-view counts, and writes deltas to Redis (as sorted sets: ZADD product:rel:123 score1 related1 score2 related2) with TTL=1 day, and async to Scylla for persistence.
-        - Cache Warmup: Preload top products' relations into Redis via a Flink bootstrap job.
-    - **Serving in Go**: Query Redis first for ZREVRANGE product:rel:pid 0 99 WITHSCORES; fallback to Scylla. Intersect with user's recent views (stored in Redis as a list: LPUSH user:views:uid pid1 pid2, limit to last 10-20).
-    - **Latency Impact**: Reduces computation from O(n) model inference to O(1) cache lookup. Update latency: <5s via Flink.
-    - **Code Snippet (Flink for Co-View Updates)**:
+    - **Data Modeling** (Separate Semantic and Category Co-View):
+        - **Semantic Relations** (Static, Daily): Master-level for efficiency.
+            - ScyllaDB Schema: CREATE TABLE master_semantic_relations (master_id uuid PRIMARY KEY, related_masters frozen<map<uuid, float>>); — Top-1000 with similarity scores.
+            - Redis: Sorted sets ZADD master:sem:mid123 score1 related_mid1 score2 related_mid2 (TTL=1 day).
+        - **Category Co-View Relations** (Dynamic, Real-Time): Pairwise co-occurrences from sessions.
+            - ScyllaDB: CREATE TABLE category_co_view_relations (cat_id text PRIMARY KEY, related_cats map<text, float>); — Scores for top-20 related categories.
+            - Redis: Sorted sets ZADD cat:co_view:electronics score1 phone_cases score2 chargers.
+        - **Master-to-Pid Mapping**: For resolving recs to seller pids.
+            - ScyllaDB: CREATE TABLE master_to_pids (master_id uuid PRIMARY KEY, pids list<uuid>, metadata map<uuid, text>); — Includes price/seller data.
+            - Redis: Hashes HMSET master:pids:mid123 pid1:price1:seller1 pid2:price2:seller2 (for hot masters).
+    - **Batch Loading**: Daily Spark/Airflow job computes embeddings (e.g., FAISS ANN), loads semantic relations to Scylla/Redis. Bootstrap category co-views from logs if needed.
+    - **Online Updates** (Category Co-View Only): Flink consumes view events (Kafka), enriches with categories.
+        - Session Windows: 30-min inactivity gap or sliding (15-min window, 5-min slide).
+        - Aggregation: Key by category, maintain map<related_cat, score> with decay (0.95 per window).
+        - Prune: Top-20 per category via min-heap in state.
+        - Writes: Redis ZINCRBY, async Scylla batch.
+        - Scale: RocksDB state backend; tiny footprint with thousands of categories.
+    - **Serving in Go**: Merge semantic + category-expanded lists with dedup.
+        - Fetch recent views (Redis LRANGE user:views:uid 0 19), map to masters/categories.
+        - Get semantic for masters; expand categories via co-view ZREVRANGE.
+        - Merge scores (weighted: semantic 0.6 + co-view boost 0.4), dedup masters (map), prune top-1000 heap.
+        - Resolve pids (best by price/rating), fallback Scylla.
+    - **Latency Impact**: <15ms total (Redis multi-get + in-memory merge).
+    - **Code Snippet (Flink for Category Co-View Updates)**:
+        
+        Java
         
         ```
-        // Flink job for real-time co-view aggregation
-        DataStream<ViewEvent> views = env.fromSource(kafkaSource, ...);
-        views.keyBy(ViewEvent::getProductId) // Key by anchor product
-            .window(TumblingProcessingTimeWindows.of(Time.minutes(5))) // Micro-batch every 5 min
-            .reduce((acc, event) -> {
-                // Increment co-view scores with decay (e.g., alpha=0.9 for recency)
-                acc.relatedProducts.merge(event.coViewedProduct, event.score * 0.9 + acc.getOrDefault(event.coViewedProduct, 0f));
-                // Prune to top-100 using a min-heap or sorted map
-                acc.pruneToTopK(100);
-                return acc;
-            })
-            .addSink(new RedisSink() { // ZADD to Redis, then async Scylla upsert
-                @Override
-                public void invoke(RelatedProducts value) {
-                    jedis.zadd("product:rel:" + value.productId, value.relatedProducts);
-                    // Async Scylla: Batch insert with TTL
+        // Flink: Aggregate category co-occurrences
+        DataStream<ViewEvent> views = ...; // Kafka, category-enriched
+        views.keyBy(event -> event.getCategoryId())
+            .window(SlidingEventTimeWindows.of(Time.minutes(15), Time.minutes(5)))
+            .aggregate(new CategoryCoViewAggregator()) // Map accumulator, increment/decay pairs
+            .addSink(new RedisCategorySink() {
+                public void invoke(CategoryRelations value) {
+                    Pipeline pipe = jedis.pipelined();
+                    value.related.forEach((relCat, score) -> 
+                        pipe.zadd("cat:co_view:" + value.catId, score, relCat));
+                    pipe.sync();
+                    // Async Scylla upsert
                 }
             });
         ```
         
-    - **Trade-offs**: Memory in Flink state (use RocksDB with compression). Handle skew (popular products) by over-provisioning task slots.
+    - **Trade-offs**: Category-level loses product granularity but scales better; hybrid possible for hot items.
 
 #### 2. **Optimizing Best-Seller Recommendations in Current User Categories (1-10 Categories, Dynamic)**
 
-- **Rationale**: Categories change per session; best-sellers need real-time ranking based on sales/views. Daily batches miss intra-day trends (e.g., flash sales).
+- **Rationale**: Categories are dynamic per session; best-sellers reflect real-time sales/views (intra-day trends like flash sales). Use Druid for 5-min rollups of top sold products per category. Expand via current viewed category + co-view related categories (weekly updated). For homepage diversity, incorporate user's recent interested categories with time-based decay.
 - **Technical Implementation**:
-    - **Real-Time Aggregation**: Flink streams sales/view events, maintaining top-K (e.g., top-50) per category using sliding windows (e.g., 1-hour window, advance every 5 min).
-        - Use Flink's KeyedProcessFunction with timers for efficient top-K via priority queues (heap) in state.
-        - Categories per user: Track in Redis as a set: SADD user:cats:uid cat1 cat2 (TTL=session duration, e.g., 30 min), updated on view events via Flink or directly in Go.
-    - **Storage**: Store category best-sellers in Redis as sorted sets: ZADD cat:bestsellers:cat1 salesScore1 pid1 salesScore2 pid2. Flink updates scores (e.g., score = views * 0.5 + sales * 1.0).
-        - Scylla Backup: Periodic snapshots (every hour) for recovery.
-    - **Serving**: In Go, fetch user's categories from Redis, then multi-get best-sellers (MULTI pipeline: ZREVRANGE for each cat), union and dedup.
-    - **Dynamic Updates**: On category change (detected in Flink from view events), expire old user sets and recompute.
-    - **Latency Impact**: Aggregations in <10s; serving <2ms with Redis multi-get.
+    - **Real-Time Aggregation**: Orders/views from FE/app → Kafka → Flink (enrichment) → Druid for ingestion.
+        - Druid: Real-time rollups every 5 min (e.g., GROUP BY category, ORDER BY sales DESC, LIMIT 50 per category). Use Druid's Kafka supervisor for streaming ingestion.
+        - Query: Serving layer (Go) calls Druid API/SQL for top products: SELECT pid, sales FROM best_sellers WHERE category = ? AND time > NOW() - INTERVAL '1' HOUR ORDER BY sales DESC LIMIT 50.
+    - **Category Expansion**:
+        - Current: From request body (viewed product's category ID).
+        - Related: Co-view categories (from section 1/3, updated weekly via batch job analyzing session logs).
+        - User's Recent Interests: Redis set SADD user:recent_cats:uid cat1 cat2 (TTL=1-7 days, decay by score or expiry; updated on views/orders). For homepage (no specific view), use this for diverse recs.
+    - **3 Ways to Generate Related Products**:
+        1. Semantic inferred list (from section 1).
+        2. Top sold in current/viewed category (Druid query).
+        3. Top sold in co-view related categories (multi-query Druid, union results).
+    - **Storage**: Redis sorted sets ZADD cat:bestsellers:cat1 salesScore1 pid1 salesScore2 pid2 (synced from Druid via Flink sink or periodic job). Scylla for backups.
+    - **Serving**: In Go, fetch categories (request + Redis user set + co-view expansion), multi-query Druid/Redis for best-sellers, union/dedup masters.
+    - **Dynamic Updates**: Flink detects category changes from events, expires old user sets. Decay user interests: Use scored sets ZADD user:recent_cats:uid score cat1 (score = timestamp, prune low scores).
+    - **Latency Impact**: Druid queries <50ms; Redis fallback <2ms; total <100ms.
     - **Code Snippet (Go Serving Example)**:
         
+        Go
+        
         ```
-        func GetBestSellers(ctx context.Context, userID string) ([]ProductID, error) {
-            catsKey := "user:cats:" + userID
-            cats, err := redisClient.SMembers(ctx, catsKey).Result() // Get 1-10 cats
-            if err != nil { return nil, err }
+        func GetBestSellers(ctx context.Context, userID, currentCat string) ([]ProductID, error) {
+            // Get expanded cats: current + co-view + user recent
+            coViewKey := "cat:co_view:" + currentCat
+            coViews, _ := redisClient.ZRevRangeWithScores(ctx, coViewKey, 0, 19).Result()
+            userKey := "user:recent_cats:" + userID
+            userCats, _ := redisClient.ZRevRangeWithScores(ctx, userKey, 0, 9).Result() // Decay by score
         
-            pipe := redisClient.Pipeline()
-            var cmds []*redis.SliceCmd
-            for _, cat := range cats {
-                key := "cat:bestsellers:" + cat
-                cmds = append(cmds, pipe.ZRevRange(ctx, key, 0, 49)) // Top-50
-            }
-            _, err = pipe.Exec(ctx)
-            if err != nil { return nil, err }
+            allCats := unionAndDedup(currentCat, coViews, userCats) // Map for dedup
         
-            var union []ProductID
-            for _, cmd := range cmds {
-                union = append(union, cmd.Val()...) // Merge, dedup with a map if needed
+            // Multi-get from Redis/Druid
+            var union []ProductScore
+            for _, cat := range allCats {
+                bestKey := "cat:bestsellers:" + cat.id
+                if exists := redisClient.Exists(ctx, bestKey).Val(); exists == 1 {
+                    union = append(union, redisClient.ZRevRangeWithScores(ctx, bestKey, 0, 49).Val()...)
+                } else {
+                    // Fallback Druid: Query top-50
+                    druidRes := queryDruid("SELECT pid, sales FROM ... WHERE category='" + cat.id + "' ...")
+                    union = append(union, druidRes...)
+                }
             }
-            // Dedup and limit
-            return dedupAndLimit(union, 100), nil
+            // Dedup masters, limit
+            return dedupAndLimitByMaster(union, 100), nil
         }
         ```
         
-    - **Trade-offs**: Window size affects freshness vs. compute (smaller windows = more CPU in Flink).
+    - **Trade-offs**: Weekly co-view updates may lag; Druid adds dependency but excels at rollups.
 
 #### 3. **Optimizing Related Categories Expansion (Co-Viewed Categories)**
 
-- **Rationale**: Categories viewed together (e.g., "electronics" with "accessories") allow expanding recs. Build a co-occurrence graph updated online.
+- **Rationale**: Co-viewed categories (e.g., "electronics" with "accessories") expand recs without product-level volume. Updated weekly from session logs for stability.
 - **Technical Implementation**:
-    - **Co-Occurrence Computation**: Flink processes session views (windowed per user session), counting pairs (catA, catB). Use matrix or graph: Aggregate globally with keyed state on cat pairs.
-        - Decay: Use time-based decay (e.g., count *= 0.95 per window) for trending relations.
-    - **Storage**: Redis graphs (via hashes: HINCRBY cat:rels:cat1 cat2 1) or dedicated graph module if using RedisGraph. Threshold to top-5 related per cat.
-        - Scylla: CREATE TABLE cat_relations (cat_id text PRIMARY KEY, related_cats map<text, int>);
-    - **Expansion in Serving**: For user's current cats, fetch related, then pull best-sellers/related products from those.
-    - **Latency Impact**: Adds <1ms to serving (extra Redis lookups).
-    - **Trade-offs**: Pair explosion (limit to frequent cats); use sampling in Flink for high volume.
+    - **Co-Occurrence Computation**: Weekly batch (Airflow/Spark) analyzes logs, counts pairs with decay.
+    - **Storage**: Redis hashes/sorted sets ZADD cat:rels:cat1 score cat2; Scylla map table.
+    - **Expansion in Serving**: For current/user cats, fetch related (top-5–10), pull best-sellers/semantics.
+    - **Latency Impact**: <1ms extra Redis lookups.
+    - **Trade-offs**: Weekly cadence vs. real-time (use Flink for intra-week trends if needed).
 
 #### 4. **Integrating Rerank/Filter Layer (Boosted Products, Flash Sales, Ads)**
 
-- **Rationale**: Post-inference reranking ensures promoted items appear in widgets (e.g., top slots). Do this in-memory in Go for speed, sourcing boosts from Redis.
+- **Rationale**: Post-generation rerank/filter adapts the long candidate list (from sections 1–3) for business rules, ensuring relevance and monetization.
 - **Technical Implementation**:
-    - **Boost Data**: Store promotions in Redis hashes: HSET promo:pid123 boost 2.0 expiry 3600 (multiplier or additive score). Flink or a separate ETL ingests promo events.
-    - **Reranking Algorithm**: In Go, after fetching candidate lists (from above), apply boosts: NewScore = BaseScore * Boost (if exists). Use a heap for top-K rerank.
-        - Filters: Widget-specific (e.g., ads only in "sponsored" widget); use rules in config.
-    - **Online Updates**: Real-time promo changes trigger Redis pubs to invalidate user caches if needed.
+    - **Boost Data**: Redis hashes HSET promo:pid123 boost 2.0 expiry 3600 out_of_stock false ad_bid 1.5 flash_sale true.
+        - Ingest via Flink/ETL from promo events.
+    - **Reranking Algorithm**: In Go, after candidate fetch (e.g., 1000+ from semantic/best-sellers/co-view expansions):
+        - Filter: Remove out-of-stock (if HGET promo:pid out_of_stock == "true").
+        - Boost: NewScore = BaseScore * (ad_bid + flash_sale_bonus) (e.g., +2.0 for flash, multiplicative for bids).
+        - Heap/sort for top-K (e.g., 50 per widget).
+        - Widget-specific: Sponsored slots prioritize ads.
+    - **Online Updates**: Promo changes pub/sub to Redis, invalidate caches.
     - **Code Snippet (Go Rerank)**:
         
         Go
@@ -106,32 +139,51 @@
         func RerankCandidates(candidates []ProductScore, widget string) []ProductScore {
             pipe := redisClient.Pipeline()
             for _, c := range candidates {
-                pipe.HGet("promo:" + c.ProductID, "boost")
+                pipe.HMGet("promo:" + c.ProductID, "boost", "out_of_stock", "ad_bid", "flash_sale")
             }
-            res, _ := pipe.Exec(context.Background())
+            res, _ := pipe.Exec(ctx)
         
+            filtered := []ProductScore{}
             for i, r := range res {
-                if boost, _ := r.(*redis.StringCmd).Float64(); boost > 0 {
-                    candidates[i].Score *= boost
-                }
+                hm := r.(*redis.StringSliceCmd).Val()
+                if hm[1] == "true" { continue } // Out of stock
+                boost, _ := strconv.ParseFloat(hm[0], 64)
+                bid, _ := strconv.ParseFloat(hm[2], 64)
+                flash := hm[3] == "true"
+                candidates[i].Score *= boost
+                if flash { candidates[i].Score += 2.0 }
+                if widget == "sponsored" { candidates[i].Score *= bid }
+                filtered = append(filtered, candidates[i])
             }
-            // Heap or sort for top-K, apply widget filters
-            sort.SliceStable(candidates, func(i, j int) bool { return candidates[i].Score > candidates[j].Score })
-            return candidates[:50] // Example limit
+            // Sort, apply filters
+            sort.SliceStable(filtered, func(i, j int) bool { return filtered[i].Score > filtered[j].Score })
+            return filtered[:50]
         }
         ```
         
-    - **Latency Impact**: <5ms for 100-500 candidates (in-memory sort).
-    - **Trade-offs**: Boost over-use can degrade relevance; A/B test.
+    - **Latency Impact**: <5ms for 1000 candidates.
+    - **Trade-offs**: Over-boosting degrades UX; A/B test (see section 6).
 
 #### 5. **General Online Feature Updates and System-Wide Optimizations**
 
-- **Rationale**: Emphasize streaming to keep features fresh beyond daily training.
+- **Rationale**: Streaming keeps features fresh; unify for consistency.
 - **Implementation**:
-    - **Feature Store**: Unified in Redis (volatile features like sessions) and Scylla (persistent like relations). Flink acts as the online feature pipeline.
-    - **Monitoring/Fallbacks**: Use Prometheus for latency (e.g., Flink backpressure, Redis hit rate >95%). Circuit breakers in Go for Scylla fallbacks.
-    - **Scaling**: Redis sharding for hot keys; Flink dynamic scaling on event rate.
-    - **End-to-End**: Full pipeline: Event -> Flink (1-5s) -> Redis/Scylla (<1ms) -> Go serve (<5ms total).
+    - **Feature Store**: Redis (volatile: sessions, recent cats) + Scylla/Druid (persistent: relations, rollups).
+    - **Monitoring/Fallbacks**: Prometheus (Flink backpressure, Redis hits >95%, Druid query time). Go circuit breakers.
+    - **Scaling**: Redis Cluster sharding; Flink/Kubernetes autoscaling on events; Druid multi-node for rollups.
+    - **End-to-End**: Event → Kafka/Flink (1-5s) → Redis/Scylla/Druid (<1ms) → Go (<5ms total).
+    - **Micro-Batch Training Experiments**: Using Airflow to orchestrate micro-batch jobs (e.g., every 1-4 hours) for semantic relations/co-view updates. Experimenting with incremental model retraining (e.g., update embeddings on new products only) to reduce full daily compute, integrated with Flink for hybrid batch-stream.
+
+#### 6. **A/B Testing with Amplitude**
+
+- **Rationale**: Validate optimizations (e.g., co-view expansion impact, rerank boosts) on metrics like click-through rate (CTR), conversion, session time.
+- **Implementation**:
+    - **Setup**: Amplitude for event tracking (e.g., "rec_viewed", "rec_clicked", "purchase"). Define variants: A (baseline batch), B (streaming with category decay).
+    - **Targeting**: Random user bucketing (e.g., 50/50 split via Go hash(userID)), or segmented (new vs. returning users).
+    - **Metrics**: Primary: CTR on rec widgets; Secondary: Revenue per session, bounce rate.
+    - **Execution**: Run tests 1-2 weeks, use Amplitude dashboards for significance (t-tests). Integrate with serving: If variant=B, apply new logic.
+    - **Examples**: Test decay rates for user recent cats (e.g., 1-day vs. 7-day TTL); rerank flash sale boosts (1.5x vs. 2.5x).
+    - **Trade-offs**: Overhead in code (variant flags); ensure statistical power with large samples.
 
 
 ## Analytics Engine
