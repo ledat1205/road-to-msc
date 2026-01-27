@@ -142,9 +142,8 @@ This design balances real-time freshness, scale (30M pids, 5M masters), cost eff
 The old GCP setup worked well until mid-2024, when several pain points became business blockers:
 
 - **Latency unacceptable for business users** Marketing and growth teams needed to see campaign performance and user funnel changes within minutes — not hours. Daily/hourly batches meant reacting to yesterday’s problems today.
-- **Cost scaling poorly** As daily events crossed 1.5–2 billion, BigQuery storage + query costs grew faster than revenue. We were paying a premium for managed convenience we no longer needed at full price.
+- **Cost scaling poorly** As daily events crossed 1.5–2 million, BigQuery storage + query costs grew faster than revenue. We were paying a premium for managed convenience we no longer needed at full price.
 - **Limited tuning surface** High-cardinality dimensions (user_id + device + campaign_id + geo + …) caused query explosions and slot contention. We couldn’t fine-tune partitioning, rollups, or ingestion compression the way we needed.
-- **Strategic reasons** Moving compute and storage closer to our Vietnam user base (lower network latency, better pricing via FPT, easier compliance story) became attractive.
 
 We decided to keep two complementary engines:
 
