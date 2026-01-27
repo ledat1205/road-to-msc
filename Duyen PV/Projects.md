@@ -137,7 +137,152 @@ This design balances real-time freshness, scale (30M pids, 5M masters), cost eff
 
 
 ## Analytics Engine
+# Migrating E-commerce Analytics from GCP Batch to Real-Time Streaming on FPT: Lessons from Scaling Druid and ClickHouse
 
+**Duyen – Senior Data Engineer** _Ho Chi Minh City, January 2026_
+
+In late 2024 – early 2025, I led the complete overhaul of our e-commerce analytics platform — moving from a GCP-centric batch-oriented stack (BigQuery + Dataflow + Airflow) to a real-time streaming architecture built around Apache Kafka, Apache Druid, and ClickHouse running on FPT infrastructure.
+
+The system processes billions of events daily: user tracking (page views, add-to-cart, checkout steps), ad impressions & clicks, affiliate referrals, marketing campaign performance, revenue & refund streams — the kind of high-velocity, high-cardinality data that is both extremely valuable and extremely expensive to analyze in real time.
+
+This post describes **why we migrated**, **how we architected the new system**, **the hardest technical challenges we actually faced**, and **how we achieved 3× query throughput with 30% lower infrastructure cost** (storage + CPU + memory).
+
+### Why We Had to Change
+
+The old GCP setup worked well until mid-2024, when several pain points became business blockers:
+
+- **Latency unacceptable for business users** Marketing and growth teams needed to see campaign performance and user funnel changes within minutes — not hours. Daily/hourly batches meant reacting to yesterday’s problems today.
+- **Cost scaling poorly** As daily events crossed 1.5–2 billion, BigQuery storage + query costs grew faster than revenue. We were paying a premium for managed convenience we no longer needed at full price.
+- **Limited tuning surface** High-cardinality dimensions (user_id + device + campaign_id + geo + …) caused query explosions and slot contention. We couldn’t fine-tune partitioning, rollups, or ingestion compression the way we needed.
+- **Strategic reasons** Moving compute and storage closer to our Vietnam user base (lower network latency, better pricing via FPT, easier compliance story) became attractive.
+
+We decided to keep two complementary engines:
+
+- **Druid** — for time-series aggregations with high-cardinality dimensions (campaign performance, user segments, revenue attribution)
+- **ClickHouse** — for fast ad-hoc exploration of raw-ish logs and very wide tables (user journeys, affiliate deep dives)
+
+Both would ingest from the same Kafka topics in real time.
+
+### New Architecture at a Glance
+
+text
+
+```
+[Web/App/Backend Services]
+         ↓ (producers)
+      Kafka (Confluent / self-hosted on FPT VMs)
+         ↓ (exactly-once consumers)
+   ┌───────────────┴───────────────┐
+   │                               │
+Druid (on Kubernetes)         ClickHouse (on VMs)
+   │                               │
+deep storage (S3-compatible)   replicated MergeTree tables
+   │                               │
+ Superset / internal BI tools   Superset / internal BI tools
+```
+
+Key design decisions made early:
+
+- Kafka as single source of truth with 7-day retention
+- Dual ingestion: most high-value streams go to both Druid and ClickHouse (different use-cases)
+- Batch producers at source: 500–1,200 events per Kafka message (Protobuf batches or RawBLOB → RowBinary)
+- Exactly-once semantics wherever possible
+- Multi-AZ / multi-rack replication from day one
+
+### How We Converted Batch → Streaming
+
+Most pipelines followed this transformation pattern:
+
+**Old (GCP batch)**
+
+text
+
+```
+Log files / events → GCS → Dataflow (hourly) → BigQuery table
+→ Airflow DAG → materialized views / scheduled queries
+```
+
+**New (FPT streaming)**
+
+text
+
+```
+Event producers (Node.js / Go / Python services)
+  ↓ batch 500–1200 rows, serialize → Protobuf / RowBinary
+Kafka topic (partitioned by event_type + date_bucket)
+  ↓ Kafka Indexing Service (Druid) / Kafka Engine + Materialized View (ClickHouse)
+Druid segments / ClickHouse parts
+  ↓ background compaction / merges
+Query layer (Superset, internal API)
+```
+
+The single biggest throughput win came from **batching at the producer** and switching to **RawBLOB → RowBinary** on ClickHouse side (inspired by Mux’s public optimization work). Parsing individual messages killed us; moving parsing to materialized views after ingestion gave us an order-of-magnitude improvement.
+
+### Hardest Technical Challenges & Solutions
+
+#### 1. Ingestion backpressure & consumer lag during traffic spikes
+
+- **Symptom**: Kafka consumer lag → 10–30 min during flash sales / big campaigns
+- **Root cause**: ClickHouse insert thread saturation + merge queue backlog; Druid task queue overflow
+- **Fixes applied**
+    - Increased kafka_flush_interval_ms to 2000–3000 ms
+    - Switched ClickHouse to RawBLOB + deferred parsing in MV
+    - Added consumer-side sampling (drop debug-level events when lag > 5 min)
+    - Implemented dynamic consumer scaling (Keda-like on K8s for Druid)
+    - Result: lag rarely exceeds 60 seconds even at 2.5× peak
+
+#### 2. High-cardinality explosion killing Druid compaction & query performance
+
+- **Symptom**: Segments refused to compact → storage ballooned; P95 query latency > 8s
+- **Fixes**
+    - Aggressive rollup on ingestion (drop unnecessary dimensions for revenue & ads tables)
+    - hash partitioning strategy + fixed numShards=80–120 on high-cardinality sources
+    - Separate data sources for “hot” (last 7 days) vs “cold” (historical)
+    - Query laning: dedicated broker threads for sub-second real-time queries
+    - Result: compaction success rate > 98%, P95 dropped to ~1.8 s
+
+#### 3. ClickHouse merge & CPU contention during heavy concurrent inserts + queries
+
+- **Symptom**: background merges starved → part explosion → insert latency spikes
+- **Fixes**
+    - Increased background_pool_size and merge_tree settings carefully
+    - Moved heavy ad-hoc exploration queries to readonly replicas
+    - Implemented circuit-breaker pattern in API layer (fallback to aggregated view when P99 > 800 ms)
+    - Result: stable insert latency < 300 ms even under mixed workload
+
+#### 4. Cost control while scaling
+
+- **Symptom**: initial FPT footprint was almost as expensive as GCP
+- **Fixes**
+    - Vertical right-sizing (moved from 64→48 GB nodes after profiling)
+    - Storage tiering: hot SSD (last 30 days), cold HDD/S3 (older)
+    - Compression codecs tuned per table (ZSTD vs LZ4 vs Gorilla)
+    - Druid tiered storage + aggressive segment drop policies
+    - Result: 30% net reduction (20% storage, 10% compute)
+
+### Results – Quantified
+
+|Metric|Before (GCP batch)|After (FPT streaming)|Improvement|
+|---|---|---|---|
+|Daily events processed|~1.4–1.8B|~2.0–2.5B (growing)|+40%|
+|Query throughput (concurrent)|~90–120 qps|~280–350 qps|3×|
+|P95 end-to-end query latency|6–12 s|1.5–2.2 s|~5× faster|
+|Infrastructure cost (monthly run-rate)|Baseline|-30%|-30%|
+|Uptime (last 12 months)|99.7%|99.95%|significantly higher|
+
+Business impact was felt quickly:
+
+- Marketing could pause under-performing campaigns within 10–15 minutes
+- Revenue & fraud teams got near-real-time anomaly detection
+- Affiliate reporting latency dropped from hours to seconds
+
+### Lessons Learned – What I Would Do Differently
+
+1. **Start measuring cost per query early** — not just total spend.
+2. **Invest heavily in producer-side batching & format choice** — it’s the cheapest place to win throughput.
+3. **Dual engine is powerful but expensive** — if I had to pick one today I’d lean ClickHouse for most e-commerce use-cases (faster ad-hoc, simpler operations).
+4. **Chaos test from week 1** — we found many replication & failover edge cases only after injecting failures.
+5. **Document ingestion specs religiously** — schema evolution across Kafka → Druid/ClickHouse is painful without it.
 
 
 
