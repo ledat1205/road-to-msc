@@ -19,3 +19,5 @@ in transit:
 ![[Pasted image 20260129183852.png]]
 
 More control than GKMS
+
+### Customer-managed encryption keys (CMEKs)
