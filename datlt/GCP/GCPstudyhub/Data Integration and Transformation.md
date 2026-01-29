@@ -23,3 +23,5 @@ code-free tool for data transformation
 ![[Pasted image 20260129144812.png]]
 
 Optimize for ELT (like dbt)
+
+### Dataprep
