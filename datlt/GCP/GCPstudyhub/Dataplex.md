@@ -8,4 +8,7 @@
 
 - dataplex admin: full control
 - dataplex owner: control assets in data mesh
-	
+- dataplex writer: write access to data assets
+- dataplex reader: read-only
+- dataplex metadata reader: read-only metadata
+- 
