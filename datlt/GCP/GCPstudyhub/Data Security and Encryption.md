@@ -4,4 +4,5 @@
 
 Method:
 - Masking
-- Format-preserving-
+- Format-preserving encryption (struct preser)
+- 
