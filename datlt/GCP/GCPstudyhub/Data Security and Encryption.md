@@ -23,3 +23,4 @@ More control than GKMS
 ### Customer-managed encryption keys (CMEKs)
 ![[Pasted image 20260129184133.png]]
 
+![[Pasted image 20260129184424.png]]
