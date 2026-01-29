@@ -7,3 +7,10 @@ Method:
 - Format-preserving encryption (struct preserve)
 
 Integrate with other services 
+at rest: 
+- cloud storage 
+- big query
+
+in transit:
+- dataflow 
+- pub/sub
