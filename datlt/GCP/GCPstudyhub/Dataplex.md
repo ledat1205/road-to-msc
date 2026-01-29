@@ -12,3 +12,5 @@
 - dataplex reader: read-only
 - dataplex metadata reader: read-only metadata
 - dataplex viewer: view the mesh and its config zones and assets
+
+### data catalog
