@@ -22,4 +22,4 @@ code-free tool for data transformation
 ### Dataform
 ![[Pasted image 20260129144812.png]]
 
-Optimize 
+Optimize for ELT (like dbt)
