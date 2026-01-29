@@ -5,4 +5,11 @@
 #### Studio
 Drag and drop interface
 
-menu categories
+menu categories:
+- source
+- sink 
+- transform
+- conditions and actions 
+- analytics
+- error handlers and alerts
+- 
