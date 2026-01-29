@@ -11,3 +11,6 @@
 ![[Pasted image 20260129164901.png]]
 
 Security:
+![[Pasted image 20260129165155.png]]
+
+BigLake vs BigQuery External Table:
