@@ -4,5 +4,6 @@
 
 Method:
 - Masking
-- Format-preserving encryption (struct preser)
-- 
+- Format-preserving encryption (struct preserve)
+
+Integrate with other services 
