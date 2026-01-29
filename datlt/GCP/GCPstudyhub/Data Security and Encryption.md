@@ -16,3 +16,6 @@ in transit:
 - pub/sub
 
 ### Cloud key management service (KMS)
+![[Pasted image 20260129183852.png]]
+
+More control than GKMS
