@@ -14,3 +14,4 @@
 - dataplex viewer: view the mesh and its config zones and assets
 
 ### data catalog
+![[Pasted image 20260129160919.png]]
