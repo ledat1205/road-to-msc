@@ -4,4 +4,4 @@
 
 Method:
 - Masking
-- 
+- Format-preserving-
