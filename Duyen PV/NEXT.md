@@ -4,3 +4,4 @@ Xem thêm về:
 - C++/ Linux multi threading/ processing. Overview các ngôn ngữ khác + framework xử lý multi thread.
 - Flink/ Scylla
 - DB - Shard, replicate, migrate, system monitoring
+- Build tools
