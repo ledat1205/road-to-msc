@@ -223,3 +223,64 @@ Based on your current view, here is how you can use `htop` to troubleshoot:
 - **`SIZE/OFF`**: For the terminal (`ttys042`), it shows the **Offset** (0t3366573), which essentially tracks how much data has passed through that terminal session.
     
 - **`NODE`**: The **Inode number** on the disk. This is the unique physical address of the file.
+
+![[Screenshot 2026-01-31 at 18.51.14.png]]
+### 1. The 8 CPU Bars (htop)
+
+Your CPU is an 8-core processor, represented by the bars numbered **0 to 7**.
+
+- **Reading the Bars**: The horizontal length shows how busy that specific core is.
+    
+- **Color Meanings**:
+    
+    - **Green**: Normal user processes (your apps).
+        
+    - **Red**: Kernel/System processes (macOS itself).
+        
+    - **Blue**: Low-priority processes.
+        
+- **The Fault Check**: In your second screenshot, core **4** is at **78.0%** and core **5** is at **76.7%**. This shows that while the work is distributed, your system is actively working hard on several tasks simultaneously.
+    
+
+### 2. Memory (Mem) and Swap (Swp) Meters
+
+This is where you see "Faults" related to memory pressure.
+
+- **Mem Usage**: You are using **13.4G out of 16.0G** of physical RAM.
+    
+- **The Swap "Fault"**: Your **Swp** bar shows **2.19G/3.00G**.
+    
+    - **Interpretation**: Because your physical RAM is nearly full, the system is forced to use "Swap" (writing data to your slow hard drive). This is a performance fault; if Swap usage increases, your system will feel sluggish or "laggy."
+        
+
+### 3. The "FAULTS" Column (top)
+
+In your fourth screenshot (the standard `top` command), there is a dedicated column labeled **FAULTS** on the far right.
+
+- **What it measures**: These are "Page Faults." They occur when a process tries to access data that is not currently in the fast physical RAM and must be fetched from the disk.
+    
+- **Current Leaders**:
+    
+    - **Google Chrome**: **27,187,320+** faults.
+        
+    - **WindowServer**: **3,688,729+** faults.
+        
+- **The Fault Check**: High numbers here aren't always a "crash," but they confirm that your applications are frequently waiting on the disk because the 16GB of RAM is fully occupied.
+    
+
+### 4. Load Average and Uptime
+
+Located near the top right of the `htop` view.
+
+- **Load Average**: **4.23, 2.90, 2.35**.
+    
+    - On an 8-core machine, a load of **4.23** means about half of your CPU capacity is being used over the last minute.
+        
+- **Uptime**: Your system has been running for **5 days, 17 hours**. If you are experiencing many "Faults," a reboot would clear the 2.19G of Swap and refresh the physical RAM.
+    
+
+### 5. Key Process Observations
+
+- **VIRT vs. RES**: In your first screenshot, processes show **VIRT** as high as **1779G**. Ignore this; it's a macOS quirk. Focus on **RES** (Resident Memory), which shows the real RAM used (e.g., Google Chrome using **85,408 KB** or ~85MB in that specific line).
+    
+- **States (S)**: Most processes are in the **S** (Sleeping) state. If you see many in **D** (Uninterruptible Sleep), it's a fault indicating they are stuck waiting on a slow hard drive.
