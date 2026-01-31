@@ -1,8 +1,4 @@
 
-![[Pasted image 20260131190156.png]]
-
----
-
 # ** How Swap Works**
 
 - **Pages in memory:** Linux divides memory into “pages” (usually 4KB each).
