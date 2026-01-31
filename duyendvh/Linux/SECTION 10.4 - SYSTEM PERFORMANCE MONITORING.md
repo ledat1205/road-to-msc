@@ -1,35 +1,9 @@
 
 ![[Pasted image 20260131190156.png]]
 
-# **1️⃣ What is Swap?**
-
-- Swap is a **space on your disk (or a swap file/partition)** that Linux/Unix uses as an **overflow area for RAM**.
-    
-- When your **physical RAM is full**, the system can **move inactive pages of memory** from RAM to swap, freeing RAM for active processes.
-    
-- Swap is **slower than RAM** because it resides on disk.
-    
-
 ---
 
-# **2️⃣ Why Swap Exists**
-
-1. **Memory overflow prevention**
-    
-    - Prevents processes from being killed immediately when RAM runs out.
-        
-2. **Hibernation**
-    
-    - Linux can store the content of RAM in swap during hibernation.
-        
-3. **System stability**
-    
-    - Keeps system responsive under heavy load.
-        
-
----
-
-# **3️⃣ How Swap Works**
+# ** How Swap Works**
 
 - **Pages in memory:** Linux divides memory into “pages” (usually 4KB each).
     
@@ -40,7 +14,7 @@
 
 ---
 
-# **4️⃣ How to Check Swap Usage**
+# ** How to Check Swap Usage**
 
 1. **`free` command**
     
@@ -73,7 +47,7 @@ Example output:
 
 ---
 
-# **5️⃣ Swap Usage Best Practices**
+# ** Swap Usage Best Practices**
 
 - **Minimal swap usage** is ideal — heavy swap usage may indicate RAM shortage.
     
@@ -99,20 +73,6 @@ Example output:
 - Swap becomes a problem when **heavy swapping (thrashing) slows down the system**, i.e., constant page-in/page-out.
     
 
----
-
-# **7️⃣ Summary**
-
-- Swap = disk space acting as “backup RAM”
-    
-- Used when RAM is full or for hibernation
-    
-- Check with `free -h` or `swapon -s`
-    
-- Control usage with `swappiness`
-    
-- High swap with slow system = problem; low swap = healthy system
-    
 ---
 
 ![[Screenshot 2025-11-30 at 20.18.51.png]]![[Screenshot 2025-11-30 at 23.21.18.png]]
