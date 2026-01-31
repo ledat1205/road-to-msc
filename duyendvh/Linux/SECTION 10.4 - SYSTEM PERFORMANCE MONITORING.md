@@ -207,3 +207,19 @@ Based on your current view, here is how you can use `htop` to troubleshoot:
 - **Kill a Hang**: If an app is frozen, highlight it and press **F9** to send a "Kill" signal.
     
 - **Tree View**: Press **F5** to see which processes "own" others (e.g., seeing which Chrome "Helper" belongs to which Tab).
+
+![[Screenshot 2026-01-31 at 18.36.37.png]]
+
+- **`TYPE`**:
+    
+    - **`DIR`**: A directory.
+        
+    - **`REG`**: A regular file.
+        
+    - **`CHR`**: A "Character Special" file (hardware/terminal device).
+        
+- **`DEVICE`**: The hardware ID of your disk (1,13 in this case).
+    
+- **`SIZE/OFF`**: For the terminal (`ttys042`), it shows the **Offset** (0t3366573), which essentially tracks how much data has passed through that terminal session.
+    
+- **`NODE`**: The **Inode number** on the disk. This is the unique physical address of the file.
