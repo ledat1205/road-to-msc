@@ -129,3 +129,81 @@ Example output:
 ![[Screenshot 2025-11-30 at 17.17.22.png]]
 ![[Screenshot 2025-11-30 at 17.17.38.png]]
 ![[Screenshot 2025-11-30 at 17.17.57.png]]
+
+![[Pasted image 20260131180901.png]]
+## 1. Reading the 8 Bars (The CPU Dashboard)
+
+The bars numbered **0 through 7** represent the individual logical cores of your processor.
+
+- **Color Meaning**: Each bar is composed of different colored segments that tell you _how_ that core is being used:
+    
+    - **Blue**: Low-priority processes (nice).
+        
+    - **Green**: Normal user-level processes (your apps like Chrome or VS Code).
+        
+    - **Red**: System/Kernel processes.
+        
+    - **Yellow**: Virtualized processes (guest OS).
+        
+- **Usage Percentage**: The number on the right (e.g., **59.1%**, **78.0%**) is the total utilization of that specific core.
+    
+- **The "Balanced" Load**: In your second screenshot, the cores are fairly evenly loaded (between 47% and 78%), which is healthy for a machine running heavy applications like Java, Chrome, and VS Code.
+    
+
+---
+
+## 2. Memory and Swap Bars
+
+Below the CPU bars, you have two critical resource meters:
+
+- **Mem (RAM)**: In your screenshot, it shows **13.4G/16.0G**.
+    
+    - This means you are using about **84%** of your total physical RAM.
+        
+    - The white vertical bars represent used memory, while the darker area is free or cached.
+        
+- **Swp (Swap)**: It shows **2.19G/3.00G**.
+    
+    - **What this tells you**: Since your RAM is nearly full (13.4G), the system is moving less-active data to your disk (Swap) to make room. A high Swap usage with high RAM usage often indicates your machine is reaching its performance limit.
+        
+
+---
+
+## 3. System Statistics Summary
+
+Next to the bars, you see high-level system metrics:
+
+- **Tasks**: **511** total processes with **2888** threads. This shows how busy the OS is managing different pieces of code.
+    
+- **Load Average**: **4.23, 2.90, 2.35**. These numbers represent the system load over the last 1, 5, and 15 minutes. On an 8-core machine, a load of 4.23 is well within capacity (anything under 8.00 means the CPU is not "waiting" for work).
+    
+- **Uptime**: **5 days, 17:43:07**. This is how long your system has been running since the last reboot.
+    
+
+---
+
+## 4. Reading the Process Columns (The Table)
+
+Using your specific screenshot as a reference, here is how to interpret the rows:
+
+|**Column**|**Example from your Screenshot**|**Meaning**|
+|---|---|---|
+|**VIRT**|**1781G**|**Virtual Memory**: Often misleadingly high on macOS. It includes shared libraries and doesn't represent actual RAM usage.|
+|**RES**|**217M**|**Resident Memory**: The _actual_ physical RAM this process is using. This is the most important memory number.|
+|**CPU%**|**3.6**|The percentage of one CPU core used by this task.|
+|**MEM%**|**1.7**|The percentage of total physical RAM (16GB) used by this task.|
+|**S (State)**|**S** (Sleeping) / **R** (Running)|**S** means the process is idle; **R** means it is currently being calculated by a CPU core.|
+
+---
+
+## 5. Practical Debugging Steps
+
+Based on your current view, here is how you can use `htop` to troubleshoot:
+
+- **Find the "Hog"**: Press **F6** (or click "Setup") to sort. You can sort by **CPU%** to see what's using your processor or **RES** to see what's eating your RAM.
+    
+- **Filter**: Press **F4** and type "Chrome" to hide everything except Google Chrome processes.
+    
+- **Kill a Hang**: If an app is frozen, highlight it and press **F9** to send a "Kill" signal.
+    
+- **Tree View**: Press **F5** to see which processes "own" others (e.g., seeing which Chrome "Helper" belongs to which Tab).
