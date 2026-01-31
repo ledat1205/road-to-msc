@@ -1,5 +1,6 @@
 
 ![[Pasted image 20260131190156.png]]
+
 # **1️⃣ What is Swap?**
 
 - Swap is a **space on your disk (or a swap file/partition)** that Linux/Unix uses as an **overflow area for RAM**.
