@@ -310,3 +310,211 @@ For syscalls, events (e.g., strace, perf, bpftrace, opensnoop).
     - **When to Use**: Trend analysis over days (enable in sysstat).
 
 These tools provide a comprehensive toolkit. Start with basic ones (top, free) for overviews, then use intermediate (sar, pidstat) for details, and advanced (BCC) for tracing. For custom needs, bpftrace allows scripting. If a specific tool's output varies by system, test on your environment.
+
+
+## **Grafana + Prometheus**
+
+**Grafana + Prometheus** is one of the most popular open-source stacks for monitoring Linux servers (and other systems). Prometheus collects time-series metrics (pull-based), while **Grafana** visualizes them in beautiful, customizable dashboards with alerts.
+
+To monitor **Linux performance** (CPU, memory, disk I/O, network, load average, filesystem usage, etc.), the standard setup uses:
+
+- **Node Exporter** — A lightweight exporter that runs on the Linux host(s) and exposes hundreds of system metrics via HTTP (/metrics endpoint on port 9100 by default).
+- **Prometheus** — Scrapes (pulls) metrics from Node Exporter(s) and stores them.
+- **Grafana** — Connects to Prometheus as a data source and displays dashboards.
+
+This matches many of the metrics from the earlier Linux observability diagram (e.g., CPU scheduler stats, VM stats, disk I/O, network interfaces).
+
+### Architecture Overview (Typical Setup)
+
+- One central server (or container) runs **Prometheus + Grafana**.
+- Every Linux server you want to monitor runs **Node Exporter**.
+- Prometheus scrapes Node Exporter from all targets → stores data → Grafana queries it.
+
+You can run everything on one machine for small setups, or separate them.
+
+### Step-by-Step Setup (Ubuntu/Debian — Most Common in 2025/2026)
+
+Assumes a recent Ubuntu 22.04 / 24.04 LTS or Debian 12+. Run as root or with sudo.
+
+#### 1. Install Node Exporter (on every Linux server you want to monitor)
+
+Bash
+
+```
+# Create a system user (good practice)
+sudo useradd --no-create-home --shell /bin/false node_exporter
+
+# Download latest version (check https://prometheus.io/download/ or GitHub releases for current)
+wget https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
+# Adjust version if newer
+
+tar xvfz node_exporter-*.linux-amd64.tar.gz
+sudo mv node_exporter-*.linux-amd64/node_exporter /usr/local/bin/
+
+# Create systemd service
+sudo tee /etc/systemd/system/node_exporter.service > /dev/null <<EOF
+[Unit]
+Description=Prometheus Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now node_exporter
+
+# Verify (should show listening on :9100)
+ss -tuln | grep 9100
+curl http://localhost:9100/metrics   # should show lots of metrics
+```
+
+Common collectors enabled by default cover cpu, meminfo, diskstats, netdev, loadavg, filesystem, etc. — exactly what you need for Linux perf observability.
+
+#### 2. Install Prometheus (usually on a central monitoring server)
+
+Bash
+
+```
+# Create user and dirs
+sudo useradd --no-create-home --shell /bin/false prometheus
+sudo mkdir -p /etc/prometheus /var/lib/prometheus
+
+# Download latest (check prometheus.io/download)
+wget https://github.com/prometheus/prometheus/releases/download/v2.55.0/prometheus-2.55.0.linux-amd64.tar.gz
+# Adjust version
+
+tar xvfz prometheus-*.linux-amd64.tar.gz
+sudo mv prometheus-*.linux-amd64/prometheus /usr/local/bin/
+sudo mv prometheus-*.linux-amd64/promtool   /usr/local/bin/
+
+# Basic config (add your targets)
+sudo tee /etc/prometheus/prometheus.yml > /dev/null <<EOF
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']           # if same machine
+      # - targets: ['192.168.1.10:9100']     # remote servers
+      # - targets: ['192.168.1.20:9100']
+EOF
+
+# systemd service
+sudo tee /etc/systemd/system/prometheus.service > /dev/null <<EOF
+[Unit]
+Description=Prometheus
+After=network.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+  --config.file /etc/prometheus/prometheus.yml \
+  --storage.tsdb.path /var/lib/prometheus/ \
+  --web.console.templates=/etc/prometheus/consoles \
+  --web.console.libraries=/etc/prometheus/console_libraries
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo chown -R prometheus:prometheus /etc/prometheus /var/lib/prometheus
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now prometheus
+
+# Check status
+sudo systemctl status prometheus
+# Access UI: http://your-server-ip:9090/targets  (should show node job UP)
+```
+
+#### 3. Install Grafana
+
+Bash
+
+```
+# Add repo (official way)
+sudo apt-get install -y apt-transport-https software-properties-common wget
+sudo mkdir -p /etc/apt/keyrings/
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+
+sudo apt update
+sudo apt install grafana
+
+sudo systemctl enable --now grafana-server
+
+# Access: http://your-server-ip:3000
+# Default login: admin / admin  → change password immediately
+```
+
+#### 4. Connect Grafana to Prometheus
+
+1. Log in to Grafana[](http://your-ip:3000).
+2. Go to **Configuration** (gear icon) → **Data Sources** → **Add data source**.
+3. Select **Prometheus**.
+4. Set **URL**: http://localhost:9090 (if on same machine) or http://prometheus-server-ip:9090.
+5. Click **Save & Test** → should say "Data source is working".
+
+#### 5. Import Ready-Made Dashboards (Best Starting Point)
+
+Grafana has excellent community dashboards for Node Exporter:
+
+- Go to **Dashboards** → **New** → **Import**.
+- Use these popular IDs (search by ID or name):
+    - **1860** — Node Exporter Full (very comprehensive — CPU, memory, disk, network, processes, etc.)
+    - **11074** — Node Exporter Server Metrics (clean & modern)
+    - **405** — Another solid one for basics
+    - **16029** — Node Exporter for Servers (2025 style)
+
+Paste the ID → Load → Select your Prometheus data source → Import.
+
+You now have instant graphs for:
+
+- CPU usage (user/system/iowait/steal)
+- Load average
+- Memory (used/free/cache/swap)
+- Disk I/O (reads/writes, latency, %util — like iostat)
+- Filesystem usage
+- Network throughput/errors
+- Many more (similar to top, vmstat, iostat, sar combined)
+
+#### Quick Tips & Next Steps
+
+- **Firewall**: Open ports 9090 (Prometheus), 3000 (Grafana), 9100 (Node Exporter) if needed.
+    
+    Bash
+    
+    ```
+    sudo ufw allow 3000/tcp
+    sudo ufw allow 9090/tcp
+    sudo ufw allow from <your-ip> to any port 9100   # restrict Node Exporter
+    ```
+    
+- **Multiple servers**: Add more targets in prometheus.yml under static_configs.
+- **Alerts**: In Prometheus → Alerts tab, or in Grafana (Alerting → Alert rules).
+- **Security (production)**: Use reverse proxy (nginx/Caddy) + HTTPS, basic auth, or Grafana auth proxy.
+- **Docker alternative** (simpler for testing):
+    
+    Bash
+    
+    ```
+    docker run -d -p 9100:9100 prom/node-exporter
+    docker run -d -p 9090:9090 -v ./prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+    docker run -d -p 3000:3000 grafana/grafana
+    ```
+    
+
+This setup gives you deep, real-time Linux performance visibility — far beyond basic tools like top/sar. You can expand later with Blackbox Exporter (uptime), Mysqld Exporter, process-exporter, etc.
