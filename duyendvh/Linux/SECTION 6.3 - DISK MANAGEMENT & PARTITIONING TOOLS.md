@@ -1,3 +1,119 @@
+### 3.1 The most important idea: Most devices look like files
+
+In Linux almost everything is a file — including devices.
+
+You open, read, write, and close them almost the same way as normal files.
+
+Examples everyone knows:
+
+Bash
+
+```
+cat /dev/null          # reads nothing forever
+echo "test" > /dev/null   # writes → nothing happens (thrown away)
+
+dd if=/dev/zero of=zeros.bin bs=1M count=100   # creates 100 MB file full of zeros
+```
+
+### 3.2 Two main kinds of device files
+
+|Type|First letter in ls -l|Can seek / jump around?|Examples|Typical use case|
+|---|---|---|---|---|
+|**Block**|**b**|Yes|/dev/sda, /dev/sda1, /dev/nvme0n1|Hard disks, SSDs, USB sticks|
+|**Character**|**c**|No (stream only)|/dev/null, /dev/random, /dev/tty|Keyboard, mouse, serial port, printer|
+
+Quick memory aid:
+
+- **Block** → you can jump to any place (like chapters in a book)
+- **Character** → only forward/backward stream (like live radio)
+
+### 3.3 Where are device files? → /dev/
+
+Bash
+
+```
+ls -l /dev/sd*     # hard disks & USB drives
+ls -l /dev/sr*     # CD/DVD/Blu-ray drives
+ls -l /dev/tty*    # terminals & virtual consoles
+ls -l /dev/input/  # mice, keyboards, touchpads
+```
+
+### 3.4 Modern way: We don't create device files by hand anymore
+
+Before ~2005–2008 people used to run:
+
+Bash
+
+```
+mknod /dev/sda1 b 8 1
+```
+
+Today almost nobody does this.
+
+Two modern systems do it automatically:
+
+1. **devtmpfs** Kernel itself creates basic /dev entries very early during boot
+2. **udev** (the userspace daemon udevd)
+    - listens to kernel events ("a new USB stick appeared!")
+    - reads device info
+    - creates nice names + many symlinks
+    - runs programs if needed (mount, notify desktop, etc.)
+
+### 3.5 The most useful symlinks udev creates
+
+You almost never use /dev/sda directly nowadays.
+
+Instead you use stable names:
+
+Bash
+
+```
+/dev/disk/by-id/     # contains serial number → very stable
+/dev/disk/by-uuid/   # filesystem UUID → most common in /etc/fstab
+/dev/disk/by-label/  # filesystem label
+/dev/disk/by-partuuid/
+/dev/disk/by-partlabel/
+```
+
+Example (very common today):
+
+Bash
+
+```
+UUID=abcd-1234-...   /     ext4   defaults   0 1
+```
+
+### 3.6 Quick cheat-sheet — most common device names in 2024/2025
+
+|Device type|Typical names today|Older names (still possible)|How to list them nicely|
+|---|---|---|---|
+|NVMe SSD|/dev/nvme0n1, /dev/nvme1n1|—|lsblk -o NAME,MODEL,SIZE,TYPE|
+|SATA / USB hard disk|/dev/sda, /dev/sdb, …|/dev/hda, /dev/hdb (very old)|lsblk or lsscsi|
+|USB flash drive|/dev/sdc, /dev/sdd, …|—|lsblk|
+|Optical drive (CD/DVD)|/dev/sr0, /dev/sr1|/dev/cdrom (symlink)|ls /dev/sr*|
+|Generic SCSI (burning)|/dev/sg0, /dev/sg1, …|—|lsscsi -g|
+|Serial port (USB-serial)|/dev/ttyUSB0, /dev/ttyACM0|/dev/ttyS0 (real COM port)|`dmesg|
+
+### 3.7 Very useful commands to understand your devices
+
+|Command|What it shows|
+|---|---|
+|lsblk -f|disks + partitions + filesystems + mount points|
+|lsblk -o +MODEL,SERIAL|even more info|
+|lsscsi|SCSI view (good for USB disks too)|
+|lsscsi -g|+ generic SCSI devices (/dev/sg*)|
+|udevadm info -a -p $(udevadm info -q path -n /dev/sda)|deep hardware attributes|
+|udevadm monitor|watch live "device added/removed" events|
+|cat /proc/devices|major numbers → driver mapping|
+|`dmesg|grep -i -E 'sd|
+
+### Summary — the shortest possible version
+
+1. Devices are files in **/dev**
+2. Two types: **block** (disks) vs **character** (everything stream-like)
+3. Modern systems use **devtmpfs + udev** → you don't create devices manually
+4. Use stable names: **UUID**, **by-id**, **by-partuuid** (not /dev/sda!)
+5. Useful commands: **lsblk**, **lsscsi**, **udevadm**, **dmesg**
 ![[Screenshot 2025-11-19 at 00.18.55.png]]
 ![[Screenshot 2025-11-19 at 00.19.58.png]]
 ![[Screenshot 2025-11-19 at 00.24.35.png]]
