@@ -92,7 +92,7 @@ Example output:
 
 ---
 
-# **6️⃣ When Swap Usage is Bad**
+# ** When Swap Usage is Bad**
 
 - Swap usage is not necessarily bad if **RAM is fully used but active processes are running smoothly**.
     
