@@ -1,4 +1,4 @@
-## Flink for recommendation
+## Flink for Recommendation
 Flink excels here because recommendations in e-commerce must react instantly to user behavior (clicks, views, adds-to-cart, purchases) while handling massive scale (millions of events/sec during peaks, as seen at Alibaba, Xiaomi, Zalando, and similar platforms).
 
 ### 1. Real-Time Session-Based Recommendations (Short-Term User Interest)
@@ -290,4 +290,3 @@ public class CartAbandonmentWithRecommendations {
 
 This pattern is production-proven (inspired by Ververica/Booking.com-style demos and Alibaba/DoorDash real-time abandonment flows).
 
-If you'd like variations (e.g., "3+ views of same category → recommend next product" for session-based next-item prediction, or PyFlink version), let me know!
