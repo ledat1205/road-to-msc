@@ -37,5 +37,5 @@ This is the "Outer Box." It is what the operating system or container (like Kube
 - **JVM Overhead:** A "safety buffer" for native overhead, compile cache, and code cache. It's usually calculated as a fraction of the total process memory.
 
 
+![[Pasted image 20260205232733.png]]
 
-![[Pasted image 20251015145655.png]]
