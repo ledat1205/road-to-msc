@@ -7,4 +7,4 @@ ví dụ: your car needs repairing/ needs to be repaired/ needs to get repaired.
 the report **should have been sent** out this morning
 * bị động + câu điều kiện loại 3 (đã xảy ra trong quá khứ)
 
-it is thought/ it is said/ it is rumored/ i
+	it is thought that/ it is said that/ it is rumored that 
