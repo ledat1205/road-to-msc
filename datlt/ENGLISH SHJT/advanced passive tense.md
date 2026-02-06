@@ -13,3 +13,5 @@ the report **should have been sent** out this morning
 can't stand + Ving
 
 S + be made + to V: bị động made + to khác với chủ động made ko đi với giới từ
+bị động: The boy was made to clean-up the mess he had caused 
+chủ động: I make you study
