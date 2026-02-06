@@ -50,6 +50,65 @@ env.getConfig().setAutoWatermarkInterval(200);
 
 ### 5. Windows Quick Reference
 
+#### 1. Tumbling Windows (Non-Overlapping)
+
+`.window(TumblingEventTimeWindows.of(Time.minutes(10)))`
+
+Think of this like a clock ticking. Every 10 minutes, the old window closes and a brand-new one starts.
+
+- **Key Characteristic:** Fixed size, **no overlap**.
+    
+- **Behavior:** Each data point belongs to exactly one window.
+    
+- **Best Use Case:** Calculating periodic statistics, like "Total sales every 10 minutes."
+    
+
+---
+
+#### 2. Sliding Windows (Overlapping)
+
+`.window(SlidingEventTimeWindows.of(Time.minutes(10), Time.minutes(2)))`
+
+This window "slides" across the timeline. In your example, the window is 10 minutes long (Size), but a new one starts every 2 minutes (Slide).
+
+- **Key Characteristic:** Fixed size, but windows **overlap**.
+    
+- **Behavior:** A single data point will likely fall into multiple windows (in this case, 5 different windows).
+    
+- **Best Use Case:** Moving averages, like "Average CPU load over the last 10 minutes, updated every 2 minutes."
+    
+
+![Image of Sliding Window diagram](https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcTcEwLdZEMBA2s1m93YwoPVFIJUHarBLFqvY6-NKzzaqdOE604WhXmBwoUJ4peASrNj05Fgt_EhAczP2OVnWXsZyHSuuMKeVQxuaCocPgMGmSAUNgM)
+
+---
+
+#### 3. Session Windows (Gap-Based)
+
+`.window(SessionWindows.withGap(Time.minutes(15)))`
+
+Session windows don't have a fixed start or end time. Instead, they close based on **periods of inactivity**.
+
+- **Key Characteristic:** Dynamic size based on data flow.
+    
+- **Behavior:** If no data arrives for 15 minutes, the current window closes. If a new point arrives, a new "session" starts.
+    
+- **Best Use Case:** Analyzing user behavior, like "A user's browsing session," where you want to group actions together until they stop clicking for a while.
+    
+
+---
+
+#### 4. Global Window (Custom Logic)
+
+`.window(GlobalWindows.create()).trigger(CountTrigger.of(1000))`
+
+By default, a Global Window puts **all** incoming data for the same key into one single, massive bucket that never ends.
+
+- **Key Characteristic:** No natural end point; it requires a **Trigger**.
+    
+- **Behavior:** In your code, the `CountTrigger` tells the window to "fire" and run your logic every time 1,000 items arrive.
+    
+- **Best Use Case:** When time doesn't matter, but volume does. For example, "Batching every 1000 logs to save to a database."
+
 ```java
 // Tumbling (non-overlapping)
 .window(TumblingEventTimeWindows.of(Time.minutes(10)))
