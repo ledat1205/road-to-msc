@@ -126,28 +126,76 @@ By default, a Global Window puts **all** incoming data for the same key into one
 ### 6. State & Timers (very useful in rec systems)
 
 ```java
-class MyProcess extends KeyedProcessFunction<String, Event, String> {
+import org.apache.flink.api.common.state.ListState;
+import org.apache.flink.api.common.state.ListStateDescriptor;
+import org.apache.flink.api.common.state.ValueState;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
+import org.apache.flink.util.Collector;
+
+public class UserBehaviorProcess extends KeyedProcessFunction<String, Event, String> {
+
+    // 1. Lưu thông tin hồ sơ người dùng (Ví dụ: tên, hạng thành viên)
     private ValueState<UserProfile> profileState;
+    
+    // 2. Lưu danh sách các sản phẩm người dùng vừa xem
     private ListState<String> recentViews;
+    
+    // 3. Lưu mốc thời gian của Timer hiện tại để có thể xóa/cập nhật
+    private ValueState<Long> activeTimerState;
 
     @Override
-    public void open(...) {
-        profileState = getRuntimeContext().getState(new ValueStateDescriptor<>("profile", UserProfile.class));
-        recentViews   = getRuntimeContext().getListState(new ListStateDescriptor<>("views", String.class));
+    public void open(Configuration parameters) {
+        // Khởi tạo các loại State
+        profileState = getRuntimeContext().getState(
+            new ValueStateDescriptor<>("profile", UserProfile.class));
+            
+        recentViews = getRuntimeContext().getListState(
+            new ListStateDescriptor<>("views", String.class));
+            
+        activeTimerState = getRuntimeContext().getState(
+            new ValueStateDescriptor<>("active-timer", Long.class));
     }
 
     @Override
-    public void processElement(Event e, Context ctx, Collector<String> out) {
-        // Update state
+    public void processElement(Event e, Context ctx, Collector<String> out) throws Exception {
+        // Cập nhật danh sách sản phẩm đã xem
         recentViews.add(e.productId);
 
-        // Register timer (event time)
-        ctx.timerService().registerEventTimeTimer(ctx.timestamp() + 15 * 60 * 1000);
+        // --- Logic quản lý Timer (Tránh spam thông báo) ---
+        Long lastTimer = activeTimerState.value();
+        if (lastTimer != null) {
+            // Nếu đã có timer cũ, xóa nó đi vì người dùng vừa có hoạt động mới
+            ctx.timerService().deleteEventTimeTimer(lastTimer);
+        }
+
+        // Đặt timer mới: 15 phút kể từ timestamp của sự kiện hiện tại
+        long newTimer = ctx.timestamp() + (15 * 60 * 1000);
+        ctx.timerService().registerEventTimeTimer(newTimer);
+        
+        // Lưu lại mốc timer mới này
+        activeTimerState.update(newTimer);
     }
 
     @Override
-    public void onTimer(long ts, OnTimerContext ctx, Collector<String> out) {
-        // Timeout logic → e.g. cart abandonment recs
+    public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
+        // Logic này chỉ chạy khi người dùng "im lặng" hoàn toàn trong 15 phút
+        
+        String userId = ctx.getCurrentKey();
+        Iterable<String> products = recentViews.get();
+        UserProfile profile = profileState.value();
+
+        String message = String.format(
+            "Gửi gợi ý cho User %s: Bạn vẫn đang quan tâm đến các sản phẩm %s chứ?",
+            userId, products.toString()
+        );
+
+        out.collect(message);
+
+        // Dọn dẹp state sau khi đã xử lý xong để giải phóng bộ nhớ
+        recentViews.clear();
+        activeTimerState.clear();
     }
 }
 ```
