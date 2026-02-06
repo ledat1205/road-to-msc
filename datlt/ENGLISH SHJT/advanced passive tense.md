@@ -18,3 +18,4 @@ chủ động: I make you study
 
 S + being used = cụm danh từ: Việc sử dụng cái gì đó 
 This medicine being used widely could lead to serious side effects 
+
