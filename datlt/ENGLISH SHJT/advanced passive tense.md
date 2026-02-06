@@ -17,4 +17,4 @@ bị động: The boy was made to clean-up the mess he had caused
 chủ động: I make you study
 
 S + being used = cụm danh từ: Việc sử dụng cái gì đó 
-This medicine be
+This medicine being used widely could lead to serious side effects 
