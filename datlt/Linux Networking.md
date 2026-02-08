@@ -13,4 +13,4 @@ Network Appliance Plane
 - Need to be fast
 - Functions: NAT, forwarding, filtering
 
-Linux cover 
+Linux covers the whole stack
