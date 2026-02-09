@@ -3,7 +3,7 @@
 [Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array):
 [Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self): prefix product (just like prefix sum) and postfix product, O(2n)
 [Number of Zero-Filled Subarrays](https://leetcode.com/problems/number-of-zero-filled-subarrays) :
-[Increasing Triplet Subsequence](https://leetcode.com/problems/increasing-triplet-subsequence):
+[Increasing Triplet Subsequence](https://leetcode.com/problems/increasing-triplet-subsequence): - `first` = smallest number in `nums[0..i]`, `second` = smallest number in `nums[0..i]` such that `second > first`. Once we see a number `num > second`, we return true.
 [Best Time to Buy and Sell Stock II](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii): every buy day ideally will have future higher-price sell day, note that if prices are 1, 2, 3, 4 then the most ideal buy-sell days are 1-4.
 [Rotate Array](https://leetcode.com/problems/rotate-array): 
 [First Missing Positive](https://leetcode.com/problems/first-missing-positive): kho nhu cho deo hieu gi het
