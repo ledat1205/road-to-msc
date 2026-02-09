@@ -18,6 +18,7 @@ def productExceptSelf(nums):
         suffix *= nums[i]
 
     return answer
+(https://leetcode.com/problems/increasing-triplet-subsequence/description/)
 
 [Best Time to Buy and Sell Stock II](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii): every buy day ideally will have future higher-price sell day, note that if prices are 1, 2, 3, 4 then the most ideal buy-sell days are 1-4.
 [First Missing Positive](https://leetcode.com/problems/first-missing-positive): kho nhu cho deo hieu gi het
