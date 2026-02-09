@@ -15,4 +15,3 @@ Network Appliance Plane
 
 Linux covers the whole stack
 
-# Linux Data Plane

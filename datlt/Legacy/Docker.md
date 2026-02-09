@@ -1,4 +1,0 @@
-Based on `namespaces` and `control groups` in linux kernel
-
-
-# Namespaces
