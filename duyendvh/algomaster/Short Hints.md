@@ -10,3 +10,4 @@
 [Is Subsequence](https://leetcode.com/problems/is-subsequence): s always has length smaller than length of t -> easy
 [Valid Palindrome](https://leetcode.com/problems/valid-palindrome):  use x.isalnum() to check if x is number. similar functions: isdigit(), isalpha(), isascii(), issuper(), islower()
 
+
