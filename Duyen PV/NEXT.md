@@ -1,7 +1,7 @@
 Xem thêm về:
 - Sách System design.
 - OS, Network, Docker, K8S.
-- C++/ Linux multi threading/ processing. Overview các ngôn ngữ khác + framework xử lý multi thread.
+- C++/ Linux multi threading/ processing hoặc các ngôn ngữ khác + framework xử lý multi thread.
 - Flink/ Scylla
 - DB - Shard, replicate, migrate, system monitoring
-- Build tools
+- Build tools - bazel, maven, 
