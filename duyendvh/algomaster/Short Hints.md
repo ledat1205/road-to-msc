@@ -1,3 +1,4 @@
+https://algomaster.io/practice/dsa-patterns
 [Move Zeroes](https://leetcode.com/problems/move-zeroes):  swap zero to the next non-zero to the right, zero nartually shift right while other non-zero will shift left
 [Majority Element](https://leetcode.com/problems/majority-element) : frequency counting
 [Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array): if n[i]== to_check_duplicate: replace n[i] by _ else: n[i] = to_check_duplicate
