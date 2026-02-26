@@ -1,140 +1,119 @@
 # TIKI
 ## Recommendation
+## 1. System Goal & Scale
 
-| Component                                                                                                                          | Typical Use in Your System                                                               | Frequent Updates?                       | Frequent Retrieval?                           | Best Backend / Store                              | Why Not the Other?                                                                                          |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------- | --------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Flink internal keyed state** (e.g., decaying co-view counts per category, top-K maintenance, windowed aggregations)              | Per-key counters/maps/priority queues during streaming aggregation                       | Yes (every event or window)             | Yes (every update/read in Flink)              | **RocksDB** (Flink's EmbeddedRocksDBStateBackend) | Redis would add network latency, lose exactly-once guarantees, complicate checkpoints                       |
-| **Hot / volatile serving data** (e.g., user:recent_cats, promo:pid123 boosts, cat:bestsellers, master:pids mappings for hot items) | Cached in Redis for sub-ms reads by Go serving layer; also for async enrichment in Flink | Yes (real-time promos, session changes) | Extremely high (every recommendation request) | **Redis**                                         | RocksDB is local to Flink tasks → not directly queryable from Go; no native pub/sub, TTL, or sorted set ops |
-| **Persistent dimension data** (e.g., master_semantic_relations, category_co_view_relations, master_to_pids)                        | Durable storage, occasional batch updates, fallback reads                                | Low (daily batch or async from Flink)   | Medium (Flink async lookup + Go fallback)     | **ScyllaDB**                                      | Redis is volatile; RocksDB not shared/distributed                                                           |
-| **Final serving hot paths**                                                                                                        | Go backend reads for recommendations                                                     | —                                       | Extremely high                                | **Redis** (primary) + Scylla fallback             | RocksDB inaccessible from Go                                                                                |
-### Goal
-Build a scalable, low-latency recommendation serving system capable of handling 1,000+ requests/sec with end-to-end inference latency reduced from hours (batch-only) to seconds. The system combines daily batch training with real-time streaming updates using Flink, Redis for caching/hot features, ScyllaDB for persistent dimension data, and Druid for real-time rollups of top-sold products.
+Build a scalable, low-latency recommendation serving system ($<15\text{ms}$ target) capable of handling $1,000+$ requests/sec.
 
-### Key Constraints & Scale
-- ~5 million unique master_ids (semantically equivalent products)  
-- ~30 million seller-specific pids  
-- Master-to-pid mapping required for final resolution  
-- Deduplication at master_id level in final recommendation lists  
-- Frequent online updates for volatile signals (promos, user interests, category trends)  
-- Cold masters (no recent interactions) must retain old semantic inference results
+- **Scale:** 5M `master_ids` (semantic products) and 30M `pids` (seller-specific).
+    
+- **Freshness:** Shift from hours (batch) to seconds (streaming) for user intent and category trends.
+    
+- **Constraints:** Deduplication at `master_id` level; mandatory "Exactly-Once" consistency for state.
+    
 
-### 1. Related Products Recommendations (Semantic + Category Expansion)
+---
 
-**Rationale**  
-Daily model training produces semantic similarity relations at master_id level. Product-level co-views are too voluminous → shift to category-level co-occurrences (thousands of categories) for dynamic expansion. This enables three complementary signals:  
-1. Semantic related masters  
-2. Best-sellers in currently viewed category  
-3. Best-sellers in co-viewed related categories  
+## 2. Tiered Data Strategy (The "Storage Matrix")
 
-**Data Modeling & Storage**  
-- **Semantic Relations** (daily, static-ish):  
-  - ScyllaDB:  
-    ```cql
-    CREATE TABLE master_semantic_relations (
-        master_id uuid PRIMARY KEY,
-        related_masters frozen<map<uuid, float>>,
-        inference_ts timestamp,
-        inference_source text
-    );
-    ```
-  - Redis mirror (hot masters): sorted sets `master:sem:mid123` (TTL 24h)  
+To balance speed and durability, data is partitioned based on access frequency and volatility:
 
-- **Category Co-View Relations** (real-time, decaying):  
-  - ScyllaDB: `category_co_view_relations (cat_id text PRIMARY KEY, related_cats map<text, float>)`  
-  - Redis: sorted sets `cat:co_view:electronics` (top-20 related categories)  
+|**Component**|**Storage Backend**|**Logic / Use Case**|
+|---|---|---|
+|**User Session Intent**|**Flink (RocksDB)**|Decaying category scores based on current clicks.|
+|**Hot Serving Data**|**Redis Cluster**|Recent `spids`, category best-sellers, hot `master:pids` maps.|
+|**Persistent Dimensions**|**ScyllaDB**|Global semantic relations, historical `reco_by_recency_long`.|
+|**Real-Time Analytics**|**Apache Druid**|5-minute rollups for "Top Sold" items per category.|
 
-- **Master-to-Pid Mapping**:  
-  - ScyllaDB: `master_to_pids (master_id uuid PRIMARY KEY, pids list<uuid>, metadata map<uuid, text>)`  
-  - Redis: hashes `master:pids:mid123` (hot masters only)  
+---
 
-**Update Strategy for Semantic Relations**  
-- Daily batch job (Airflow/Spark):  
-  1. Identify "hot" masters (recent interactions from Druid rollup or Flink/Redis active set)  
-  2. Compute new embeddings/relations only for hot subset  
-  3. Update **only** those rows in ScyllaDB:  
-     ```cql
-     UPDATE master_semantic_relations
-     SET related_masters = {... new map ...},
-         inference_ts = now(),
-         inference_source = 'daily-batch-v3'
-     WHERE master_id = ?;
-     ```
-  4. Inactive/cold masters are never touched → old frozen map remains indefinitely  
-- Serving fallback: if `inference_ts` > 3 months old → log/alert, still serve old map, optionally trigger background refresh  
+## 3. Real-Time Personalization Pipeline (Flink)
 
-**Online Category Co-View Updates**  
-- Flink job: consumes view events from Kafka  
-- Uses **RocksDBStateBackend** for keyed state (MapState or custom top-K structure per category_id)  
-- Sliding window (15 min window / 5 min slide) or session window (30 min gap)  
-- Decay: score *= 0.95 per window/timer  
-- Prune to top-20 via min-heap  
-- Sink deltas to Redis (`ZINCRBY`) + async batch to ScyllaDB  
+The "Brain" of the system is an Apache Flink job that processes the Kafka clickstream.
 
-**Serving Logic (Go)**  
-1. Fetch user recent views → map to masters/categories  
-2. Get semantic relations for masters (Redis first, Scylla fallback)  
-3. Expand categories via co-view relations (`ZREVRANGE`)  
-4. Merge scores (weighted: semantic 0.6 + co-view boost 0.4)  
-5. Deduplicate at master_id level (Go map)  
-6. Prune to top-1000 (heap)  
-7. Resolve to best pid (price/rating from Redis hash)  
-**Latency target**: <15 ms  
+### A. Internal Keyed State (The "Why RocksDB" Argument)
 
-### 2. Best-Seller Recommendations in Current / Related Categories
+We use `EmbeddedRocksDBStateBackend` because:
 
-**Rationale**  
-Real-time intra-day trends (flash sales, promotions) require fresh top-sold products per category. Use Druid for 5-minute rollups. Expand using current category + weekly co-view related categories + user recent interests (decaying).
+- **Scale:** Storing intent for millions of active users exceeds RAM; RocksDB spills to local SSD.
+    
+- **Consistency:** Flink checkpoints RocksDB state and Kafka offsets together, ensuring that if the system crashes, user intent isn't "double-counted" or lost.
+    
 
-**Pipeline**  
-- FE/App → Kafka → Flink (enrich) → Druid ingestion  
-- Druid: real-time rollup (GROUP BY category, ORDER BY sales DESC, LIMIT 50 per category)  
-- Serving query: Druid SQL or API for top-N per category  
+### B. User Intent & Category Decay
 
-**User Recent Interests**  
-- Redis scored set: `ZADD user:recent_cats:uid score cat1` (score = timestamp or decaying weight)  
-- TTL 1–7 days + periodic prune of low-score entries  
-- Used for homepage diversity (no current category)  
+We track what a user is interested in _right now_. If a user searches "Shoes" but clicks "High Heels," we must pivot the recommendations instantly.
 
-**Serving Flow**  
-1. Get current category from request  
-2. Expand: current + co-view related (Redis) + user recent (Redis)  
-3. Multi-query top sellers (Redis cache first, Druid fallback)  
-4. Union, deduplicate masters, limit  
-**Latency target**: <100 ms (Druid queries dominate)  
+- **Logic:** When a user interacts with Category $A$:
+    
+    1. `Score(A) = Score(A) + 1.0`
+        
+    2. `Score(Others) = Score(Others) * 0.8` (Decay)
+        
+- **State Structure:** `MapState<String, Double> userIntent` keyed by `user_id`.
+    
 
-### 3. Rerank / Filter Layer
+---
 
-**Rationale**  
-Long candidate list (semantic + best-sellers + expanded) must be adapted for business rules: out-of-stock filtering, ad bidding, flash sale boosts, widget-specific prioritization.
+## 4. Recommendation Logic & Data Modeling
 
-**Implementation**  
-- Redis hashes: `promo:pid123` with fields (boost, out_of_stock, ad_bid, flash_sale)  
-- In Go:  
-  - Pipeline HMGET for all candidates  
-  - Filter out-of-stock  
-  - Apply boosts (multiplicative + additive)  
-  - Widget-specific logic (e.g., higher bid weight for sponsored slots)  
-  - Final sort + top-K (heap)  
-**Latency**: <5 ms for 1000 candidates  
+### A. Semantic & Category Expansion
 
-### 4. System-Wide Architecture & Optimizations
+We combine three signals to build the candidate list:
 
-- **Streaming Layer**: Apache Flink (RocksDBStateBackend for keyed state, async I/O for Redis/Scylla lookups)  
-- **Serving Cache & Hot Features**: Redis Cluster (sharded, TTL, pub/sub for invalidations)  
-- **Durable Dimensions**: ScyllaDB (wide-column, shard-per-core, predictable latency)  
-- **Real-time Analytics Rollups**: Apache Druid (5-min top-sold per category)  
-- **Monitoring**: Prometheus (Flink backpressure, Redis hit rate >95%, Druid query latency)  
-- **Micro-batch Experiments**: Airflow orchestrates incremental retraining (e.g., only new/changed products) every 1–4 hours  
+1. **Semantic Similarity:** From ScyllaDB (e.g., "iPhone 15" $\approx$ "Samsung S24").
+    
+2. **Category Co-Views:** Real-time relations (e.g., People viewing "Laptops" also view "Laptop Sleeves").
+    
+3. **User Recency:** Items from `reco_by_recency_short` (Last 15 mins).
+    
 
-### 5. A/B Testing & Validation (Amplitude)
+### B. The "Master-to-Pid" Resolution
 
-- Variants: baseline batch vs. streaming + category decay vs. different rerank weights  
-- Bucketing: random 50/50 or segmented (new vs. returning users)  
-- Key metrics: CTR on recommendation widgets, conversion rate, revenue per session  
-- Run 1–2 weeks, evaluate statistical significance in Amplitude  
+Since users buy specific `pids` but we recommend `master_ids`, we maintain a mapping:
 
-This design balances real-time freshness, scale (30M pids, 5M masters), cost efficiency, and cold-start protection while keeping serving latency low and predictable.
+- **Storage:** Redis Hash `master:pids:{mid}`.
+    
+- **Fields:** `price`, `rating`, `stock_status`, `seller_id`.
+    
+- **Benefit:** Allows the Go layer to pick the "best" PID (cheapest or highest rated) for a recommended Master ID.
+    
 
+---
+
+## 5. Serving Layer (Go Backend)
+
+The Go layer performs the final "Rerank & Filter" in under $15\text{ms}$.
+
+1. **Parallel Fetch:**
+    
+    - Fetch `UserIntent` (Redis).
+        
+    - Fetch `RecentSPIDs` (Redis).
+        
+    - Fetch `LongTermCandidates` (ScyllaDB/Redis).
+        
+2. **Scoring & Bias:**
+    
+    - $FinalScore = BaseScore \times IntentScore_{category}$.
+        
+    - Items in a "decayed" category (low intent score) are pushed to the bottom.
+        
+3. **Business Filtering (Redis Hash Lookups):**
+    
+    - Check `promo:pid123` for `out_of_stock` or `ad_boost`.
+        
+4. **Deduplication:** Use a Go `map` to ensure only one PID per `master_id` is shown.
+    
+
+---
+
+## 6. Maintenance & Experiments (Amplitude/Airflow)
+
+- **Savepoints:** Used for manual updates. Before deploying new Go or Flink code, a Savepoint is taken to ensure the "User Intent" state survives the migration.
+    
+- **A/B Testing:** Variants are bucketed in Amplitude (e.g., 50% see "High Decay" vs. 50% "Low Decay").
+    
+- **Recovery:** If Redis fails, the system falls back to ScyllaDB for `reco_by_recency_long`.
 
 ## Analytics Engine
 ### Why We Had to Change
