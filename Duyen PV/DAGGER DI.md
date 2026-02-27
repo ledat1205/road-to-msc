@@ -1,3 +1,252 @@
+### 1. @Provides
+
+Most common use: creating instances of third-party libraries or complex objects.
+
+Kotlin
+
+```
+@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        gson: Gson
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.example.vn/v2/")
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .create()
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        loggingInterceptor: HttpLoggingInterceptor,
+        authInterceptor: AuthInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
+        .addInterceptor(loggingInterceptor)
+        .connectTimeout(25, TimeUnit.SECONDS)
+        .readTimeout(25, TimeUnit.SECONDS)
+        .build()
+}
+```
+
+### 2. @Binds
+
+Most common for binding your own interface implementations.
+
+Kotlin
+
+```
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRepository(
+        impl: UserRepositoryImpl
+    ): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTransactionRepository(
+        impl: TransactionRepositoryImpl
+    ): TransactionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthService(
+        impl: AuthServiceImpl
+    ): AuthService
+}
+```
+
+Implementation example (constructor injection):
+
+Kotlin
+
+```
+@Singleton
+class UserRepositoryImpl @Inject constructor(
+    private val remoteDataSource: RemoteUserDataSource,
+    private val localDataSource: LocalUserDataSource
+) : UserRepository { ... }
+```
+
+### 3. @Singleton / @ApplicationScope
+
+Scopes a binding to the entire application lifecycle.
+
+Kotlin
+
+```
+@Singleton
+class TokenManager @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
+    // stores tokens in EncryptedSharedPreferences
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object StorageModule {
+
+    @Provides
+    @Singleton
+    fun provideEncryptedSharedPrefs(
+        @ApplicationContext context: Context
+    ): SharedPreferences = EncryptedSharedPreferences.create(
+        context,
+        "secure_prefs",
+        MasterKey.Builder(context).setKeyScheme(AES256_GCM).build(),
+        AES256_SIV,
+        AES256_GCM
+    )
+}
+```
+
+### 4. @InstallIn
+
+Required on every Hilt module (replaced old Dagger @Component).
+
+Kotlin
+
+```
+// Application-wide
+@Module
+@InstallIn(SingletonComponent::class)
+object CoreModule { ... }
+
+// Activity-scoped (rare now, ViewModelComponent preferred)
+@Module
+@InstallIn(ActivityComponent::class)
+object ActivityUiModule { ... }
+
+// ViewModel-scoped
+@Module
+@InstallIn(ViewModelComponent::class)
+object ViewModelModule {
+
+    @Provides
+    @ViewModelScoped
+    fun provideSomeViewModelDep(): SomeDep = ...
+}
+```
+
+### 5. @Inject
+
+The entry point — constructor injection (preferred), field injection (legacy/activities), method injection (rare).
+
+Kotlin
+
+```
+// Constructor injection (best)
+@Singleton
+class AnalyticsTracker @Inject constructor(
+    private val eventBus: EventBus,
+    private val userRepository: UserRepository
+) { ... }
+
+// Field injection (common in Activities/Fragments before Hilt)
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var analytics: AnalyticsTracker
+
+    @Inject
+    lateinit var navigator: Navigator
+}
+
+// Method injection (rare, for optional deps)
+class SomeClass @Inject constructor() {
+
+    @Inject
+    fun injectLogger(logger: Logger) {
+        this.logger = logger
+    }
+}
+```
+
+### 6. @HiltViewModel
+
+Required for Hilt-injected ViewModels (replaces manual factories).
+
+Kotlin
+
+```
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
+    private val transactionRepo: TransactionRepository,
+    private val userRepo: UserRepository,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    val userName: StateFlow<String> = userRepo.getCurrentUserFlow()
+        .map { it?.name ?: "Guest" }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Guest")
+
+    fun loadTransactions() {
+        viewModelScope.launch {
+            transactionRepo.getRecentTransactions()
+        }
+    }
+}
+```
+
+### Bonus: Very Common Combo – @Qualifier + @Provides + @Binds
+
+Kotlin
+
+```
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Authenticated
+
+@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+
+    @Provides
+    @Authenticated
+    @Singleton
+    fun provideAuthOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        logging: HttpLoggingInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
+        .addInterceptor(logging)
+        .build()
+
+    @Provides
+    fun providePublicOkHttpClient(
+        logging: HttpLoggingInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(logging)
+        .build()
+
+    @Provides
+    @Authenticated
+    fun provideAuthRetrofit(
+        @Authenticated okHttpClient: OkHttpClient,
+        gson: Gson
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl("https://secure.api/")
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
+}
+```
 ### Very High Frequency (almost every module has at least some of these)
 
 |Annotation / Decorator|Where used|Common purpose / real-world use case|Example snippet|
@@ -61,3 +310,4 @@
 - "We use custom @Qualifier annotations instead of @Named for type-safety when we have multiple bindings of the same type."
 - "Core infrastructure (network, db) goes into a CoreModule with @Provides, while feature-specific repositories use @Binds and include the core module."
 - "In tests we always use @TestInstallIn to swap real Retrofit with a mock server."
+- 
