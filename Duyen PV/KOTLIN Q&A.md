@@ -1,158 +1,437 @@
-### 1. Kotlin Language & Best Practices
+Here are **model answers** for the **19 Kotlin-focused middle-level interview questions** I prepared earlier. These answers are written in a natural, confident style that you can adapt to your own experience (e.g., mentioning MoMo, Tiki, or TMA). They are concise enough for verbal delivery but detailed enough to show depth.
 
-**Q1: Explain the difference between val and var, and when you prefer one over the other in production code.**
+Practice saying them aloud — aim for 1–2 minutes per answer. Feel free to personalize with your real stories.
 
-**Answer**: val is immutable (read-only) — once assigned, it cannot change. var is mutable.
+### Kotlin Language & Idioms
 
-In production Kotlin code, I almost always prefer val unless I have a very good reason to mutate state. Immutability reduces bugs (no accidental changes), makes code thread-safe by default, and improves readability/intent.
+**1. In production Kotlin code, when do you still use var instead of val? Give a concrete example.**
 
-For example, in a data class or function return value:
+**Answer**: I default to val everywhere because immutability prevents accidental mutations, makes code thread-safe by default, and improves readability.
 
-Kotlin
+I only use var in these practical cases:
 
-```
-data class User(val id: Long, val name: String) // never var here
-```
+- Building mutable collections before converting to immutable (e.g., val temp = mutableListOf<T>() … return temp.toList())
+- In performance-sensitive loops where re-assignment avoids extra allocations
+- In builder patterns or DSLs (e.g., configuring OkHttpClient or Vert.x Router)
 
-I only use var when state must change, like in a builder pattern, mutable collections during construction, or performance-critical mutable buffers (very rare). At MoMo, we enforced val-first style in code reviews — it caught many concurrency bugs early.
+Real example from MoMo: When migrating minigame metadata from HBase to PostgreSQL, we had a batch builder class. We used var batchSize = 0 and var currentBatch = mutableListOf<Row>() inside a loop — it was clearer and avoided creating new lists every iteration. Once the batch was full, we passed currentBatch.toList() to the sink. Code review enforced: var only when mutation is intentional and scoped.
 
-**Q2: How do you handle null safety in Kotlin when working with legacy Java libraries or JSON from external APIs?**
+**2. How does Kotlin null-safety work? Show 3–4 different ways to safely handle a nullable value coming from a Java library or external JSON.**
 
-**Answer**: I use safe calls (?.), Elvis operator (?:), let, run, or requireNotNull/checkNotNull depending on context.
+**Answer**: Kotlin prevents NullPointerExceptions at compile time: non-nullable types (String) can't hold null; nullable types use ? (String?).
 
-For JSON (e.g., from Retrofit/Gson/Jackson), I prefer:
+Safe handling patterns I use daily:
 
-- Custom deserializers or @JsonAdapter to map nulls to defaults
-- Sealed class wrappers: sealed class ApiResult<out T> { data class Success<T>(val data: T) : ApiResult<T>(), data class Error(val message: String) : ApiResult<Nothing>() }
-- Or NonNullJsonAdapter if using Moshi
-
-Example from real code:
+1. Safe call + Elvis:
 
 Kotlin
 
 ```
-val userName = response.data?.user?.name ?: "Guest"
+val name = json?.user?.name ?: "Guest"
 ```
 
-In legacy Java interop, I wrap dangerous calls in requireNotNull or use !! only in very controlled places with immediate checks. We had a rule: max 1 !! per 1000 lines — it forced us to handle nulls properly.
-
-### 2. Coroutines & Concurrency
-
-**Q3: What is structured concurrency and why is it important in Kotlin? Give an example.**
-
-**Answer**: Structured concurrency means that coroutines have a clear parent-child hierarchy and lifecycle. When a scope is cancelled or fails, all children are cancelled automatically. No leaked coroutines.
-
-Without it (e.g., globalScope.launch), coroutines can outlive their intended lifetime and cause memory leaks or zombie work.
-
-Example (good):
+2. Safe call + let (scoped non-null):
 
 Kotlin
 
 ```
-suspend fun loadData() = coroutineScope {
-    val user = async { fetchUser() }
-    val orders = async { fetchOrders() }
-    combine(user.await(), orders.await())
+json?.user?.let { user ->
+    processUser(user.name, user.email)
 }
 ```
 
-If the outer scope is cancelled, both asyncs are cancelled.
+3. requireNotNull / checkNotNull (fail fast):
 
-At Tiki, we used coroutineScope { } in streaming pipelines — it made cancellation reliable when jobs were interrupted.
+Kotlin
 
-**Q4: When would you use Dispatchers.IO vs Dispatchers.Default vs Dispatchers.Unconfined?**
+```
+val token = requireNotNull(headers["Authorization"]) { "Missing auth header" }
+```
+
+4. run + safe calls (for chaining):
+
+Kotlin
+
+```
+val result = response.run { data?.items?.firstOrNull()?.id } ?: -1
+```
+
+From TMA ingestion pipelines: When parsing third-party JSON, we used let chains + Elvis defaults to avoid !! entirely — reduced runtime crashes by ~70% in one sprint.
+
+**3. What is the difference between data class, class, and object? When would you choose one over the others?**
 
 **Answer**:
 
-- Dispatchers.IO: For I/O-bound work (network, disk, DB calls). Limited parallelism (64 threads max by default, grows if needed). Prevents starving the CPU pool.
-- Dispatchers.Default: For CPU-bound work (parsing, calculations). Uses thread pool sized to CPU cores.
-- Dispatchers.Unconfined: Almost never in production — runs on caller thread, no thread switch. Useful only in tests or very specific cases (can break structured concurrency).
+- data class: For immutable data holders. Auto-generates equals(), hashCode(), toString(), copy(), componentN(). Use when you mainly care about data equality/value objects (DTOs, domain models).
+- class: General-purpose. No auto-generated methods. Use for behavior-heavy classes, services, stateful objects.
+- object: Singleton (one instance per JVM). Use for utilities, singletons, companion-like global state.
 
-Rule of thumb: 90% of suspend functions use Dispatchers.IO or withContext(IO) { ... }. In Vert.x I usually use vertx.dispatcher() to stay on event loop when possible.
+Choices:
 
-### 3. Vert.x Specific Questions (Middle Level)
+- DTO from API → data class
+- Service/repository → class (or object if stateless singleton)
+- Factory/Logger → object
 
-**Q5: Explain Vert.x event-loop model. What happens if you block inside a normal verticle?**
+In MoMo Vert.x services, we used data class for event payloads (e.g., data class TransactionCreated(val id: String, val amount: Double)), class for repositories, and object for config loaders.
 
-**Answer**: Vert.x uses a small number of event-loop threads (default 2 × CPU cores). Each normal verticle instance is pinned to **one event-loop thread** — Vert.x guarantees no concurrent execution on the same instance.
+**4. Explain extension functions. Give a real-world example where you used (or would use) an extension function instead of a utility class.**
 
-All handlers, timers, Event Bus consumers for that verticle run on the same thread.
+**Answer**: Extension functions add methods to existing classes without inheritance or modifying source code. Syntax: fun ReceiverType.extensionName(params): ReturnType { ... }.
 
-If you block (e.g., Thread.sleep, synchronous JDBC, heavy CPU loop), **that entire event loop stalls** — no other requests/timers on that loop are processed → high latency or timeouts across unrelated requests.
+Benefits: Cleaner API, better discoverability, no wrapper classes.
 
-Fix:
-
-- Use vertx.executeBlocking { ... }
-- Deploy as worker verticle (setWorker(true))
-- Or use virtual threads (Vert.x 4.5+)
-
-In MoMo I once debugged a slow startup that blocked event loops — moved DB init to worker verticle and latency dropped 10×.
-
-**Q6: How do you deploy multiple instances of the same verticle? When do you do it?**
-
-**Answer**: Use DeploymentOptions().setInstances(n) when deploying:
+Real example: At Tiki, we had frequent PostgreSQL timestamp handling. Instead of DateUtils.toUtcString(timestamp), we added:
 
 Kotlin
 
 ```
-vertx.deployVerticle(MyHttpVerticle(), DeploymentOptions().setInstances(4))
+fun Instant.toUtcIsoString(): String = this.atZone(ZoneOffset.UTC).toString()
 ```
 
-Vert.x distributes instances across event loops (round-robin).
+Usage: event.timestamp.toUtcIsoString() — more readable, discoverable via IDE, no static utils class clutter.
 
-You do this when:
+Another common one: fun String?.ifNotBlank(block: (String) -> Unit) for safe string processing.
 
-- The verticle is CPU-bound (more instances = better core utilization)
-- You want higher throughput for I/O-bound work
-- Horizontal scaling inside one JVM before clustering
+**5. What are sealed classes / sealed interfaces? Why are they useful compared to regular enums or open classes?**
 
-In production I usually set instances = Runtime.getRuntime().availableProcessors() for HTTP verticles — gives good balance without over-threading.
+**Answer**: Sealed classes/interfaces restrict inheritance: all subclasses must be declared in the same file (or nested). Compiler knows all possible types at compile time → exhaustive when without else.
 
-**Q7: How do you integrate Kotlin coroutines with Vert.x? Give a code example.**
+Compared to enums: sealed classes can hold state/data (not just constants). Compared to open classes: no unknown subclasses → safer pattern matching.
 
-**Answer**: Use CoroutineVerticle + suspend fun start() + await() extensions.
+Use cases:
 
-Example (common pattern):
+- Result/Error handling: sealed class ApiResult<out T> { data class Success<T>(val data: T) : ApiResult<T>(), data class Error(val message: String) : ApiResult<Nothing>() }
+- State machines: sealed interface PaymentState { object Idle : PaymentState, data class Processing(val amount: Double) : PaymentState, ... }
+
+In MoMo, we used sealed classes for event outcomes — when (result) { is Success -> … is Failure -> … } — compiler enforced all cases.
+
+**6. Compare let, run, with, apply, and also. Give a situation for each where it is the most idiomatic choice.**
+
+**Answer**: All are scope functions — they execute a block with an object as receiver (this) or argument (it).
+
+- let (lambda with it, returns lambda result): null-safe transform / scoping → json?.let { process(it) } ?: default
+- run (lambda with this, returns lambda result): combine null-check + configuration → user?.run { name = "New"; save() }
+- with (non-extension, this, returns lambda result): group calls on non-null object → with(builder) { url = "..."; timeout = 30; build() }
+- apply (lambda with this, returns receiver): configure and return same object → val client = OkHttpClient.Builder().apply { addInterceptor(...); timeout(...) }.build()
+- also (lambda with it, returns receiver): side effects / logging → list.also { logger.info("Processing $it") }.map { ... }
+
+Idiomatic choices:
+
+- Null-safe mapping → let
+- Builder pattern → apply
+- Side effect/logging → also
+- Grouping calls on external object → with
+
+**7. How do you implement a singleton in Kotlin? What is the difference between object, companion object, and lazy initialization?**
+
+**Answer**:
+
+- object Singleton { ... } → JVM singleton (one instance per class loader). Thread-safe by default. Best for pure singletons (utils, configs).
+- companion object → static-like members inside a class. Not a singleton instance unless you make it one.
+- Lazy initialization: val instance by lazy { ExpensiveObject() } — thread-safe, lazy, inside class or top-level.
+
+Preferred:
+
+- Global singleton → object
+- Class with singleton instance → companion object { val instance by lazy { ... } }
+
+In Vert.x services, I use object Config { val env = System.getenv("ENV") } — simple, no DI overhead.
+
+### Collections & Functional Style
+
+**8. Explain the difference between List<T>, MutableList<T>, ArrayList<T>, listOf(), mutableListOf() and arrayListOf(). Which ones do you prefer in API signatures and why?**
+
+**Answer**:
+
+- List<T>: Read-only interface (immutable view)
+- MutableList<T>: Read-write interface
+- ArrayList<T>: Concrete mutable implementation (backed by array)
+
+Creation functions:
+
+- listOf() → immutable List (backed by ArrayAsList)
+- mutableListOf() → MutableList (usually ArrayList)
+- arrayListOf() → explicitly ArrayList
+
+In API signatures (return types, parameters):
+
+- Prefer List<T> (immutable) for inputs/outputs — protects callers, communicates intent
+- Use MutableList<T> only when caller must mutate (rare)
+- Never expose ArrayList — leaks implementation
+
+Example: fun getUsers(): List<User> — caller can't mutate. At Tiki, this prevented bugs in recommendation pipelines.
+
+**9. Write (or describe) a one-liner that groups a list of transactions by userId and calculates the total amount per user using functional style.**
+
+**Answer**:
 
 Kotlin
 
 ```
-class UserVerticle : CoroutineVerticle() {
+val totals = transactions
+    .groupBy { it.userId }
+    .mapValues { (_, txs) -> txs.sumOf { it.amount } }
+```
 
-    private lateinit var pgPool: PgPool
+Or more concise with associate:
 
-    override suspend fun start() {
-        pgPool = PgBuilder.pool(...).build()
+Kotlin
 
-        val router = Router.router(vertx)
-        router.get("/users/:id").coroutineHandler(this::getUser)
+```
+val totals = transactions.associateBy { it.userId }
+    .mapValues { (_, tx) -> transactions.filter { it.userId == tx.userId }.sumOf { it.amount } } // less efficient
+```
 
-        vertx.createHttpServer()
-            .requestHandler(router)
-            .listen(8080).await()
-    }
+Better: groupingBy + aggregate for single pass:
 
-    private suspend fun getUser(ctx: RoutingContext) {
-        val id = ctx.pathParam("id").toLong()
-        val row = pgPool.preparedQuery("SELECT * FROM users WHERE id = $1")
-            .executeAwait(Tuple.of(id))
+Kotlin
 
-        ctx.response().end(row.firstOrNull()?.toJson()?.encode() ?: "{}")
-    }
+```
+val totals = transactions.groupingBy { it.userId }
+    .aggregate { _, acc: Double?, tx, first -> (acc ?: 0.0) + tx.amount }
+```
+
+I used similar in Tiki for per-user spend aggregation — groupingBy + aggregate was 2× faster than groupBy + map.
+
+**10. What is the difference between map, flatMap, mapNotNull, filterNotNull, and associate? When would you choose flatMap over map + flatten?**
+
+**Answer**:
+
+- map: 1:1 transform (List → List**)**
+**- flatMap: 1:many transform + flatten (List → List**)**
+**- mapNotNull: map + skip null results
+- filterNotNull: remove nulls
+- associate: create Map<K,V> from list (key selector + value selector)****
+
+****
+
+flatMap vs map + flatten:
+
+- flatMap is more efficient (single pass) and idiomatic
+- map { ... }.flatten() creates intermediate list → more allocations
+
+Choose flatMap when each element produces a collection (e.g., splitting strings, API calls returning lists).
+
+Example:
+
+Kotlin
+
+```
+users.flatMap { user -> user.orders }  // better than users.map { it.orders }.flatten()
+```
+
+**11. How do you efficiently remove duplicates from a list while preserving insertion order? What about when you need to keep only the first occurrence of each item?**
+
+**Answer**: Preserve order + remove duplicates:
+
+Kotlin
+
+```
+val unique = list.distinct()                    // uses equals/hashCode, preserves order
+```
+
+Or if custom equality:
+
+Kotlin
+
+```
+val seen = mutableSetOf<Key>()
+val unique = list.filter { seen.add(it.key) }   // keeps first occurrence
+```
+
+For large lists:
+
+Kotlin
+
+```
+val unique = list.associateBy { it.id }.values.toList()  // preserves order, keeps first
+```
+
+distinct() is O(n), uses hash set internally — very efficient.
+
+### Coroutines & Concurrency
+
+**12. What is a suspend function? How is it different from a normal function under the hood?**
+
+**Answer**: suspend marks a function that can be paused/resumed without blocking the thread. It can call other suspend functions and use suspension points (e.g., delay, await).
+
+Under the hood: Kotlin compiler turns suspend functions into state machines (continuations). Each suspension point saves state and returns a Continuation. No OS thread is blocked — coroutine is suspended and can resume on any thread.
+
+Difference from normal function:
+
+- Can't call suspend from non-suspend
+- Transformed to CPS (continuation-passing style)
+- Enables structured concurrency
+
+**13. Explain the difference between launch, async, withContext, coroutineScope, and supervisorScope. When do you use supervisorScope instead of coroutineScope?**
+
+**Answer**:
+
+- launch: Fire-and-forget coroutine (returns Job)
+- async: Deferred result (returns Deferred<T>) — use await()
+- withContext: Change dispatcher for block, wait for completion
+- coroutineScope: Create child scope, wait for all children, propagate exceptions
+- supervisorScope: Like coroutineScope, but exceptions in one child don't cancel siblings
+
+Use supervisorScope when partial failures are acceptable (e.g., fetch multiple independent resources — one fails, others continue).
+
+Example:
+
+Kotlin
+
+```
+suspend fun loadDashboard() = supervisorScope {
+    val user = async { fetchUser() }
+    val orders = async { fetchOrders() } // if this fails, user still completes
+    combine(user.await(), orders.awaitOrNull())
 }
+```
 
-// Extension helper (very common)
-fun Router.coroutineHandler(fn: suspend (RoutingContext) -> Unit) {
-    get("/").handler { ctx ->
-        vertx.launch(ctx.vertx().dispatcher()) {
+**14. How do you handle exceptions in coroutines so that one failing task does not cancel all siblings?**
+
+**Answer**: Use supervisorScope + async (or launch) + await with try-catch or awaitOrNull.
+
+Pattern:
+
+Kotlin
+
+```
+suspend fun fetchAll() = supervisorScope {
+    val results = listOf("A", "B", "C").map { key ->
+        async {
             try {
-                fn(ctx)
+                fetch(key)
             } catch (e: Exception) {
-                ctx.fail(500, e)
+                logger.error("Failed $key", e)
+                null
             }
         }
     }
+
+    results.awaitAll() // or map { it.awaitOrNull() }
 }
 ```
 
-This keeps code linear, non-blocking, and uses Vert.x dispatcher for context propagation.
+CoroutineExceptionHandler can be installed on scope/job for global handling, but supervisorScope is preferred for structured partial failure.
+
+**15. What are the main Dispatchers (Default, IO, Main, Unconfined)? Which one should you almost never use in production code and why?**
+
+**Answer**:
+
+- Dispatchers.Default: CPU-bound work (parsing, calculations). Pool size = CPU cores.
+- Dispatchers.IO: I/O-bound (network, disk, DB). Starts with 64 threads, grows if needed.
+- Dispatchers.Main: UI thread (Android only).
+- Dispatchers.Unconfined: Runs on caller thread, no switch. No thread confinement.
+
+Unconfined should almost never be used in production:
+
+- Breaks structured concurrency guarantees
+- Can leak coroutines across threads
+- Makes debugging hard (no predictable thread)
+
+Only use in tests or very specific low-level cases. In Vert.x, I use vertx.dispatcher() instead to stay on event loop.
+
+**16. You need to run 100 network requests in parallel but limit concurrency to 10 at a time. How would you implement this with coroutines?**
+
+**Answer**: Use coroutineScope + channelFlow / semaphore / limitedParallelism.
+
+Cleanest modern way (Kotlin 1.7+):
+
+Kotlin
+
+```
+suspend fun fetchAll(ids: List<String>): List<Result<String>> = coroutineScope {
+    ids.chunked(10).flatMap { chunk ->
+        chunk.map { id ->
+            async { fetchWithRetry(id) }
+        }.awaitAll()
+    }
+}
+```
+
+Or with explicit concurrency limit using limitedParallelism:
+
+Kotlin
+
+```
+val limited = Dispatchers.IO.limitedParallelism(10)
+
+suspend fun fetchAll(ids: List<String>) = coroutineScope {
+    ids.map { id ->
+        async(limited) { fetch(id) }
+    }.awaitAll()
+}
+```
+
+Both approaches keep max 10 concurrent requests. I used the chunked + async pattern in Tiki for parallel ClickHouse queries — controlled load without overwhelming the cluster.
+
+### Kotlin in Backend / Production
+
+**17. How do you usually handle serialization / deserialization in Kotlin backend services? (Kotlinx Serialization vs Gson vs Jackson vs Moshi) What are the trade-offs?**
+
+**Answer**: I prefer **Kotlinx Serialization** in new Kotlin-first services because:
+
+- Type-safe (compile-time checks)
+- Null safety integrated
+- Kotlin idioms (data classes, sealed) work out-of-box
+- No reflection by default (faster, smaller binary)
+- Good Vert.x/Ktor integration
+
+Trade-offs:
+
+- Kotlinx: Best for pure Kotlin, but less mature ecosystem than Jackson, fewer custom adapters
+- Jackson: Most mature, huge ecosystem, good Java interop, but reflection-heavy, null-safety issues
+- Gson: Simple, lightweight, but reflection-based, weak Kotlin support (needs annotations)
+- Moshi: Good balance, Kotlin-friendly, but smaller community
+
+In MoMo Vert.x services, we switched to Kotlinx Serialization for internal events — reduced runtime errors and improved performance on high-throughput endpoints.
+
+**18. You receive a large JSON payload from a third-party API. How do you parse it safely without OOM or blocking the thread for too long?**
+
+**Answer**: Steps I follow:
+
+1. Use streaming parser (Jackson JsonParser or Kotlinx JsonReader) — parse incrementally, not whole string
+2. Offload to worker / Dispatchers.IO / executeBlocking
+3. Validate size first (e.g., Content-Length header < 10MB)
+4. Use mapNotNull / takeWhile to process only needed parts
+5. Set timeouts on HTTP client
+
+Example with Kotlinx (streaming):
+
+Kotlin
+
+```
+suspend fun parseLargeJson(input: InputStream): List<Item> = withContext(Dispatchers.IO) {
+    Json.decodeFromStream<List<Item>>(input) // streaming under the hood
+}
+```
+
+Or Jackson:
+
+Kotlin
+
+```
+val parser = JsonFactory().createParser(input)
+while (parser.nextToken() != JsonToken.END_ARRAY) { ... }
+```
+
+In Tiki, we used Jackson streaming for large ClickHouse exports — avoided OOM and kept event loops free.
+
+**19. In a high-throughput service, how do you avoid common coroutine pitfalls (leaked coroutines, context loss, wrong dispatcher usage)? Give 3–4 concrete rules or patterns you follow.**
+
+**Answer**: Rules I enforce in code reviews:
+
+1. **Never use GlobalScope**: always coroutineScope, viewModelScope, lifecycleScope, or custom scope — prevents leaks
+2. **Always use correct dispatcher**: Dispatchers.IO for I/O, withContext(vertx.dispatcher()) in Vert.x for context propagation
+3. **Structured concurrency everywhere**: wrap parallel work in coroutineScope or supervisorScope — automatic cleanup
+4. **Avoid async without await**: if fire-and-forget needed, use launch + Job tracking
+
+Patterns:
+
+- supervisorScope for independent tasks
+- CoroutineExceptionHandler on root scope for logging
+- Job.join() in tests to ensure completion
+
+In MoMo high-traffic services, we added linter rule against GlobalScope — reduced leaked coroutines from ~5% to near zero.
+
+****
