@@ -78,3 +78,231 @@ Hands-on: Use AWS free tier to deploy a simple Python/Kotlin app (e.g., via Elas
 - **Questions to Ask**: "How does the team handle on-call for SRE?" or "What's the roadmap for Thought Machine integrations?" Shows interest.
 - **Logistics**: Since it's in HCMC and you're local, confirm hybrid details. Review basics like time complexity (O(n)) for coding.
 - **Mindset**: Be confident in your 2+ years of relevant exp; they're looking for quick learners. If stuck, think aloud and ask clarifying questions.
+
+
+### Scenario – "Fintech Wallet App" Module Structure
+
+We have:
+
+- Multiple **repositories** (interface + impl)
+- Retrofit + OkHttp setup with interceptors (auth, logging)
+- Room database + DAO
+- Repository that depends on both network and local storage
+- ViewModel that depends on repository
+- Qualifiers for different OkHttp clients (authenticated vs. public)
+
+Kotlin
+
+```
+// =============================================
+// 1. Qualifiers (very common in real apps)
+// =============================================
+
+import javax.inject.Qualifier
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AuthenticatedOkHttpClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class LoggingInterceptor
+
+// =============================================
+// 2. Interfaces (what we usually bind with @Binds)
+// =============================================
+
+interface AuthRepository {
+    suspend fun login(email: String, password: String): Result<User>
+    suspend fun getCurrentUser(): User?
+}
+
+interface TransactionRepository {
+    suspend fun getTransactions(page: Int): List<Transaction>
+    suspend fun syncTransactions()
+}
+
+interface SettingsRepository {
+    fun getThemeMode(): Flow<ThemeMode>
+    suspend fun updateThemeMode(mode: ThemeMode)
+}
+
+// =============================================
+// 3. Concrete implementations (constructor-injected)
+// =============================================
+
+@Singleton
+class AuthRepositoryImpl @Inject constructor(
+    private val api: AuthApi,
+    private val userDao: UserDao,
+    @ApplicationContext private val context: Context
+) : AuthRepository { ... }
+
+@Singleton
+class TransactionRepositoryImpl @Inject constructor(
+    private val transactionApi: TransactionApi,
+    private val transactionDao: TransactionDao,
+    private val authRepository: AuthRepository
+) : TransactionRepository { ... }
+
+@Singleton
+class SettingsRepositoryImpl @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+) : SettingsRepository { ... }
+
+// =============================================
+// 4. The Complex Module – mix of @Binds + @Provides
+// =============================================
+
+@Module
+@InstallIn(SingletonComponent::class)           // Application-wide scope
+object AppModule {
+
+    // ────────────────────────────────────────
+    // @Binds section – for interfaces → impl
+    // Fastest & most efficient (no runtime creation code)
+    // ────────────────────────────────────────
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        impl: AuthRepositoryImpl
+    ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTransactionRepository(
+        impl: TransactionRepositoryImpl
+    ): TransactionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
+
+    // ────────────────────────────────────────
+    // @Provides section – for 3rd-party / complex creation
+    // You must own the construction logic
+    // ────────────────────────────────────────
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(
+        @AuthenticatedOkHttpClient okHttpClient: OkHttpClient
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.yourbank.vn/v1/")
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideAuthApi(retrofit: Retrofit): AuthApi =
+        retrofit.create(AuthApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideTransactionApi(retrofit: Retrofit): TransactionApi =
+        retrofit.create(TransactionApi::class.java)
+
+    @Provides
+    @Singleton
+    @AuthenticatedOkHttpClient
+    fun provideAuthenticatedOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        @LoggingInterceptor loggingInterceptor: HttpLoggingInterceptor
+    ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)           // adds Bearer token
+        .addInterceptor(loggingInterceptor)
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    @Provides
+    @Singleton
+    @LoggingInterceptor
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
+        HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                    else HttpLoggingInterceptor.Level.NONE
+        }
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(
+        tokenManager: TokenManager
+    ): AuthInterceptor = AuthInterceptor(tokenManager)
+
+    @Provides
+    @Singleton
+    fun provideRoomDatabase(
+        @ApplicationContext context: Context
+    ): AppDatabase = Room.databaseBuilder(
+        context,
+        AppDatabase::class.java,
+        "fintech_db"
+    )
+        .fallbackToDestructiveMigrationOnDowngrade()
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
+
+    @Provides
+    @Singleton
+    fun provideTransactionDao(db: AppDatabase): TransactionDao = db.transactionDao()
+
+    @Provides
+    @Singleton
+    fun provideDataStore(
+        @ApplicationContext context: Context
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create {
+        context.preferencesDataStoreFile("settings")
+    }
+}
+
+// =============================================
+// 5. Bonus: Hilt ViewModel that consumes many deps
+// =============================================
+
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
+    private val transactionRepo: TransactionRepository,
+    private val authRepo: AuthRepository,
+    private val settingsRepo: SettingsRepository,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
+    val transactions = _transactions.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            transactionRepo.getTransactions(1).let { _transactions.value = it }
+        }
+    }
+}
+```
+
+### Why This Example Is "Complex" and Realistic
+
+- Mixes **@Binds** (for your own impl → interface bindings → fastest codegen)
+- Uses **@Provides** for everything you don't own or need custom construction (Retrofit, OkHttp, Room, DataStore, interceptors)
+- Uses **qualifiers** (@AuthenticatedOkHttpClient, @LoggingInterceptor) → very common in production
+- Shows **@Singleton** scoping (application-wide singletons)
+- Includes **ViewModel** injection with **@HiltViewModel** + constructor injection
+- Has real dependencies chain (ViewModel → Repo → Api/Dao → Retrofit/OkHttp/Room)
+
+### Quick Rules of Thumb (interview gold)
+
+|Situation|Use this|Why / Benefit|
+|---|---|---|
+|You own the implementation class|@Inject constructor|Zero module code, fastest|
+|Interface → your impl|@Binds|Fastest code-gen, no reflection|
+|3rd-party class / builder pattern|@Provides|You control creation (Retrofit, Room, etc.)|
+|Multiple impls / named variants|@Qualifier + @Provides|Clear separation (auth vs public client)|
+|Same module has both|Yes – allowed & common|@Binds for interfaces, @Provides for factories|
+
+This is a very typical setup in mid-large Android teams in 2025–2026.
