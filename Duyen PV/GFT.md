@@ -1,4 +1,4 @@
-### Preparation for Python Programming
+### Python Programming
 
 Expect questions on core concepts, best practices, and problem-solving, possibly with live coding (e.g., LeetCode-style problems like string manipulation, data structures, or async tasks). Focus on backend relevance: concurrency, APIs, databases.
 
@@ -22,7 +22,7 @@ Expect questions on core concepts, best practices, and problem-solving, possibly
 
 Practice 5-10 problems on HackerRank or LeetCode in Python, focusing on arrays, trees, and dynamic programming.
 
-### Preparation for Kotlin Programming
+### Kotlin Programming
 
 Kotlin questions may cover interoperability with Java, modern features, and backend use (e.g., in Spring/Vert.x). Expect coding on null safety, coroutines, or collections.
 
