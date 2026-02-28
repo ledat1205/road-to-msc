@@ -1,3 +1,92 @@
+
+### Core Idea – No Thread per Request
+
+Traditional servers (Tomcat, old Java servlets):
+
+- 1 incoming connection → 1 dedicated thread
+- Thread blocks during I/O → need thousands of threads for thousands of connections
+
+Vert.x (event-driven + non-blocking):
+
+- A small number of event-loop threads **multiplex** thousands of connections
+- Threads **never block** on I/O — they use **epoll/kqueue** to wait for many sockets at once
+- When data arrives on any socket, the event loop calls your handler for **that one connection** → then immediately moves to the next ready one
+
+### How 10,000 Concurrent Connections Are Handled by ~16 Event-Loop Threads
+
+Assume:
+
+- 8-core machine → Vert.x creates **16 event-loop threads** by default (2 × cores)
+- All connections are keep-alive (HTTP/1.1 or HTTP/2) — typical in modern APIs
+
+Step-by-step life of 10,000 concurrent connections:
+
+1. **Connections arrive**
+    - Netty boss thread accepts TCP connections (very fast)
+    - Each new socket is registered with one of the 16 event-loop threads (round-robin)
+2. **Idle connections wait**
+    - All 10,000 sockets are registered with epoll/kqueue
+    - Each event-loop thread calls epoll_wait() → sleeps until **any** of its ~625 sockets (10,000 ÷ 16) has data
+    - **Zero CPU usage** while waiting — kernel handles waiting
+3. **Request arrives on one connection**
+    - Network card receives packet → interrupt → kernel wakes the correct event-loop thread
+    - epoll_wait() returns → “socket #7842 is readable”
+    - Event-loop thread reads bytes → parses HTTP headers/body (non-blocking)
+    - When full request is ready → calls **your handler** on **that same thread**
+    - Handler runs quickly (non-blocking DB, cache lookup, etc.) → sends response (queues write)
+    - Thread immediately goes back to epoll_wait() — no waiting
+4. **Response is sent**
+    - When socket becomes writable → epoll notifies again
+    - Event-loop thread writes response chunks (non-blocking)
+    - If write buffer full → thread queues rest and continues polling other sockets
+5. **Many requests at the same time**
+    - If 100 requests arrive at once → epoll returns a list of 100 ready sockets
+    - One event-loop thread processes all 100 in a tight loop (microseconds each)
+    - No thread switching — just sequential calls to handlers
+    - Other 15 event loops do the same for their sockets
+
+Result: **16 event-loop threads** can handle **10,000+ concurrent connections** because:
+
+- Most connections are idle most of the time (keep-alive)
+- Idle waiting is done by the kernel (epoll_wait blocks with 0% CPU)
+- When work arrives, it’s **very short bursts** of CPU time per request
+- One thread can process **hundreds of requests per second** if handlers are fast
+
+### When the 20 Worker Threads Come In
+
+Workers are only used when **you** explicitly offload blocking work.
+
+Example scenarios:
+
+- Sync JDBC query
+- Large JSON parsing
+- File read/write
+- CPU-heavy computation
+
+Flow:
+
+- Your handler needs to do slow work:
+    
+    Kotlin
+    
+    ```
+    router.get("/report").handler { ctx ->
+        vertx.executeBlocking { promise ->
+            // Blocking JDBC or file read here
+            val report = generateSlowReport()
+            promise.complete(report)
+        } { ar ->
+            if (ar.succeeded()) ctx.response().end(ar.result())
+            else ctx.fail(500)
+        }
+    }
+    ```
+    
+- Vert.x picks one of the **20 worker threads** → runs the blocking code
+- Event-loop thread is free immediately → continues handling other requests
+- When worker finishes → result is sent back to event loop → handler continues
+
+So the **20 workers** handle occasional blocking tasks while the **16 event loops** keep the event-driven world spinning fast.
 - “What does event-driven mean to you?”
     
 - “How is Vert.x different from a traditional thread-pool server like Tomcat?”
