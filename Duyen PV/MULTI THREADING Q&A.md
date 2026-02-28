@@ -565,3 +565,304 @@ If you want:
 - Focus on one category (e.g., only coroutines)
 
 Let me know! Good luck with the prep! 🚀
+
+
+
+### 1. Global Lock Ordering — Always acquire locks in the same order
+
+**Why it prevents deadlock**: If all threads always lock resources in a fixed global order (e.g., by resource ID or name), it's impossible to create a circular wait.
+
+**Example**: Transferring money between two accounts (classic deadlock risk if order is not enforced).
+
+**Bad code (can deadlock)**:
+
+Kotlin
+
+```
+suspend fun transferBad(from: Account, to: Account, amount: Long) {
+    from.lock.withLock {
+        to.lock.withLock {  // different order depending on call
+            from.balance -= amount
+            to.balance += amount
+        }
+    }
+}
+```
+
+**Good code (global ordering by account ID)**:
+
+Kotlin
+
+```
+suspend fun transfer(from: Account, to: Account, amount: Long) {
+    // Always lock lower ID first → global order
+    val (first, second) = if (from.id < to.id) from to else to to from
+
+    first.lock.withLock {
+        second.lock.withLock {
+            first.balance -= amount
+            second.balance += amount
+        }
+    }
+}
+```
+
+**Vert.x version** (using Event Bus instead — even better):
+
+Kotlin
+
+```
+// No locks needed — single verticle owns all accounts
+class AccountVerticle : CoroutineVerticle() {
+    private val balances = mutableMapOf<Long, Long>()
+
+    override suspend fun start() {
+        vertx.eventBus().consumer<JsonObject>("account.transfer") { msg ->
+            val fromId = msg.body().getLong("fromId")!!
+            val toId = msg.body().getLong("toId")!!
+            val amount = msg.body().getLong("amount")!!
+
+            // Single-threaded → safe without locks
+            val fromBalance = balances.getOrDefault(fromId, 0L)
+            if (fromBalance >= amount) {
+                balances[fromId] = fromBalance - amount
+                balances[toId] = balances.getOrDefault(toId, 0L) + amount
+                msg.reply("success")
+            } else {
+                msg.reply("insufficient")
+            }
+        }
+    }
+}
+```
+
+### 2. Timeout Locks — use tryLock(timeout) instead of lock()
+
+**Why it prevents deadlock**: If a thread can't acquire a lock within a timeout, it gives up → breaks potential cycles.
+
+**Example**: Acquiring locks for order processing with timeout.
+
+Kotlin
+
+```
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantLock
+
+class OrderProcessor {
+    private val inventoryLock = ReentrantLock()
+    private val paymentLock = ReentrantLock()
+
+    suspend fun processOrder(orderId: String): Boolean {
+        // Try to get inventory lock with 5-second timeout
+        if (!inventoryLock.tryLock(5, TimeUnit.SECONDS)) {
+            logger.warn("Failed to acquire inventory lock for order $orderId")
+            return false
+        }
+
+        try {
+            // Now try payment lock with timeout
+            if (!paymentLock.tryLock(3, TimeUnit.SECONDS)) {
+                logger.warn("Failed to acquire payment lock for order $orderId")
+                return false
+            }
+
+            try {
+                // Critical section
+                reserveInventory(orderId)
+                processPayment(orderId)
+                return true
+            } finally {
+                paymentLock.unlock()
+            }
+        } finally {
+            inventoryLock.unlock()
+        }
+    }
+}
+```
+
+**With coroutines Mutex** (preferred in Kotlin):
+
+Kotlin
+
+```
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withTimeoutOrNull
+
+class OrderProcessor {
+    private val inventoryMutex = Mutex()
+    private val paymentMutex = Mutex()
+
+    suspend fun processOrder(orderId: String): Boolean {
+        if (!withTimeoutOrNull(5_000) { inventoryMutex.lock() }) {
+            logger.warn("Inventory lock timeout")
+            return false
+        }
+
+        try {
+            if (!withTimeoutOrNull(3_000) { paymentMutex.lock() }) {
+                logger.warn("Payment lock timeout")
+                return false
+            }
+
+            try {
+                reserveInventory(orderId)
+                processPayment(orderId)
+                return true
+            } finally {
+                paymentMutex.unlock()
+            }
+        } finally {
+            inventoryMutex.unlock()
+        }
+    }
+}
+```
+
+### 3. Avoid Nested Locking When Possible — Refactor Code
+
+**Why it helps**: Nested locks increase deadlock risk and contention.
+
+**Bad (nested locking)**:
+
+Kotlin
+
+```
+suspend fun updateUserAndOrder(userId: Long, orderId: Long) {
+    userLock.withLock {
+        orderLock.withLock {  // nested → deadlock risk
+            updateUserBalance(userId)
+            updateOrderStatus(orderId)
+        }
+    }
+}
+```
+
+**Good (refactored — no nesting)**:
+
+Kotlin
+
+```
+suspend fun updateUserAndOrder(userId: Long, orderId: Long) {
+    // Step 1: Update user first (no lock overlap)
+    userLock.withLock {
+        updateUserBalance(userId)
+    }
+
+    // Step 2: Update order separately
+    orderLock.withLock {
+        updateOrderStatus(orderId)
+    }
+}
+```
+
+**Even better (Vert.x style — no locks)**:
+
+Kotlin
+
+```
+// Single verticle owns both user and order state
+class UserOrderVerticle : CoroutineVerticle() {
+    private val userBalances = mutableMapOf<Long, Long>()
+    private val orderStatuses = mutableMapOf<Long, String>()
+
+    override suspend fun start() {
+        vertx.eventBus().consumer<JsonObject>("update.userAndOrder") { msg ->
+            val userId = msg.body().getLong("userId")!!
+            val orderId = msg.body().getLong("orderId")!!
+
+            // No locks — single-threaded
+            val balance = userBalances.getOrDefault(userId, 0L)
+            if (balance >= 100) {
+                userBalances[userId] = balance - 100
+                orderStatuses[orderId] = "PAID"
+                msg.reply("success")
+            } else {
+                msg.reply("insufficient")
+            }
+        }
+    }
+}
+```
+
+### 4. Use Higher-Level Primitives — ConcurrentHashMap, BlockingQueue, coroutines Mutex, Vert.x Event Bus
+
+**Examples**:
+
+**ConcurrentHashMap** (thread-safe map, no explicit locks):
+
+Kotlin
+
+```
+val cache = ConcurrentHashMap<String, String>()
+
+// Safe concurrent access
+cache.compute("key") { _, oldValue ->
+    oldValue?.plus(" updated") ?: "new value"
+}
+```
+
+**BlockingQueue** (producer-consumer without manual locks):
+
+Kotlin
+
+```
+val queue = LinkedBlockingQueue<String>(100)
+
+// Producer
+launch {
+    queue.put("task-1")  // blocks if full
+}
+
+// Consumer
+launch {
+    while (isActive) {
+        val task = queue.take()  // blocks if empty
+        process(task)
+    }
+}
+```
+
+**Kotlin Mutex** (coroutine-friendly lock):
+
+Kotlin
+
+```
+val mutex = Mutex()
+val sharedList = mutableListOf<String>()
+
+suspend fun addItem(item: String) {
+    mutex.withLock {
+        sharedList.add(item)
+    }
+}
+```
+
+**Vert.x Event Bus** (no locks, single verticle):
+
+Kotlin
+
+```
+// Single verticle owns shared state
+class SharedStateVerticle : CoroutineVerticle() {
+    private val state = mutableMapOf<String, Int>()
+
+    override suspend fun start() {
+        vertx.eventBus().consumer<JsonObject>("state.update") { msg ->
+            val key = msg.body().getString("key")!!
+            val delta = msg.body().getInteger("delta")!!
+            state.compute(key) { _, old -> (old ?: 0) + delta }
+            msg.reply(state[key])
+        }
+    }
+}
+```
+
+**When to choose which**:
+
+- ConcurrentHashMap → concurrent key-value store
+- BlockingQueue → producer-consumer queue
+- Mutex → coroutine-specific locking
+- **Event Bus + single verticle** → preferred in Vert.x (no locks, decoupling, clustering-ready)
+
+These are the exact patterns used in production to eliminate deadlock risk while keeping code safe and performant.
