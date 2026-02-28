@@ -1,4 +1,12 @@
 
+| Need                           | Choose this                    | Creation example              |
+| ------------------------------ | ------------------------------ | ----------------------------- |
+| Ordered list, allow duplicates | `List<T>` / `MutableList<T>`   | `listOf()`, `mutableListOf()` |
+| Key → value lookup             | `Map<K,V>` / `MutableMap<K,V>` | `mapOf()`, `mutableMapOf()`   |
+| Unique items only              | `Set<T>` / `MutableSet<T>`     | `setOf()`, `mutableSetOf()`   |
+| Fixed size, fast access        | `Array<T>` or primitive arrays | `arrayOf()`, `intArrayOf()`   |
+| FIFO / LIFO / double-ended     | `ArrayDeque<T>`                | `ArrayDeque()`                |
+| Preserve insertion order + map | `LinkedHashMap<K,V>`           | `linkedMapOf()`               |
 ### Kotlin Language & Idioms
 
 **1. When do you still use `var` instead of `val`?**
