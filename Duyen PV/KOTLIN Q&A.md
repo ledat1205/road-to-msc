@@ -1,3 +1,129 @@
+### 1. List<T> / MutableList<T> (by far the #1 most used)
+
+- Ordered collection that allows duplicates.
+- Access by index (like arrays but dynamic/resizable).
+- Most common implementations:
+    - ArrayList<T> (default backing for mutableListOf() — fast random access, O(1) get/set)
+    - LinkedList<T> (rarely used directly — better for frequent inserts/deletes in middle)
+
+**When to use**:
+
+- Almost everything: user lists, search results, API responses, event logs, etc.
+- Prefer **immutable**List<T> in function signatures/return types.
+
+Kotlin
+
+```
+val names: List<String> = listOf("Alice", "Bob", "Charlie")          // immutable
+val scores = mutableListOf(85, 92, 78)                               // mutable
+scores.add(95)
+scores[1] = 90
+```
+
+### 2. Map<K, V> / MutableMap<K, V> (very close #2)
+
+- Key-value pairs (dictionary/hash table).
+- Keys are **unique**, values can duplicate.
+- Most common implementations:
+    - HashMap<K, V> (unordered, fastest average O(1) lookup/insert)
+    - LinkedHashMap<K, V> (preserves insertion order — very common for JSON serialization)
+    - TreeMap<K, V> (sorted by keys — rare unless you need ordering)
+
+**When to use**:
+
+- Caching, configs, grouping data, API params, user sessions, etc.
+
+Kotlin
+
+```
+val userScores: Map<String, Int> = mapOf("Alice" to 95, "Bob" to 82)
+val cache = mutableMapOf<String, String>()
+cache["token"] = "xyz123"
+val score = userScores["Alice"] ?: 0   // safe access
+```
+
+### 3. Set<T> / MutableSet<T>
+
+- Collection of **unique** elements (no duplicates).
+- Most common implementations:
+    - HashSet<T> (unordered, fastest membership check O(1))
+    - LinkedHashSet<T> (preserves insertion order)
+    - TreeSet<T> (sorted — via Java interop)
+
+**When to use**:
+
+- Removing duplicates, tracking seen items, tags, permissions, unique IDs.
+
+Kotlin
+
+```
+val uniqueIds: Set<Long> = setOf(1001, 1002, 1001)          // → {1001, 1002}
+val activeUsers = mutableSetOf<String>()
+activeUsers.add("alice42")
+activeUsers.contains("bob99")   // fast check
+```
+
+### 4. Array<T>
+
+- Fixed-size, primitive-friendly collection (not a Collection subclass).
+- Better performance for primitives (no boxing) and when size is known & fixed.
+
+**When to use**:
+
+- Performance-critical code, interop with Java arrays, primitive collections.
+
+Kotlin
+
+```
+val numbers = arrayOf(1, 2, 3)              // Array<Int>
+val primitives = IntArray(5) { it * 10 }    // [0,10,20,30,40] — no boxing
+```
+
+### 5. Queue / Deque (less common but important)
+
+- **Queue<T>** → FIFO (first-in-first-out)
+    - Most used: ArrayDeque<T> (double-ended queue — very efficient)
+- **Stack** → LIFO (last-in-first-out) — usually just use ArrayDeque with push/pop
+
+**When to use**:
+
+- Task queues, BFS (queue), undo/redo (stack), sliding window, etc.
+
+Kotlin
+
+```
+val tasks = ArrayDeque<String>()
+tasks.addLast("fetch data")     // enqueue
+tasks.addFirst("priority task") // can act as deque
+val next = tasks.removeFirst()  // dequeue
+```
+
+### 6. Other somewhat common ones (but not daily for most devs)
+
+|Data Structure|Kotlin Type / Impl|Best For|Approx. Frequency|
+|---|---|---|---|
+|PriorityQueue|java.util.PriorityQueue|Tasks by priority (Dijkstra, etc.)|Medium (algorithms)|
+|Pair / Triple|Pair<A,B>, Triple<A,B,C>|Simple tuples (return 2–3 values)|Common|
+|Data class (custom)|Your own data class|DTOs, domain models|Extremely common|
+|Sequence<T>|sequence { ... }|Lazy / infinite / large data streams|Growing (performance)|
+|ArrayDeque<T>|(as above)|Queue + Stack + Deque in one|Increasing|
+
+### Quick decision table (what most Kotlin devs use 95% of the time)
+
+|Need|Choose this|Creation example|
+|---|---|---|
+|Ordered list, allow duplicates|List<T> / MutableList<T>|listOf(), mutableListOf()|
+|Key → value lookup|Map<K,V> / MutableMap<K,V>|mapOf(), mutableMapOf()|
+|Unique items only|Set<T> / MutableSet<T>|setOf(), mutableSetOf()|
+|Fixed size, fast access|Array<T> or primitive arrays|arrayOf(), intArrayOf()|
+|FIFO / LIFO / double-ended|ArrayDeque<T>|ArrayDeque()|
+|Preserve insertion order + map|LinkedHashMap<K,V>|linkedMapOf()|
+
+In practice (from interviews, code reviews, production at places like Tiki/MoMo):
+
+- **List** + **Map** cover ~80–90% of use cases.
+- Prefer immutable types (List, Map, Set) in APIs and return types.
+- Use mutableXxxOf() only when you actually need to mutate.
 ### Kotlin Language & Idioms
 
 **1. When do you still use var instead of val?**
