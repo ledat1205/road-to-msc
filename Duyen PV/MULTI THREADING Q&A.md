@@ -559,12 +559,7 @@ In production, we added health-check endpoint that returns 503 when shutting dow
 
 These answers are now more detailed with code where it adds value.
 
-If you want:
-- More questions (e.g., 10 more on concurrency pitfalls)
-- Mock interview simulation (I ask → you answer → feedback)
-- Focus on one category (e.g., only coroutines)
 
-Let me know! Good luck with the prep! 🚀
 
 
 
