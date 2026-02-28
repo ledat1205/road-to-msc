@@ -8,7 +8,143 @@
     
 - “Why is non-blocking important in high-throughput systems?”
 
+### 1. “What does event-driven mean to you?”
 
+**Answer**:
+
+To me, event-driven means the system is **built around reacting to things that happen**, rather than following a fixed sequence of steps or constantly checking if something is ready.
+
+Instead of code saying: "Do this → wait → do that → wait → do the next thing…"
+
+The code says: "When X happens (an event), run this handler. When Y happens, run that handler."
+
+Events can be anything:
+
+- A new HTTP request arrives
+- A timer fires
+- A message arrives from Kafka
+- A database row changes (via CDC)
+- A price drops below a threshold (like in a price tracker)
+
+The big advantages are:
+
+- **High concurrency** — one thread can wait for thousands of events without wasting CPU
+- **Loose coupling** — different parts of the system don't call each other directly; they just emit and react to events
+- **Resilience** — if one handler is slow, it doesn't block everything else
+
+In practice, I see this every day in Vert.x: the event loop waits for network I/O or timers using epoll under the hood, then calls my handler only when something is actually ready. At MoMo, our high-traffic mini-apps were event-driven — when a user completed a game round, we published an event, and separate services reacted to update leaderboards or send rewards without blocking the main flow.
+
+### 2. “How is Vert.x different from a traditional thread-pool server like Tomcat?”
+
+**Answer**:
+
+The biggest difference is the **threading model and how they handle requests**.
+
+In a traditional thread-pool server like Tomcat (classic servlet container):
+
+- Each incoming HTTP request gets its own thread from a pool (e.g., 200 threads max by default)
+- The thread blocks while doing work: reading the request, calling your servlet, querying the DB, writing the response
+- If 200 requests come in at once and each takes 1 second (e.g., slow DB call), the server can only handle 200 concurrent requests — more requests queue up or get rejected
+- High thread count → high memory (each thread has ~1 MB stack), lots of context switching, higher latency under load
+
+Vert.x is **event-driven and non-blocking**:
+
+- It uses a small number of event-loop threads (default 2 × CPU cores)
+- One event-loop thread can handle **thousands** of requests because it **never blocks** — it registers interest in sockets/timers with epoll, then sleeps until the OS wakes it with ready events
+- When a request arrives or data is ready, the event loop calls your handler quickly, then moves on to the next ready event
+- Blocking work (e.g., sync DB call) is offloaded to a worker pool or executeBlocking — event loops stay fast
+- Result: one server can handle 10k–100k+ concurrent connections with very low CPU/memory
+
+In short: Tomcat scales by adding threads (thread-per-request). Vert.x scales by **avoiding blocking** and reusing few threads efficiently.
+
+At Tiki, we switched some high-throughput endpoints to Vert.x — same hardware handled 5–10× more RPS because we eliminated blocking DB calls on the main loop.
+
+### 3. “Explain how you would build a price-drop notification system in Vert.x.”
+
+**Answer**:
+
+I’d build it as an **event-driven microservice** using Vert.x + Kotlin + coroutines for clean async code.
+
+High-level design:
+
+1. **Input**: Users add products they want to track (keyword or URL) via HTTP API
+2. **Periodic checking**: A scheduler periodically searches Google Shopping (or Shopee/Lazada APIs) for the lowest price
+3. **Price drop detection**: Compare new price with previous lowest → if drop > threshold (e.g., 5%), publish event
+4. **Notification**: Other services react to the event (email, push, in-app alert)
+
+Implementation in Vert.x:
+
+- **Verticle 1: HTTP API + Storage** (normal verticle)
+    - POST /track → store keyword + user ID + threshold in PostgreSQL (using vertx-pg-client)
+    - GET /tracked → list user’s items
+- **Verticle 2: Price Checker** (CoroutineVerticle)
+    - setPeriodic(30 minutes) → query DB for all tracked keywords
+    - For each keyword: use WebClient (Vert.x HTTP client) to search Google Shopping
+    - Parse lowest price (Jsoup or regex on HTML)
+    - If new_low < previous_low:
+        
+        Kotlin
+        
+        ```
+        vertx.eventBus().publish("price.dropped", JsonObject()
+            .put("keyword", keyword)
+            .put("newPrice", newPrice)
+            .put("oldPrice", oldPrice)
+            .put("userIds", userIds)
+        )
+        ```
+        
+- **Verticle 3: Notification Sender** (worker verticle if email is blocking)
+    - Subscribe to Event Bus address "price.dropped"
+    - Send email/push via async client (e.g., Vert.x MailClient or Firebase SDK)
+    - Update DB with new lowest price
+
+Why Vert.x fits perfectly:
+
+- Event Bus decouples checker from notifier — easy to scale or add more notifiers
+- Non-blocking WebClient for Google searches → no event-loop stalls
+- Coroutines make async parsing/HTTP/DB calls look synchronous
+
+This way, even if email sending is slow, it doesn't block price checking or API.
+
+### 4. “What is the role of the Event Bus in Vert.x?”
+
+**Answer**:
+
+The **Event Bus** is the **central nervous system** of Vert.x — it's a lightweight, asynchronous message bus that lets verticles (or different parts of your app) communicate without knowing about each other.
+
+Main roles:
+
+1. **Decoupling**: Verticles don’t call each other directly — one publishes a message, others subscribe and react. Example: "OrderPlaced" → inventory verticle decreases stock, notification verticle sends email.
+2. **Pub/Sub & Request-Reply**:
+    - publish() → fire-and-forget to all subscribers
+    - send() → point-to-point (round-robin if multiple consumers)
+    - request() → request-reply pattern (like RPC over async)
+3. **Clustering**: If you enable clustering (Hazelcast or Ignite), Event Bus messages automatically go across JVMs/servers — great for distributed systems.
+4. **Thread safety**: All delivery happens on event-loop threads — no locks needed if you follow Vert.x rules.
+
+Real example from MoMo: When a user completed a minigame round, we published "GameRoundCompleted" on Event Bus → leaderboard verticle updated scores, reward verticle credited coins, analytics verticle logged event — all decoupled, easy to add new features.
+
+In short: Event Bus turns your app into a reactive, loosely-coupled system — core to Vert.x’s power.
+
+### 5. “Why is non-blocking important in high-throughput systems?”
+
+**Answer**:
+
+Non-blocking is crucial in high-throughput systems because it lets you **handle many more concurrent requests with fewer resources**.
+
+In blocking systems (like classic Tomcat/JDBC):
+
+- Each request ties up one thread while waiting (DB query, network call, file read)
+- If each request waits 100 ms for DB, one thread can handle only ~10 requests per second
+- 1,000 concurrent requests → need 1,000 threads → high memory (~1 MB stack per thread), lots of context switching, expensive scaling
+
+In non-blocking systems (Vert.x, Netty, reactive drivers):
+
+- Threads **never wait** — they register interest ("tell me when DB data is ready") and move on
+- One event-loop thread can handle **thousands** of requests because it only works when real data arrives
+- Waiting is done by the OS kernel (epoll_wait) → zero CPU while idle
+- Result: same server handles 10–100× more throughput with 10–20× less memory/CPU
 ### 1. The Event Loop — Core Idea (Simplified View)
 
 At its simplest:
