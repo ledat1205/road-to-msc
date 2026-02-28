@@ -135,3 +135,276 @@ Look for:
 - Add metric alert if blocked count > 0
 
 In practice, **Vert.x blocked-thread logs** solve most cases — teams that monitor them rarely have mystery latency issues.
+
+### Resolving Common Blocking Code Patterns in Vert.x
+
+In Vert.x (or any event-driven framework), blocking code on the event-loop thread is a common issue that causes latency spikes. The general fix is to **offload blocking operations** to the worker pool using vertx.executeBlocking(), or better yet, switch to non-blocking alternatives (e.g., async clients). I'll explain how to resolve each of your examples, with code snippets in Kotlin + Vert.x. Then, I'll add a few more common examples.
+
+For all fixes, assume you're inside a CoroutineVerticle (using suspend and await() for clean code). If not using coroutines, replace await() with onSuccess { ... } callbacks.
+
+#### 1. java.sql.Statement.executeQuery → Sync JDBC (Classic Blocking DB Call)
+
+**Why it's blocking**: Traditional JDBC is synchronous — the thread waits for the DB response, stalling the event loop.
+
+**Resolution**:
+
+- **Short-term fix**: Wrap in executeBlocking (offloads to worker pool).
+- **Long-term fix**: Switch to Vert.x's async SQL client (vertx-pg-client for PostgreSQL, vertx-mysql-client, etc.) or R2DBC for reactive JDBC.
+
+**Code Example (Short-term)**:
+
+Kotlin
+
+```
+suspend fun syncJdbcQuery(id: Long): RowSet<Row> {
+    return vertx.executeBlockingAwait { promise ->
+        try {
+            val conn = DriverManager.getConnection("jdbc:postgresql://localhost/mydb", "user", "pass")
+            val stmt = conn.createStatement()
+            val rs = stmt.executeQuery("SELECT * FROM users WHERE id = $id")
+            // Convert ResultSet to Vert.x RowSet (or your model)
+            val rowSet = convertToRowSet(rs)  // Custom helper
+            promise.complete(rowSet)
+        } catch (e: Exception) {
+            promise.fail(e)
+        } finally {
+            conn.close()
+        }
+    }
+}
+```
+
+**Code Example (Long-term — Async)**:
+
+Kotlin
+
+```
+// In start(): init PgPool
+val pgPool = PgBuilder.pool(vertx, connectOptions, poolOptions)
+
+suspend fun asyncQuery(id: Long): RowSet<Row> {
+    return pgPool.preparedQuery("SELECT * FROM users WHERE id = $1")
+        .executeAwait(Tuple.of(id))
+}
+```
+
+#### 2. com.fasterxml.jackson.databind.ObjectMapper.readValue → Huge JSON Parsing
+
+**Why it's blocking**: Jackson's readValue is CPU-bound and memory-intensive for large payloads — it can take seconds on big JSON, stalling the event loop.
+
+**Resolution**:
+
+- **Short-term fix**: Offload to executeBlocking (worker pool).
+- **Long-term fix**: Use Jackson's streaming API (JsonParser) to parse incrementally (non-blocking). Or switch to Kotlinx Serialization (faster, but still offload if huge).
+
+**Code Example (Short-term)**:
+
+Kotlin
+
+```
+suspend fun parseHugeJson(jsonString: String): JsonObject {
+    return vertx.executeBlockingAwait { promise ->
+        try {
+            val mapper = ObjectMapper()
+            val tree = mapper.readTree(jsonString)
+            promise.complete(JsonObject(tree.toString()))  // Convert to Vert.x Json
+        } catch (e: Exception) {
+            promise.fail(e)
+        }
+    }
+}
+```
+
+**Code Example (Long-term — Streaming)**:
+
+Kotlin
+
+```
+suspend fun parseStreamingJson(input: Buffer): JsonObject {  // Vert.x Buffer
+    val mapper = ObjectMapper()
+    val parser = mapper.factory.createParser(input.bytes)
+    
+    return withContext(Dispatchers.IO) {  // Offload if parsing is heavy
+        val tree = mapper.readTree(parser)
+        JsonObject(tree.toString())
+    }
+}
+```
+
+#### 3. java.net.HttpURLConnection.getInputStream → Sync HTTP Call
+
+**Why it's blocking**: getInputStream() waits for the full response, blocking the thread on network I/O.
+
+**Resolution**:
+
+- **Short-term fix**: Wrap in executeBlocking.
+- **Long-term fix**: Use Vert.x's non-blocking WebClient (built on Netty) for all HTTP calls.
+
+**Code Example (Short-term)**:
+
+Kotlin
+
+```
+suspend fun syncHttpGet(url: String): Buffer {
+    return vertx.executeBlockingAwait { promise ->
+        try {
+            val conn = URL(url).openConnection() as HttpURLConnection
+            conn.requestMethod = "GET"
+            val input = conn.inputStream
+            val body = input.readBytes()
+            promise.complete(Buffer.buffer(body))
+        } catch (e: Exception) {
+            promise.fail(e)
+        } finally {
+            conn.disconnect()
+        }
+    }
+}
+```
+
+**Code Example (Long-term — Async)**:
+
+Kotlin
+
+```
+val webClient = WebClient.create(vertx)
+
+suspend fun asyncHttpGet(url: String): Buffer {
+    return webClient.getAbs(url)
+        .sendAwait()
+        .body()
+}
+```
+
+#### 4. java.io.FileInputStream.read → Large File Read
+
+**Why it's blocking**: read() waits for disk I/O, which can be slow for large files (hundreds of MB).
+
+**Resolution**:
+
+- **Short-term fix**: Offload to executeBlocking.
+- **Long-term fix**: Use Vert.x's async file system API (vertx.fileSystem()) for non-blocking reads.
+
+**Code Example (Short-term)**:
+
+Kotlin
+
+```
+suspend fun syncFileRead(path: String): Buffer {
+    return vertx.executeBlockingAwait { promise ->
+        try {
+            val input = FileInputStream(path)
+            val bytes = input.readBytes()
+            promise.complete(Buffer.buffer(bytes))
+        } catch (e: Exception) {
+            promise.fail(e)
+        } finally {
+            input.close()
+        }
+    }
+}
+```
+
+**Code Example (Long-term — Async)**:
+
+Kotlin
+
+```
+suspend fun asyncFileRead(path: String): Buffer {
+    return vertx.fileSystem().readFileAwait(path)
+}
+```
+
+### More Examples of Blocking Code and Resolutions
+
+**Example 5: Thread.sleep or TimeUnit.sleep (Debug / Wait Logic)**
+
+**Why blocking**: Obviously blocks the thread for the duration.
+
+**Resolution**:
+
+- Replace with Vert.x's non-blocking timer.
+- **Code**:
+    
+    Kotlin
+    
+    ```
+    suspend fun asyncSleep(ms: Long) {
+        vertx.timer(ms).await()
+    }
+    ```
+    
+
+**Example 6: Large Collection Processing (e.g., list.sortBy on 1M items)**
+
+**Why blocking**: CPU-bound — takes seconds on event loop.
+
+**Resolution**:
+
+- Offload to executeBlocking or use worker verticle for repeated heavy tasks.
+- **Code**:
+    
+    Kotlin
+    
+    ```
+    suspend fun sortLargeList(list: MutableList<Item>): List<Item> {
+        return vertx.executeBlockingAwait { promise ->
+            list.sortBy { it.price }
+            promise.complete(list)
+        }
+    }
+    ```
+    
+
+**Example 7: Sync Encryption / Decryption (e.g., Cipher.doFinal on large data)**
+
+**Why blocking**: CPU-intensive for big payloads.
+
+**Resolution**:
+
+- Offload to worker, or use non-blocking crypto libs if available.
+- **Code** (offload):
+    
+    Kotlin
+    
+    ```
+    suspend fun encryptLargeData(data: Buffer): Buffer {
+        return vertx.executeBlockingAwait { promise ->
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.ENCRYPT_MODE, key)
+            val encrypted = cipher.doFinal(data.bytes)
+            promise.complete(Buffer.buffer(encrypted))
+        }
+    }
+    ```
+    
+
+**Example 8: External Command Execution (e.g., ProcessBuilder.start().waitFor)**
+
+**Why blocking**: waitFor blocks until subprocess finishes.
+
+**Resolution**:
+
+- Use Vert.x's Process API for async execution.
+- **Code**:
+    
+    Kotlin
+    
+    ```
+    suspend fun runExternalCommand(cmd: String): String {
+        return vertx.executeBlockingAwait { promise ->
+            val process = Runtime.getRuntime().exec(cmd)
+            val output = process.inputStream.readBytes().toString(Charsets.UTF_8)
+            process.waitFor()
+            promise.complete(output)
+        }
+    }
+    ```
+    
+
+### General Tips for Resolutions
+
+- **Always measure before/after**: Use Micrometer metrics to track handler time (vertx_http_server_request_duration_seconds).
+- **Pattern for offloading**: Use executeBlockingAwait in coroutines — clean and safe.
+- **Prevention**: In code reviews, flag any import of java.sql.*, java.net.HttpURLConnection, java.io.FileInputStream inside normal verticles.
+- **Edge case**: If blocking is from GC pauses (not code), tune JVM heaps (-Xmx, -XX:+UseG1GC).
