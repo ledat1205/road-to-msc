@@ -95,6 +95,59 @@ fun loop() {
   Fix: `AtomicInteger`, `synchronized`, or `Mutex` in coroutines
 
 I used `volatile` for shutdown flags in Vert.x services at MoMo — safe and cheap. For counters, we always used `Atomic*` or Event Bus + single verticle.
+### Event Bus + Single Verticle Instance (Most Common & Safest in Vert.x)
+
+This is the **preferred pattern** in Vert.x for shared mutable state — no locks, no atomics needed.
+
+Kotlin
+
+```
+// Single instance — all increments go through this verticle
+class CounterVerticle : CoroutineVerticle() {
+
+    private var requestCount = 0L   // Plain var — safe because single-threaded
+    private var errorCount = 0L
+
+    override suspend fun start() {
+        // All updates go through Event Bus
+        vertx.eventBus().consumer<JsonObject>("counter.increment") { msg ->
+            val type = msg.body().getString("type")
+            when (type) {
+                "request" -> requestCount++
+                "error" -> errorCount++
+            }
+            // Optional: reply with current value
+            msg.reply(JsonObject()
+                .put("requests", requestCount)
+                .put("errors", errorCount))
+        }
+
+        // Metrics endpoint (can be in another verticle)
+        router.get("/metrics").handler { ctx ->
+            val json = JsonObject()
+                .put("requests_total", requestCount)
+                .put("errors_total", errorCount)
+            ctx.response().end(json.encode())
+        }
+    }
+}
+
+// In another verticle (e.g. API handler)
+router.get("/api/ping").handler { ctx ->
+    // Increment via Event Bus — fire-and-forget
+    vertx.eventBus().publish("counter.increment", JsonObject().put("type", "request"))
+
+    ctx.response().end("Pong")
+}
+```
+
+**Why this is the best pattern in Vert.x**:
+
+- No shared mutable state across verticles — no locks, no volatile, no Atomic*
+- Single-threaded guarantee: all updates happen on the same event-loop thread
+- Scales with clustering: Event Bus automatically distributes messages across nodes
+- Easy to monitor/debug: all updates go through one place
+- Can add rate-limiting, logging, or persistence easily
 
 **Q4. Explain the difference between synchronized method/block and ReentrantLock. When would you choose one over the other?**
 
