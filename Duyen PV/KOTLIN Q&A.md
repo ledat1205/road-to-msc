@@ -254,39 +254,3 @@ suspend fun processLargeJson(stream: InputStream, consumer: (Item) -> Unit) =
 
 
 
-## 1. `List<T>` / `MutableList<T>`
-
-**By far the #1 most used collection**
-
-### Characteristics
-
-- Ordered collection
-    
-- **Allows duplicates**
-    
-- Fast random access by index (dynamic array behavior)
-    
-
-### Common Implementations
-
-- `ArrayList<T>` ← default backing for `mutableListOf()` — **O(1)** get/set
-    
-- `LinkedList<T>` ← rarely used directly — better for frequent middle inserts/deletes
-    
-
-### When to Use
-
-Almost everything:
-
-- User lists
-    
-- Search results
-    
-- API responses
-    
-- Event logs
-    
-- Timelines
-    
-
-**Rule:** Prefer **immuta**
