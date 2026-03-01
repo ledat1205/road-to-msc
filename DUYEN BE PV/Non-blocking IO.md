@@ -1,4 +1,3 @@
-
 ### Core Idea – No Thread per Request
 
 Traditional servers (Tomcat, old Java servlets):
