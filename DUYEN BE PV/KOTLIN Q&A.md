@@ -7,6 +7,182 @@
 | Fixed size, fast access        | `Array<T>` or primitive arrays | `arrayOf()`, `intArrayOf()`   |
 | FIFO / LIFO / double-ended     | `ArrayDeque<T>`                | `ArrayDeque()`                |
 | Preserve insertion order + map | `LinkedHashMap<K,V>`           | `linkedMapOf()`               |
+### 1. Core Mental Model (must understand)
+
+|Concept|What it really means|Fire & forget?|Returns value?|Structured?|
+|---|---|---|---|---|
+|launch|Start coroutine, don't wait for result|Yes|Job|Yes|
+|async|Start coroutine + **Deferred** (like Promise)|No|Deferred<T>|Yes|
+|withContext|**Change dispatcher** inside suspend function|—|T|Yes|
+|coroutineScope {}|Create child scope — waits for **all** children|—|T|Yes|
+|supervisorScope {}|Like above, but **children failures don't propagate**|—|T|Yes|
+
+### 2. Most Important Best Practices in 2025
+
+**Rule #1: Never use GlobalScope in production code**
+
+Kotlin
+
+```
+// ❌ NEVER do this (except maybe in main() of a tiny script)
+GlobalScope.launch { ... }
+```
+
+**Rule #2: Almost always use structured concurrency**
+
+Choose the right scope (in order of preference):
+
+|Situation|Recommended Scope|Cancels automatically when…?|
+|---|---|---|
+|ViewModel|viewModelScope|ViewModel cleared|
+|Fragment / Activity|lifecycleScope|DESTROYED|
+|Jetpack Compose|rememberCoroutineScope()|composable leaves composition|
+|Repository / UseCase / Service|Injected CoroutineScope or coroutineScope {}|Parent scope cancels|
+|Custom long-running process|Custom CoroutineScope + SupervisorJob()|You call cancel()|
+
+**Rule #3: Make functions main-safe when reasonable**
+
+Kotlin
+
+```
+// Good – safe to call from main thread
+suspend fun loadUser(id: String): User {
+    return withContext(Dispatchers.IO) {
+        api.getUser(id)
+    }
+}
+```
+
+**Rule #4: Inject Dispatchers (testability + flexibility)**
+
+Kotlin
+
+```
+class NewsRepository(
+    private val api: NewsApi,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+    suspend fun getTopHeadlines() = withContext(dispatcher) {
+        api.fetchTopHeadlines()
+    }
+}
+```
+
+In tests → pass Dispatchers.Unconfined or TestDispatcher.
+
+**Rule #5: Prefer exception handling inside coroutineScope / supervisorScope**
+
+Kotlin
+
+```
+suspend fun doSeveralThings() = coroutineScope {
+    val job1 = launch { doThing1() }
+    val job2 = launch { doThing2() } // ← can fail independently
+
+    // Both can run in parallel
+    // If one fails → other continues (if using supervisorScope)
+}
+```
+
+**Rule #6: Use Flow correctly (cold vs hot, sharing)**
+
+Kotlin
+
+```
+// Cold flow (starts anew each collect)
+fun getUserFlow(id: String): Flow<User> = flow { ... }
+
+// Shared / StateFlow (usually better for UI)
+val userState = MutableStateFlow<User?>(null)
+```
+
+Common pattern in 2025:
+
+Kotlin
+
+```
+class ProfileViewModel(...) : ViewModel() {
+    val user = userRepository.getUserFlow(userId)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+}
+```
+
+**Rule #7: Cancellation awareness (very important in 2025)**
+
+Make long-running or repeating work cooperative:
+
+Kotlin
+
+```
+suspend fun processItems(items: List<Item>) = coroutineScope {
+    items.forEach { item ->
+        ensureActive()           // ← throws if cancelled
+        processSingleItem(item)
+    }
+}
+```
+
+Or use yield() in very CPU-heavy loops.
+
+**Rule #8: Avoid runBlocking except in tests / main**
+
+Kotlin
+
+```
+// ❌ Almost never in production code
+runBlocking { ... }
+
+// OK in unit tests
+@Test fun test() = runTest { ... }
+```
+
+**Rule #9: Testing coroutines (2025 style)**
+
+Use official test library:
+
+Kotlin
+
+```
+dependencies {
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")  // or latest
+}
+```
+
+Kotlin
+
+```
+@Test
+fun `loads user correctly`() = runTest {
+    val repo = FakeUserRepository()
+    val result = repo.loadUser("123")
+    assertEquals("John", result.name)
+}
+```
+
+### Quick Reference – When to Use What (2025 Android-mostly)
+
+|Use-case|Recommended code pattern|
+|---|---|
+|One-shot network call|viewModelScope.launch { ... }|
+|Show loading → success/error|MutableStateFlow + stateIn(...)|
+|Parallel independent work|supervisorScope { launch {} ; launch {} }|
+|Sequential dependent steps|coroutineScope { val a = async{...}.await() ; val b = ... }|
+|Heavy CPU work|withContext(Dispatchers.Default) { ... }|
+|File / DB / network|withContext(Dispatchers.IO) { ... }|
+|Collect from many flows|lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) { ... }|
+
+### Final Mini-Cheat-Sheet (most violated rules in reviews)
+
+- No GlobalScope
+- No hardcoded Dispatchers.IO everywhere
+- No runBlocking in production
+- Prefer stateIn + SharingStarted.WhileSubscribed over manual collection in ViewModel
+- Use supervisorScope when children can fail independently
+- Always think: **"When should this work be cancelled?"**
 ### Kotlin Language & Idioms
 
 **1. When do you still use `var` instead of `val`?**

@@ -468,3 +468,5 @@ consumer.handler { record ->  // Event: DB change message arrived via Kafka
 ```
 
 Behind the scenes: Debezium uses Kafka Connect to stream binlog/WAL changes as events (key: row ID, value: before/after snapshot). Vert.x polls Kafka (as above) — the "change" is just a Kafka message event.
+
+
