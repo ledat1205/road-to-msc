@@ -634,3 +634,160 @@ Tools: Prometheus + Grafana, pgBadger.
 **Hybrid**: SQL for core (transactions), NoSQL for feeds/search.
 
 This covers the questions in depth with practical examples and trade-offs. Let me know if you'd like to expand on any specific one!
+
+## autovacuum
+PostgreSQL's **autovacuum** is a critical background process that automatically runs **VACUUM** and **ANALYZE** to:
+
+- Remove **dead tuples** (old row versions from MVCC updates/deletes) → prevents **table/index bloat**.
+- Update table statistics → helps the query planner choose better execution plans.
+- Prevent **transaction ID wraparound** (emergency shutdown risk if not vacuumed in time).
+
+By default, autovacuum is enabled and works well for many workloads, but **high-write** (frequent UPDATE/DELETE), large tables, or bursty activity often requires tuning to avoid bloat, slow queries, or autovacuum "storms" (long-running vacuums consuming I/O/CPU).
+
+### Step 1: Always Monitor First (Don't Tune Blindly)
+
+Before changing anything, check current behavior:
+
+SQL
+
+```
+-- Top tables by dead tuples (bloat risk)
+SELECT 
+    relname,
+    n_live_tup,
+    n_dead_tup,
+    last_autovacuum,
+    last_analyze,
+    autovacuum_count,
+    pg_size_pretty(pg_relation_size(relid)) AS table_size
+FROM pg_stat_user_tables
+ORDER BY n_dead_tup DESC
+LIMIT 20;
+
+-- Autovacuum activity over time
+SELECT 
+    schemaname,
+    relname,
+    last_autovacuum,
+    vacuum_count,
+    analyze_count,
+    n_dead_tup AS dead_tuples_now
+FROM pg_stat_user_tables
+WHERE last_autovacuum > now() - interval '7 days'
+ORDER BY last_autovacuum DESC;
+```
+
+Look for:
+
+- High n_dead_tup relative to n_live_tup (>5–10% often bad).
+- Tables never/last vacuumed long ago.
+- autovacuum_count low on write-heavy tables.
+
+Also monitor:
+
+- pg_stat_activity for running autovacuum workers.
+- Logs for "autovacuum: ..." messages or wraparound warnings.
+
+### Step 2: Global Tuning (postgresql.conf or ALTER SYSTEM)
+
+These affect the entire cluster. Restart required for some.
+
+Common starting recommendations (2025–2026 best practices, adjusted for modern PG 16–18+):
+
+ini
+
+```
+# Enable (almost never disable)
+autovacuum = on
+
+# More workers for busy clusters (default 3; good range 4–10 depending on cores)
+autovacuum_max_workers = 6–8
+
+# How often launcher checks (default 1min → lower for aggressive)
+autovacuum_naptime = 30s–1min
+
+# Cost-based throttling (default delay 2ms → lower = faster vacuum, but more I/O)
+autovacuum_vacuum_cost_delay = 1ms–2ms   # Aggressive: 0–1ms on SSD
+autovacuum_vacuum_cost_limit = 2000–8000 # Default 200; raise to allow more work per worker
+
+# Memory for VACUUM/ANALYZE (helps sort/hash in vacuum)
+maintenance_work_mem = 128MB–1GB  # Per worker; don't over-allocate
+
+# New in PG 16+: Limit buffer usage during vacuum (prevents evicting hot pages)
+vacuum_buffer_usage_limit = 2MB   # Default; increase if needed
+
+# New in PG 18+: Cap max dead tuples before forced vacuum (safety net)
+autovacuum_vacuum_max_threshold = 10000000  # Optional upper bound
+```
+
+### Step 3: Per-Table Tuning (Most Powerful for Problem Tables)
+
+Use ALTER TABLE — no restart, takes effect immediately.
+
+**For write-heavy tables** (e.g., orders, events, audit logs — frequent UPDATE/DELETE):
+
+SQL
+
+```
+ALTER TABLE orders SET (
+    autovacuum_enabled = true,
+    autovacuum_vacuum_scale_factor = 0.02–0.05,      -- Default 0.2 → lower = trigger earlier
+    autovacuum_vacuum_threshold = 1000–5000,         -- Default 50
+    autovacuum_analyze_scale_factor = 0.01–0.05,     -- For stats updates
+    autovacuum_analyze_threshold = 500–2000,
+    autovacuum_vacuum_insert_scale_factor = 0.1,     -- For append-only tables (PG 13+)
+    autovacuum_vacuum_insert_threshold = 10000
+);
+```
+
+**For very large tables with infrequent updates** (e.g., historical data):
+
+- Set scale_factor = 0 → use fixed threshold (e.g., 50,000 dead tuples)
+
+SQL
+
+```
+ALTER TABLE archive_logs SET (
+    autovacuum_vacuum_scale_factor = 0,
+    autovacuum_vacuum_threshold = 50000
+);
+```
+
+**For insert-heavy but rarely updated** (append-only logs):
+
+- Focus on insert-based triggering (PG 13+)
+
+SQL
+
+```
+ALTER TABLE metrics SET (
+    autovacuum_vacuum_insert_scale_factor = 0.2,
+    autovacuum_vacuum_insert_threshold = 5000
+);
+```
+
+### Step 4: Aggressive but Safe Starting Points (Common 2025–2026 Patterns)
+
+|Workload Type|autovacuum_max_workers|naptime|vacuum_scale_factor|vacuum_threshold|cost_delay|cost_limit|Notes|
+|---|---|---|---|---|---|---|---|
+|General production|6–8|30s–1min|0.1|1000|2ms|2000–4000|Balanced|
+|High-write OLTP (e.g., orders)|8–10|15–30s|0.02–0.05|500–2000|1ms|4000–8000|Frequent small vacuums|
+|Large append-only (logs)|4–6|1min|0.1–0.2|5000|2ms|2000|Use insert triggers|
+|Very large historical|Default|Default|0|10000–100000|Default|Default|Fixed threshold|
+
+### Step 5: Additional Best Practices & Gotchas (2025–2026)
+
+- **Never disable autovacuum globally** — only for bulk loads (temporarily).
+- **Increase shared_buffers** (25–40% RAM) — VACUUM uses shared buffers → avoids extra I/O.
+- **maintenance_work_mem** — higher helps VACUUM sort/index cleanup faster.
+- **PG 16+**: Use vacuum_buffer_usage_limit to cap memory pressure.
+- **PG 18+**: autovacuum_vacuum_max_threshold as safety cap.
+- **Manual VACUUM** — During low-traffic windows: VACUUM ANALYZE VERBOSE orders;
+- **Partitioning** — Partition large tables (e.g., by date) → autovacuum per partition = faster.
+- **Monitor bloat** — Use extensions like pgstattuple, pgstattuple_approx, or tools (pganalyze, check_postgres.pl).
+- **Avoid long transactions** — They block vacuum → xmin horizon → bloat/replication lag.
+- **Test changes** — Apply per-table first, monitor for 1–2 days, then global if needed.
+
+**Common Pitfall**: Too aggressive (scale_factor=0.001, many workers, 0 cost delay) → autovacuum consumes too much I/O → query slowdowns.
+
+**Summary Rule of Thumb (2025+)**: "Make autovacuum run **more often** and **faster** on hot tables — small, frequent vacuums are cheap and keep bloat low."
