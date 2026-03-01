@@ -143,3 +143,4 @@ Shows actual time, loops, rows — similar to PostgreSQL.
     - **pgAdmin / DBeaver**: EXPLAIN button → graphical plan
     - **[https://explain.depesz.com/](https://explain.depesz.com/)** → paste EXPLAIN ANALYZE text → beautiful tree
     - **EverSQL** or **pgMustard** → online analyzers with suggestions
+
