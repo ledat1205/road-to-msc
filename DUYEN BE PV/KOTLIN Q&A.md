@@ -9,13 +9,13 @@
 | Preserve insertion order + map | `LinkedHashMap<K,V>`           | `linkedMapOf()`               |
 ### 1. Core Mental Model (must understand)
 
-|Concept|What it really means|Fire & forget?|Returns value?|Structured?|
-|---|---|---|---|---|
-|launch|Start coroutine, don't wait for result|Yes|Job|Yes|
-|async|Start coroutine + **Deferred** (like Promise)|No|Deferred<T>|Yes|
-|withContext|**Change dispatcher** inside suspend function|—|T|Yes|
-|coroutineScope {}|Create child scope — waits for **all** children|—|T|Yes|
-|supervisorScope {}|Like above, but **children failures don't propagate**|—|T|Yes|
+| Concept            | What it really means                                  | Fire & forget? | Returns value? | Structured? |
+| ------------------ | ----------------------------------------------------- | -------------- | -------------- | ----------- |
+| launch             | Start coroutine, don't wait for result                | Yes            | Job            | Yes         |
+| async              | Start coroutine + **Deferred** (like Promise)         | No             | Deferred<T>    | Yes         |
+| withContext        | **Change dispatcher** inside suspend function         | —              | T              | Yes         |
+| coroutineScope {}  | Create child scope — waits for **all** children       | —              | T              | Yes         |
+| supervisorScope {} | Like above, but **children failures don't propagate** | —              | T              | Yes         |
 
 ### 2. Most Important Best Practices in 2025
 
