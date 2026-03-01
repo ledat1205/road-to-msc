@@ -1,4 +1,4 @@
 - Slow code due to wrong usage of framework + not caching (leaderboard)
 - Scale down node druid and clickhouse + fix lag clickhouse (kafka engine tables)
-- Database Postgres replication.
-- 
+- Database Postgres: replication, connection pool handling
+- Mys
