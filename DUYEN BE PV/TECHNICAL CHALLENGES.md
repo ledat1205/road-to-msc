@@ -1,1 +1,4 @@
-- Slow code due to wrong usag not caching (leaderboard)
+- Slow code due to wrong usage of framework + not caching (leaderboard)
+- Lag clickhouse (kafka engine tables)
+- Database Postgres replication.
+- 
