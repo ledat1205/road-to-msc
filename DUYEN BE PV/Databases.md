@@ -107,7 +107,7 @@ Expect EXPLAIN ANALYZE walkthroughs or "fix this slow query" scenarios.
     - NoSQL: Extreme write scale, flexible schema, eventual consistency OK.
 
 
-
+-----------------------------
 ### 1. How would you design a schema for a high-traffic system like Twitter/X (tweets, users, follows, likes) handling 500M+ users and billions of interactions?
 
 At this scale, pure relational design fails due to join explosion, write hotspots, and read latency. Use a **hybrid approach** combining normalization for core data integrity and heavy denormalization/materialization for reads.
