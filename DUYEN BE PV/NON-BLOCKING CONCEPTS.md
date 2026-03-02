@@ -11,9 +11,6 @@
 
 ### Deeper Dive on Disadvantages & Enterprise Solutions in Fintech Concurrency
 
-Hey Duyen! Since you're prepping for that GFT backend role, let's expand on the **disadvantages** of these concurrency models (focusing on Python, Java, Kotlin, and Go for CPU-bound and I/O-bound workloads). I'll go deeper than the table, highlighting real pain points from fintech scenarios like high-frequency trading (HFT), risk engines, payment gateways, and fraud detection. Then, I'll cover **how enterprises solve or mitigate them** in 2025–2026 production (based on common practices at banks, hedge funds, and fintech giants like JPMorgan, Stripe, or Revolut).
-
-I'll structure this by language/model, blending I/O and CPU aspects where they overlap. These insights come from patterns in open-source repos, conference talks (e.g., QCon, JavaDay), and reports (e.g., InfoQ, Gartner fintech surveys) — enterprises often hybridize to balance perf, reliability, and dev speed.
 
 #### 1. **Python + asyncio (Mainly I/O-bound, but hybrids for CPU)**
    - **Deeper Disadvantages**:
