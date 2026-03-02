@@ -1,5 +1,5 @@
 - Slow code due to wrong usage of framework vertx (not offloading heavy task) 
--  relying on solely db (inbox pattern) cause the program run slow -> switch to using redis for idempotency checking and distributed locking
+-  relying on solely db (inbox pattern) cause the program run slow -> switch to using redis + luascript for idempotency checking and distributed locking
 - 
 - Scale down node druid and clickhouse -> migrating  from service read from kafka topic to manually insert to kafka (kafka engine tables)  -> need reasonable performance test -> observe and see lag clickhouse 
 -
