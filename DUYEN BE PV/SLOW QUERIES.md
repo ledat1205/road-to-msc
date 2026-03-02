@@ -26,13 +26,13 @@ For Apache Druid, focus on segment optimization and query patterns first, as lon
 
 PostgreSQL handles long-running queries via timeouts and optimization. Start with logging slow queries and EXPLAIN ANALYZE.
 
-| Category | Solutions |
-|----------|-----------|
-| **Query Optimization** | - Use EXPLAIN ANALYZE to identify seq scans; add indexes on WHERE/JOIN/ORDER BY columns.<br>- Rewrite queries: avoid complex subqueries, use CTEs, denormalize if needed.<br>- Run ANALYZE/VACUUM to update stats and reduce bloat.<br>- Use materialized views for pre-computed results. |
-| **Timeouts & Killing** | - Set `statement_timeout` (e.g., '30s') per session/role/server to auto-kill long queries.<br>- Use `pg_cancel_backend(pid)` to softly kill; `pg_terminate_backend(pid)` for hard kill.<br>- Set `lock_timeout` to prevent long lock waits.<br>- Use `idle_in_transaction_session_timeout` for idle tx. |
-| **Configuration Tuning** | - Increase `work_mem` for sorts/joins, but per-operation to avoid OOM.<br>- Tune `shared_buffers` (25% RAM) and `effective_cache_size`.<br>- Adjust `checkpoint_completion_target` and `checkpoint_timeout` for smoother I/O.<br>- Use SERIALIZABLE isolation for consistency, with app retries. |
-| **Monitoring & Logging** | - Log slow queries: set `log_min_duration_statement = 1000`.<br>- Enable `pg_stat_statements` and `auto_explain` for slow query plans.<br>- Monitor with `pg_locks`, `pg_stat_activity` for blockers. |
-| **Hardware/Cluster** | - Use connection pooling (PgBouncer) to limit connections.<br>- Scale with read replicas for offloading analytics.<br>- Use SSDs; tune autovacuum for aggressive cleanup. |
+| Category                 | Solutions                                                                                                                                                                                                                                                                                               |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Query Optimization**   | - Use EXPLAIN ANALYZE to identify seq scans; add indexes on WHERE/JOIN/ORDER BY columns.<br>- Rewrite queries: avoid complex subqueries, use CTEs, denormalize if needed.<br>- Run ANALYZE/VACUUM to update stats and reduce bloat.<br>- Use materialized views for pre-computed results.               |
+| **Timeouts & Killing**   | - Set `statement_timeout` (e.g., '30s') per session/role/server to auto-kill long queries.<br>- Use `pg_cancel_backend(pid)` to softly kill; `pg_terminate_backend(pid)` for hard kill.<br>- Set `lock_timeout` to prevent long lock waits.<br>- Use `idle_in_transaction_session_timeout` for idle tx. |
+| **Configuration Tuning** | - Increase `work_mem` for sorts/joins, but per-operation to avoid OOM.<br>- Tune `shared_buffers` (25% RAM) and `effective_cache_size`.<br>- Adjust `checkpoint_completion_target` and `checkpoint_timeout` for smoother I/O.<br>- Use SERIALIZABLE isolation for consistency, with app retries.        |
+| **Monitoring & Logging** | - Log slow queries: set `log_min_duration_statement = 1000`.<br>- Enable `pg_stat_statements` and `auto_explain` for slow query plans.<br>- Monitor with `pg_locks`, `pg_stat_activity` for blockers.                                                                                                   |
+| **Hardware/Cluster**     | - Use connection pooling (PgBouncer) to limit connections.<br>- Scale with read replicas for offloading analytics.<br>- Use SSDs; tune autovacuum for aggressive cleanup.                                                                                                                               |
 ### 1. "A query is slow in production — walk me through your step-by-step debugging process."
 
 **Why asked**: This is the #1 slow-query question. It reveals if you panic-fix (e.g., blindly add indexes) or systematically diagnose.
