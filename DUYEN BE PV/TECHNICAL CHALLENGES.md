@@ -3,5 +3,5 @@
 - 
 - Scale down node druid and clickhouse -> migrating  from service read from kafka topic to manually insert to kafka (kafka engine tables)  -> need reasonable performance test -> observe and see lag clickhouse 
 -
-- Database Postgres: replication https://stackoverflow.com/questions/14592436/postgresql-error-canceling-statement-due-to-conflict-with-recovery, connection pool handling, partitioning
+- Database Postgres batch snapshot to bigquery: replication https://stackoverflow.com/questions/14592436/postgresql-error-canceling-statement-due-to-conflict-with-recovery, connection pool handling, partitioning
 - Consistency in distributed system with redis and so on
