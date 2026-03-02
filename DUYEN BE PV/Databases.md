@@ -635,6 +635,7 @@ Tools: Prometheus + Grafana, pgBadger.
 
 This covers the questions in depth with practical examples and trade-offs. Let me know if you'd like to expand on any specific one!
 
+
 ## autovacuum
 PostgreSQL's **autovacuum** is a critical background process that automatically runs **VACUUM** and **ANALYZE** to:
 
