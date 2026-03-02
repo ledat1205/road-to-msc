@@ -1,6 +1,6 @@
 - Slow code due to wrong usage of framework vertx (not offloading heavy task) 
 -  relying on solely db (inbox pattern) cause the program run slow -> switch to using redis for idempotency checking and distributed locking
 - 
-- Scale down node druid and clickhouse -> need reasonable performance test -> observe and see lag clickhouse when switching from service read from kafka topic(kafka engine tables) + MERGE DRUID SEGMENT
+- Scale down node druid and clickhouse -> migrating  from service read from kafka topic to manually insert to kafka (kafka engine tables)  -> need reasonable performance test -> observe and see lag clickhouse when migrating  + MERGE DRUID SEGMENT
 - Database Postgres: replication https://stackoverflow.com/questions/14592436/postgresql-error-canceling-statement-due-to-conflict-with-recovery, connection pool handling, partitioning
 - Consistency in distributed system with redis and so on
