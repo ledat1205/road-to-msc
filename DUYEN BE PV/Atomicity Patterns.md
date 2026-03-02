@@ -1,4 +1,3 @@
-Yes, Duyen! I'll make this **more detailed** by expanding on our entire discussion thread. I'll provide deeper explanations, more concrete code examples (in **Java/Spring Boot** style, since we've referenced `@Transactional` a lot), step-by-step flows, failure scenarios with resolutions, and best practices for production.
 
 This covers the key pillars we talked about: **atomicity** (via local transactions + patterns), **resilience** (crash recovery, retries, eventual consistency), and **idempotency** (the unbreakable safety net for duplicates/redeliveries/crashes).
 
@@ -201,5 +200,3 @@ public void reserve(ReserveInventoryCommand cmd) {
 - **Tools** → Temporal/Cadence for durable orchestration (handles crashes best), Debezium for outbox CDC.
 
 This setup gives you **high resilience** with **local atomicity** and **eventual consistency**, surviving crashes, retries, and duplicates without data corruption.
-
-If you'd like even deeper dive (e.g., full Temporal saga example, multi-DB saga, or Go/Python versions), specific failure simulation, or a diagram explanation, just tell me which part! 😊
