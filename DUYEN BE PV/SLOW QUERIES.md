@@ -1,3 +1,38 @@
+### Solutions for ClickHouse
+
+Here’s a comprehensive list of solutions to prevent or mitigate slow/timeout issues in long-running (hours-long) queries in ClickHouse. These are drawn from best practices in 2026, focusing on optimization first (preferred over just increasing timeouts), monitoring, and configuration. Prioritize identifying slow queries via `system.query_log` before applying fixes.
+
+| Category | Solutions |
+|----------|-----------|
+| **Query Optimization** | - Use filters on `ORDER BY` columns first for efficient pruning.<br>- Enable proper partition pruning with date/time keys.<br>- Avoid `SELECT *`; select only necessary columns to reduce data read.<br>- Use `PREWHERE` for heavy filters (e.g., non-indexed columns) to scan less data.<br>- Optimize `GROUP BY` with low-cardinality keys or approximations (e.g., `uniqCombined`).<br>- Rewrite joins to use `JOIN` with indexed columns; prefer `LEFT JOIN` over subqueries.<br>- Use `EXPLAIN` or `EXPLAIN ESTIMATE` to analyze plans and spot full scans.<br>- Disable filesystem cache during testing (`SET enable_filesystem_cache = 0`) for accurate benchmarks. |
+| **Indexing & Schema** | - Add skip indexes (e.g., minmax, bloom_filter) for common filters.<br>- Use proper data types (e.g., LowCardinality for strings) and compression codecs.<br>- Switch to `AggregatingMergeTree` for pre-aggregated data to speed up summaries.<br>- Materialize views for complex computations to pre-compute results. |
+| **Configuration Tuning** | - Increase `max_threads` (start at half CPU cores) for parallel execution.<br>- Set `max_memory_usage` higher for large datasets, but monitor OOM.<br>- Use `max_bytes_before_external_group_by`/`max_bytes_before_external_sort` to spill to disk and avoid OOM.<br>- Enable query queuing (`<queue_max_wait_ms>5000</queue_max_wait_ms>`) instead of rejection.<br>- Adjust `max_concurrent_queries` to limit overload. |
+| **Monitoring & Management** | - Log slow queries with `log_queries_min_query_duration_ms`.<br>- Kill long queries: `KILL QUERY WHERE query_id = 'id'` or by user/pattern.<br>- Use connection pooling to manage concurrent queries.<br>- Increase timeouts only as last resort (e.g., `SET max_execution_time = 300`). |
+| **Hardware/Cluster** | - Use SSDs for faster I/O; scale shards/replicas for distribution.<br>- Batch inputs properly to avoid small inserts. |
+
+### Solutions for Apache Druid
+
+For Apache Druid, focus on segment optimization and query patterns first, as long-running queries often stem from small segments or unfiltered scans. Use request logging to identify issues.
+
+| Category | Solutions |
+|----------|-----------|
+| **Query Optimization** | - Always filter on time (__time) and dimensions first.<br>- Minimize inequality filters; they’re resource-heavy.<br>- Use approximations (e.g., HyperLogLog for cardinality) for high-cardinality GROUP BY.<br>- Avoid large IN clauses (~14k+ elements slow planning).<br>- Break complex queries into subqueries or use materialized views. |
+| **Data/Segment Tuning** | - Compact small segments into larger ones (target 5M rows/segment) via compaction tasks to reduce overhead.<br>- Optimize segment sizes for better query routing and I/O.<br>- Use rollup during ingestion to pre-aggregate. |
+| **Configuration Tuning** | - Enable query caching (result/segment) for repeated queries.<br>- Increase JVM heap/GC tuning on Historicals/Brokers for large intermediates.<br>- Set higher `druid.server.http.maxIdleTime` to avoid web timeouts.<br>- Use query laning to isolate slow queries from real-time ones.<br>- Adjust query context: higher `timeout` or `perSegmentTimeout`. |
+| **Monitoring & Management** | - Enable request logging for query-level monitoring to spot slow ones.<br>- Kill queries via Historical logs or API if they exceed timeouts.<br>- Use service tiering for dedicated resources on priority queries. |
+| **Hardware/Cluster** | - Scale Historical nodes for parallelism; use SSDs for segment cache.<br>- Batch ingestion to avoid small segments. |
+
+### Solutions for PostgreSQL
+
+PostgreSQL handles long-running queries via timeouts and optimization. Start with logging slow queries and EXPLAIN ANALYZE.
+
+| Category | Solutions |
+|----------|-----------|
+| **Query Optimization** | - Use EXPLAIN ANALYZE to identify seq scans; add indexes on WHERE/JOIN/ORDER BY columns.<br>- Rewrite queries: avoid complex subqueries, use CTEs, denormalize if needed.<br>- Run ANALYZE/VACUUM to update stats and reduce bloat.<br>- Use materialized views for pre-computed results. |
+| **Timeouts & Killing** | - Set `statement_timeout` (e.g., '30s') per session/role/server to auto-kill long queries.<br>- Use `pg_cancel_backend(pid)` to softly kill; `pg_terminate_backend(pid)` for hard kill.<br>- Set `lock_timeout` to prevent long lock waits.<br>- Use `idle_in_transaction_session_timeout` for idle tx. |
+| **Configuration Tuning** | - Increase `work_mem` for sorts/joins, but per-operation to avoid OOM.<br>- Tune `shared_buffers` (25% RAM) and `effective_cache_size`.<br>- Adjust `checkpoint_completion_target` and `checkpoint_timeout` for smoother I/O.<br>- Use SERIALIZABLE isolation for consistency, with app retries. |
+| **Monitoring & Logging** | - Log slow queries: set `log_min_duration_statement = 1000`.<br>- Enable `pg_stat_statements` and `auto_explain` for slow query plans.<br>- Monitor with `pg_locks`, `pg_stat_activity` for blockers. |
+| **Hardware/Cluster** | - Use connection pooling (PgBouncer) to limit connections.<br>- Scale with read replicas for offloading analytics.<br>- Use SSDs; tune autovacuum for aggressive cleanup. |
 ### 1. "A query is slow in production — walk me through your step-by-step debugging process."
 
 **Why asked**: This is the #1 slow-query question. It reveals if you panic-fix (e.g., blindly add indexes) or systematically diagnose.
