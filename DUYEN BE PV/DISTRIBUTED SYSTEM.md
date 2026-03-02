@@ -200,3 +200,11 @@ public void reserve(ReserveInventoryCommand cmd) {
 - **Tools** → Temporal/Cadence for durable orchestration (handles crashes best), Debezium for outbox CDC.
 
 This setup gives you **high resilience** with **local atomicity** and **eventual consistency**, surviving crashes, retries, and duplicates without data corruption.
+
+|Module|Main Class / Decorator|What it protects against / does|Typical Use Case|Configurable Aspects|
+|---|---|---|---|---|
+|**CircuitBreaker**|`CircuitBreaker`|Prevents cascading failures by "opening" when failure/slow rate is too high → fast-fail|Downstream services failing or timing out|failureRateThreshold, slowCallRateThreshold, waitDurationInOpen, slidingWindowSize, permitted calls in half-open, etc.|
+|**Retry**|`Retry`|Automatically retries failed calls (sync + async) with configurable backoff / jitter|Transient network errors, temporary outages|maxAttempts, waitDuration, retryOnExceptionPredicate, intervalFunction|
+|**RateLimiter**|`RateLimiter`|Limits how many calls are allowed per time window (token bucket / smooth burst)|Protect against traffic spikes / API abuse|limitForPeriod, limitRefreshPeriod, timeoutDuration|
+|**Bulkhead**|`Bulkhead` / `ThreadPoolBulkhead`|Limits concurrent executions (semaphore-style or thread-pool-style)|Prevent overload of downstream or own thread pool|maxConcurrentCalls, maxWaitDuration (semaphore) core/max thread pool size (thread-pool)|
+|**TimeLimiter**|`TimeLimiter`|Enforces a maximum duration on async calls (especially useful with CompletableFuture / reactive)|Prevent hanging calls forever|timeoutDuration, cancelRunningFuture|
