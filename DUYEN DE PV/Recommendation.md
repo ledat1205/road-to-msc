@@ -139,15 +139,9 @@ AND session_duration < 3600s
 
 This is the exact **end-to-end feature store + data-quality shield** that turned chaotic peak-season data into trustworthy training data every single day.
 
-### Next Steps for You (how to turn this into your final docs)
-1. Copy this structure into Notion / Confluence / GitHub wiki.  
-2. Add a **Feature Dictionary** page with one row per feature (name, description, table, owner, importance rank, drift threshold).  
-3. Add **ER diagram** of the 4 main marts (I can help sketch it).  
-4. Add **Runbook** section for “What to do when the drift gate fires”.  
 
 
-
-
+## 3 main types of drift
 **Here’s a deep dive into the 3 main types of drift** that every production ML system (like our Tiki search & recommendation models) must monitor. These are the ones that directly impact daily retraining and online metrics (NDCG, CTR, conversion).
 
 I’ll cover each one with:
