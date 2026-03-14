@@ -1,3 +1,5 @@
+Airflow ecosystem ownership & dbt migration at Tiki (Python, Go – April 2025–present) At Tiki I took full ownership of an Airflow deployment with 300+ DAGs that orchestrated end-to-end analytics and ML pipelines. I identified that our legacy BigQuery/SQL transformations were scattered and hard to maintain, so I migrated everything into dbt. This standardized feature logic, added version-controlled models, and made it trivial for the ML team to iterate on new features without breaking downstream models. I also introduced data validation checks and quality monitors inside the DAGs (using Great Expectations-style tests) so we could catch drift before models were retrained.
+
 **What datasources were involved?** Tiki’s data platform is a classic e-commerce mix. The raw sources feeding the 300+ DAGs were:
 
 - Transactional MySQL/PostgreSQL databases (orders, users, products, inventory, search queries, cart events)
