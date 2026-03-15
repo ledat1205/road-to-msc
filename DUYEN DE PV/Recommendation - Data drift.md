@@ -60,7 +60,7 @@ I designed a **Lambda-style hybrid architecture** with protection at every layer
 ![[Pasted image 20260315171825.png]]
 
 
-
+![[Pasted image 20260315171938.png]]
 
 
 **Protection layers I added**:
