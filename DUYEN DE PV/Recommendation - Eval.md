@@ -86,3 +86,80 @@ Because everything flows through the same dbt macros + schemas, the offline trai
 - During 2025 seasonal peaks: zero definition-related bugs.
 - ML team feedback: “For the first time we can trust that the features and metrics we train on are exactly the same as what runs online.”
 - This directly enabled faster iteration (new model versions tested same-day) and protected revenue during high-traffic periods.
+
+### 1. High-Level Flow (Real-Time Eval → Amplitude)
+
+text
+
+```
+Flink (streaming feature computation)
+    ↓ (side outputs + shadow inference)
+Real-time Evaluation Events (predicted vs actual metrics)
+    ↓ (Kafka topic + direct SDK)
+Amplitude (A/B experiment tracking + metric monitoring)
+```
+
+### 2. What Data We Stream (the actual online eval payload)
+
+Every time a recommendation is served (or every 5 minutes in aggregate), the system emits a rich event to Amplitude with:
+
+- **Experiment metadata**experiment_id, variant (e.g., “model_v2_high_decay”, “control”), user_id, session_id
+- **Canonical metrics (real-time)**
+    - predicted_ctr (from shadow model)
+    - actual_ctr (observed click/impression)
+    - ndcg_precursor (position-discounted)
+    - final_score vs base_score (intent boost applied)
+- **Feature values that drove the prediction**ctr_mobile_7d, is_sale_period, category_intent_score, etc. (sampled 1% for cost reasons)
+- **Business context**is_peak_season, device_type, master_id, position
+
+These events are emitted **in real time** so Amplitude dashboards show live lift in NDCG@10 and CTR within 2–5 minutes of traffic.
+
+### 3. Technical Implementation (how I made it stream reliably)
+
+**A. Flink Side-Output for Shadow Evaluation** In the main Flink job (the same one that computes user intent and features), I added a **side output** stream:
+
+Java
+
+```
+// Inside the main Flink ProcessFunction
+if (shouldRunShadowInference()) {
+    double predictedCTR = shadowModel.predict(features);   // lightweight XGBoost inference
+    double actualCTR = observedClick ? 1.0 : 0.0;
+    
+    EvaluationEvent event = new EvaluationEvent(
+        userId, experimentId, variant,
+        predictedCTR, actualCTR, ndcgPrecursor,
+        features  // map of key metrics
+    );
+    
+    ctx.output(shadowEvalSideOutput, event);
+}
+```
+
+This side output is **non-blocking** — the main recommendation path continues at <2 ms latency.
+
+**B. Routing to Amplitude** Two parallel paths (for reliability):
+
+1. **Real-time path** (low latency): Flink side output → Kafka topic real_time_eval_events → lightweight Go consumer (or Flink sink) that calls Amplitude’s HTTP SDK in batches of 100 events. Latency: <30 seconds from impression to Amplitude.
+2. **Batch fallback** (for high-volume safety): Every 5 minutes, a small Airflow task aggregates the Kafka topic and sends summarized events to Amplitude (prevents rate limits during peaks).
+
+**C. A/B Bucketing Integration**
+
+- Amplitude experiment variants are assigned in the Go serving layer (using the same bucketing logic as Amplitude’s own SDK).
+- The variant is attached to every recommendation request and flows through Flink → shadow model → eval event.
+- This lets PMs and ML engineers see live charts in Amplitude like:
+    - “Variant A vs Control: CTR lift +3.2%”
+    - “NDCG@10 delta over last 30 min”
+
+### 4. Why This Works So Well for Real-Time Model Evaluation
+
+- **Canonical metrics guarantee**: All events use the exact same dbt macros for CTR and NDCG precursors (no definition drift).
+- **Real-time vs offline alignment**: The shadow model uses the exact same feature schemas as production training.
+- **Seasonal & drift safety**: If covariate drift is detected, the eval events are automatically tagged with drift_flagged: true and filtered out of Amplitude experiment dashboards until the gate is cleared.
+- **Scale**: Handles 1,000+ QPS with <1% sampling on feature-heavy events.
+
+### 5. Real Impact I Saw
+
+- Before: Model evaluation took 24 hours + manual Excel work.
+- After: New model versions could be A/B tested **live** in Amplitude. We went from 1–2 model iterations per week to 5–8 per week during peak seasons.
+- During Lunar New Year 2025, we caught a concept drift in <15 minutes via Amplitude’s live CTR divergence chart and rolled back the bad variant instantly.
