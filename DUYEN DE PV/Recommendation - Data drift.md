@@ -386,3 +386,19 @@ To stop fighting the same fires every sale, I built two automated improvements t
 - During the three major 2025 events, we never once had to manually block training — the dynamic bounds + is_sale_period flag handled everything automatically.
 
 This layered fix strategy (immediate hard gate → same-day contextual feature → weekly self-healing baseline) is what made the real-time recommendation platform actually reliable at scale. It protected model evaluation, kept canonical NDCG/CTR definitions trustworthy, and prevented any revenue loss from drifted features.
+
+
+### 1. How Flink Handles Partial Consumption (The Built-in Isolation via Checkpoints & Watermarks)
+
+Flink is designed for this scenario with its **checkpointing system** (which I configured with RocksDB backend for state persistence):
+
+- Events are processed in **event-time windows** with watermarks (I set a 30-second bounded out-of-orderness to handle late events during peaks).
+- Every 60 seconds (configurable at peak), Flink takes a **checkpoint** — a consistent snapshot of all state (user intent maps, CTR aggregates, etc.) + consumed Kafka offsets.
+- If drift is detected (via the sidecar KS check every 5 minutes), I send a control signal to the Flink job via a dedicated Kafka control topic.
+- The job then **rolls back to the last clean checkpoint** (before the bad partition started) and resumes processing — but with the bad partition flagged for side-output.
+
+**What this means for already-consumed events**:
+
+- Any events processed after the last clean checkpoint but before detection are **discarded from the main output stream** and replayed into the quarantine path.
+- Flink's exactly-once semantics ensure no duplicates: the rollback resets the state to the clean snapshot, and the Kafka consumer offsets are adjusted to re-consume only the unflagged events.
+- In practice, during the April 2025 incident (the duplicate-click bug), this isolated ~15% of the bad events that had been partially consumed — all without restarting the job or losing healthy partitions.
