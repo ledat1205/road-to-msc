@@ -126,6 +126,88 @@ I designed a **Lambda-style hybrid architecture** with protection at every layer
 
 This system is now the standard for all new ML feature pipelines at Tiki.
 
-I’m happy to walk through any section in more depth, share GitHub structure examples, dbt model YAML snippets, Flink job logic, or the exact Looker dashboard queries. This project best represents my ability to deliver production-grade, reliable data platforms that directly drive business outcomes.
 
-Ready for questions!
+
+**My Understanding of the Drift Detection Techniques & How I Fix Them**  
+*(Real-Time Recommendation Platform – Tiki)*
+
+These four techniques were deliberately chosen because they cover **all three types of drift** that kill recommendation models in e-commerce (especially during seasonal spikes). I implemented them as a multi-layer “hard gate” inside the Flink + ScyllaDB system so that **no bad data ever reaches model training or online inference**.
+
+Here’s exactly how each technique works, why I trust it, and — most importantly — **how I actually fix the drift** once it is detected.
+
+### 1. Covariate Drift (Feature Distribution Shift) – KSDrift in Alibi Detect
+**What it detects**: P(X) changes while P(Y|X) stays the same.  
+Example: During a flash sale, `ctr_mobile_7d` suddenly jumps from mean 0.082 → 0.119.
+
+**How the technique works** (my implementation):
+- 7-day stratified 10% baseline (BigQuery → GCS artifact).
+- Every day after dbt run + every 5 min in Flink: `KSDrift.predict(X_test)` on all 65 features.
+- Returns per-feature p-values + overall `is_drift` flag.
+- Decision: p < 0.05 on any high-SHAP feature → gate fails.
+
+**Why I chose KSDrift (Alibi Detect)**:
+- Non-parametric (works on any distribution shape).
+- Multivariate + per-feature breakdown (I can tell exactly which feature drifted).
+- Baseline is versioned in GCS → I can roll back instantly.
+- Fast even on millions of rows (10% sample + KeOps backend).
+
+**How I fix it**:
+- **Immediate fix** (0–5 min): Airflow gate blocks the ML training DAG + Flink pauses the bad partition and routes events to `quarantine_clicks` topic.
+- **Short-term fix** (same day): Add `is_sale_period` flag as a new feature in Flink (stateful) and retrain only after the baseline is refreshed.
+- **Long-term fix**: Automatic weekly baseline refresh (Sunday job) + dynamic rolling bounds (±30% on high-importance features like `ctr_mobile_7d`). This is the same pattern Netflix and Uber use for holiday traffic.
+
+### 2. Label Drift (Prior / Target Shift) – KS + PSI on Conversion Rate
+**What it detects**: P(Y) changes (e.g., overall purchase rate drops from 3.2% → 1.8% during Lunar New Year).
+
+**How the technique works**:
+- Daily KS test on the global conversion rate distribution.
+- PSI (Population Stability Index) on binned purchase labels (10–20 buckets).
+- PSI > 0.25 or KS p < 0.05 → drift flagged.
+
+**Why this combination**:
+- KS gives statistical rigor.
+- PSI is business-friendly (easy to explain to PMs: “the positive rate moved too much”).
+
+**How I fix it**:
+- **Immediate fix**: Block training + send Slack with exact PSI value and before/after distribution charts.
+- **Short-term fix**: Adjust negative sampling ratio in the training dataset (increase negatives if positives dropped) and apply Platt scaling / isotonic regression on the model predictions.
+- **Long-term fix**: Add a global `seasonality_factor` feature (computed in Flink from Druid rollups) so the model learns to down-weight predictions automatically during low-conversion periods.
+
+### 3. Concept Drift (Relationship Change) – Shadow-Model Comparison
+**What it detects**: P(Y|X) changes (e.g., after UI redesign, the same `query_item_affinity_score` now predicts much lower conversion).
+
+**How the technique works**:
+- A lightweight “shadow model” (same XGBoost/LambdaMART weights) runs in parallel in Airflow on the new day’s features.
+- Compare predicted CTR vs actual live CTR (from ScyllaDB feedback logs).
+- If divergence > 2% (or NDCG drop > 1.5%) → concept drift.
+
+**Why this is the strongest signal**:
+- It directly measures model performance degradation in production — the ultimate ground truth.
+- Works even when feature distributions look normal.
+
+**How I fix it**:
+- **Immediate fix**: Block the main training DAG; promote the shadow model only if it passes.
+- **Short-term fix**: Trigger an emergency micro-retrain (6-hour window instead of 24-hour) with higher weight on the last 3 hours of data (Flink state TTL adjustment).
+- **Long-term fix**: Shorten the retrain window during detected high-volatility periods and add more interaction features (e.g., `post_ui_change_flag`) to let the model adapt faster.
+
+### 4. Seasonal Adaptation (The Glue That Makes Everything Work)
+**Technique**: 
+- Automatic baseline refresh every Sunday night (or on `is_sale_period = true` trigger).
+- Dynamic feature `is_peak_season` (computed in Flink from traffic velocity + Druid 5-min rollups).
+- Two baselines maintained: 7-day normal + 30-day peak-adjusted.
+
+**How I fix seasonal drift proactively**:
+- When `is_peak_season` flips to true, the system automatically switches to the peak baseline and relaxes some thresholds (e.g., allow 40% shift on CTR features).
+- After the event ends, a one-click “baseline rollback” job in Airflow restores the normal 7-day reference.
+- This prevented any false-positive blocks during three major 2025 events.
+
+### Overall Fix Workflow (The “Data Shield” I Built)
+1. Drift detected (any of the three) → Airflow/Flink gate fails.
+2. Event routed to quarantine + detailed incident logged in BigQuery (feature name, p-value, before/after charts).
+3. Slack/PagerDuty alert + automatic Jira ticket.
+4. Fix applied (flag/feature addition or emergency retrain).
+5. Post-fix validation: shadow model must show <1% metric degradation before re-opening the gate.
+
+This exact combination (KSDrift + PSI + shadow model + seasonal baselines) is what big tech uses to keep models stable at 100× scale. I implemented it entirely as a Data Engineer layer — no model code changes were required.
+
+The result: during the highest-traffic periods in 2025, the recommendation platform stayed 100% trustworthy, and the ML team could focus on new architectures instead of firefighting bad data.
