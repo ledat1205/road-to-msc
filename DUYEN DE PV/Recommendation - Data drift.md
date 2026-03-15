@@ -128,8 +128,6 @@ This system is now the standard for all new ML feature pipelines at Tiki.
 
 
 
-**My Understanding of the Drift Detection Techniques & How I Fix Them**  
-*(Real-Time Recommendation Platform – Tiki)*
 
 These four techniques were deliberately chosen because they cover **all three types of drift** that kill recommendation models in e-commerce (especially during seasonal spikes). I implemented them as a multi-layer “hard gate” inside the Flink + ScyllaDB system so that **no bad data ever reaches model training or online inference**.
 

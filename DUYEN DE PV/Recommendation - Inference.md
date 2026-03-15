@@ -139,3 +139,55 @@ Final rerank & filter in <15 ms:
 - Alibaba Taobao real-time feature serving with ScyllaDB.
 - LinkedIn/Netflix observability (Alibi Detect drift gating).
 - Airbnb-style canonical metric layer.
+In Flink, a **Window** is just a way to **group events together** so you can do calculations on them (like sum, average, count, deduplication, etc.).
+
+Think of it like putting events into different “buckets” based on time or count.
+
+Here are the **main types** of windows in Flink, explained simply:
+
+### 1. Tumbling Window (Most Common)
+
+- **What it is**: Fixed, non-overlapping buckets.
+- Example: Every 5 minutes → events from 00:00-00:05, 00:05-00:10, 00:10-00:15…
+- No overlap.
+
+**How we used it at Tiki**:
+
+- 5-minute tumbling window for real-time drift checking (KS test every 5 minutes).
+- 60-second tumbling window for click-to-impression ratio check (to detect polluted clicks).
+
+### 2. Sliding Window (Overlapping)
+
+- **What it is**: Buckets that overlap.
+- Example: Every 5 minutes, but the window slides every 1 minute. → Window 1: 00:00-00:05 → Window 2: 00:01-00:06 → Window 3: 00:02-00:07
+
+**How we used it**:
+
+- Calculating rolling CTR (ctr_7d, ctr_mobile_7d) in real time.
+- Session-based metrics that need to update frequently.
+
+### 3. Session Window (Activity-based)
+
+- **What it is**: Groups events by user activity with a **gap**.
+- Example: If a user is inactive for more than 30 minutes → close the session window and start a new one.
+
+**How we used it**:
+
+- Tracking user intent and session_click_sequence.
+- If user is idle for 30 minutes → we decay their intent scores and close the session.
+
+### 4. Count Window
+
+- **What it is**: Groups by number of events, not time.
+- Example: Group every 100 clicks.
+
+**How we used it**:
+
+- Rarely, but we used it for sampling (e.g., process every 1000 events for heavy calculations to reduce load).
+
+### 5. Global Window (Advanced)
+
+- **What it is**: One single big window for all events (never closes automatically).
+- You must manually define when to trigger calculation using **Triggers**.
+
+Used when you want full control (we used it for some global metrics).
