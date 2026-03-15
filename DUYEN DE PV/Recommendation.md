@@ -1,243 +1,131 @@
-**Purpose:** Single source of truth for the ~65–70 engineered features that power both production models. This document describes the feature mart tables, the observability layer, the automated protection mechanisms, and how everything stays trustworthy even during 3–5× traffic spikes (flash sales, Lunar New Year, etc.).
-
-### 1. Overview & Architecture
-We operate **two main production models** that retrain **daily** on the exact same feature mart tables:
-
-- **Search Ranking Model** – LambdaMART / XGBoost + deep reranking layers (learning-to-rank)  
-- **Product Recommendation Model** – Two-tower candidate generation + session-based reranker (collaborative filtering + deep learning)
-
-**Training data volume:** ~1.5 billion query-item-user rows per day (joined from feature marts + click / add-to-cart / purchase labels).
-
-**Core principle:**  
-**No raw tables, no external signals.** Every feature used by ML comes from the dbt feature marts I own:  
-`fct_search_features`, `fct_rec_features`, `dim_user`, `dim_item`.
-
-**High-level architecture (hybrid batch + streaming):**
-```
-Raw sources + CDC
-        ↓
-Kafka (clicks, impressions, purchases)
-        ↓
-Flink (real-time cleaning + polluted-click guard)
-        ↓
-dbt (incremental, partitioned on event_date + user_id)
-        ↓
-BigQuery / ClickHouse feature marts
-        ↓
-Daily training DAG + shadow-model gate
-        ↓
-Production models
-```
-
-The **protection layer** (the “shield”) sits across the entire flow and guarantees zero bad models reach production.
-
-### 2. Complete Feature Inventory (the only features ML uses)
-
-#### 2.1 User Features (~12)
-- `rfm_score` (7d / 30d / 90d)  
-- `session_length_sec`, `sessions_7d`, `avg_session_depth`  
-- `device_type`, `time_of_day_bucket`, `user_tier` (new/active/loyal)  
-- `geo_region`  
-- `historical_category_affinity` (128-dim embedding)
-
-#### 2.2 Item Features (~15)
-- `price`, `price_discount_pct`, `inventory_level`, `is_in_stock`  
-- `category_id`, `category_path` (full hierarchy), `brand_id`  
-- `rating_avg`, `review_count_30d`  
-- `image_embedding` (128-dim MobileNet)  
-- `popularity_score_7d` (views + sales)
-
-#### 2.3 Query / Context Features (~10)
-- `query_length`, `query_embedding` (BERT)  
-- `query_item_text_match_score` (BM25 + dense)  
-- `is_sale_period` (flag added after Feb incident)  
-- `platform` (app/web), `referrer_type`
-
-#### 2.4 Interaction / Behavioral Features (strongest signals – ~20)
-- `ctr_7d`, `ctr_30d`, `ctr_mobile_7d`, `ctr_desktop_7d` ← critical feature that broke during flash sale  
-- `NDCG_precursor` (position-discounted click probability)  
-- `click_rate_position_1to5`, `add_to_cart_rate`  
-- `query_item_affinity_score`  
-- `session_click_sequence` (last 5 clicks → embedding)  
-- `conversion_rate_7d`
-
-#### 2.5 Temporal Freshness Features
-Every numeric feature above exists in **7d / 14d / 30d / 90d** rolling windows.  
-Additional freshness signals: `days_since_last_interaction`, `trend_velocity_24h`.
-
-**Total per query-item pair:** 65–70 fully engineered, materialized features.  
-All built as **incremental dbt models**, partitioned daily.
-
-### 3. Daily Monitoring & Observability Layer (the shield that prevents bad data)
+I owned and built the end-to-end data reliability layer that protects Tiki’s search ranking and product recommendation models during normal operation **and** extreme seasonal events (flash sales, Lunar New Year, Black Friday).  
 
-#### 3.1 Daily Distribution Monitoring (dbt + KS gate)
-- Every dbt run runs **40+ dbt-expectations tests**.  
-- After dbt finishes, `data_drift_gate` PythonOperator executes:  
-  - Kolmogorov-Smirnov (numeric)  
-  - Chi-square (categorical)  
-  - Custom ±30 % bounds on high-importance features (e.g. `ctr_mobile_7d`)  
-- If any test fails → **entire training DAG is blocked automatically**.
+This system directly addressed the biggest risk in e-commerce ML: **bad or drifted data reaching daily model retraining**, causing immediate online metric degradation and revenue loss.
 
-#### 3.2 Feature Importance Tracking (SHAP)
-- After every retrain: SHAP explainer on 1 % sample.  
-- Results stored in `monitoring.feature_importance_history`.  
-- Weekly Monday review with ML team: “ctr_7d importance dropped from 0.18 → 0.09 — shall we retire/boost it?”
+### 1. Executive Summary
+- **Scope**: 300+ Airflow DAGs, 65+ engineered features, ~1.5–2 billion rows/day  
+- **Core Achievement**: Built a hybrid batch + real-time “data shield” using dbt + Alibi Detect + Flink that automatically detects polluted clicks, covariate drift, concept drift, and label drift.  
+- **Key Outcome**: Zero bad models deployed during three major 2025 seasonal peaks; polluted clicks reduced from ~11% → 0.4%; online NDCG@10 and CTR variance dropped ~65%.
 
-#### 3.3 Real-time Drift Dashboard (Flink + Looker)
-- Flink job computes histograms every 5 minutes for streaming features.  
-- Looker dashboard: live vs 7-day baseline (red/yellow/green) for top 15 features.  
-- PagerDuty alerts on high-importance features.
+### 2. Data Landscape – What Kinds of Data I Handled
 
-#### 3.4 Model Impact Simulation (pre-retrain gate)
-- Shadow model runs on new day’s features vs previous day.  
-- If predicted NDCG or CTR changes >2 % → gate fails + Slack report listing the exact culprit features.
+**Raw Transactional Sources (MySQL / PostgreSQL + CDC via Debezium)**
+- Orders, users, products, inventory, cart, search queries, payments
+- Slowly-changing dimensions (product catalog, pricing, categories)
 
-#### 3.5 Post-Training Validation
-- Compare offline NDCG@10 / AUC vs previous 7 days.  
-- Drop >1.5 % (even if drift tests passed) → deep investigation.
+**Real-time Event Streams (Kafka – 15–20 high-volume topics)**
+- Clickstream events (`impression`, `click`, `add_to_cart`, `purchase`, `search_query`)
+- Recommendation feedback (impression → action pairs)
+- A/B test exposure logs
+- User session events (page views, scroll depth, device, geo)
 
-### 4. Key Protection Components (detailed implementation)
+**Feature Store & Warehouse Data (BigQuery + ClickHouse)**
+- Aggregated user features (RFM, session stats, tier)
+- Item features (price, inventory, image embeddings, brand, category hierarchy)
+- Interaction features (`ctr_7d`, `ctr_mobile_7d`, `NDCG_precursor`, `query_item_affinity_score`, `session_click_sequence`)
+- Temporal rolling windows (7d / 30d / 90d)
 
-#### 4.1 Polluted Clicks Detection & Deduplication
-**Real-time (Flink):**  
-- 60-second tumbling window, keyed by `click_id + user_id`.  
-- Duplicate `click_id` or click/impression ratio > 3× rolling median → dead-letter topic + metric.  
+**Label Data for Models**
+- Positive labels: actual clicks, add-to-cart, purchases
+- Negative labels: impressions without clicks (critical for ranking)
 
-**Batch (dbt):**  
-```sql
-QUALIFY ROW_NUMBER() OVER (PARTITION BY click_id ORDER BY timestamp) = 1
-AND click_timestamp > impression_timestamp + 200ms
-AND session_duration < 3600s
-```
+**External / Seasonal Data**
+- Marketing campaign flags, sale periods, flash-sale metadata
 
-**Scalability trick at 5× peak:** RocksDB state backend + exactly-once + 10 % sampling.  
-**Result:** polluted clicks dropped from ~11 % to 0.4 %.
+This data is extremely high-velocity, high-cardinality, and highly seasonal — exactly the conditions that create polluted clicks and drift.
 
-#### 4.2 Multi-Type Drift Detection Engine
-- **Covariate drift** – feature distributions (KS)  
-- **Label drift** – conversion rate  
-- **Concept drift** – shadow-model prediction vs actual CTR  
+### 3. Key Problems Before My Work
 
-**Daily gate** uses Alibi Detect-style logic on versioned 7-day baseline (GCS).  
-**Seasonal adaptation:**  
-- Auto baseline refresh every Sunday OR when `is_sale_period = true`.  
-- Dynamic rules: allow drift if sale flag is active.  
+**Problem 1 – Polluted Clicks**  
+Duplicate events, bot clicks, test traffic, and double-clicks inflated CTR features by 10–30% during peaks. Models learned wrong probabilities → over-boosting irrelevant items.
 
-**False-positive solution:** started in “warning mode” for 2 weeks, tuned p-value per SHAP importance, added business rules.
+**Problem 2 – Severe Drift During Seasonal Events**  
+- Covariate drift: mobile CTR distribution shifted 38–45% in hours during flash sales.  
+- Label drift: overall conversion rate dropped 40% during Lunar New Year.  
+- Concept drift: after UI redesign, same features predicted completely different user intent.  
+Models retrained daily on drifted data → immediate 3–8% drop in online metrics.
 
-#### 4.3 Integration & Observability
-- Everything version-controlled in Git (dbt + Airflow + Flink).  
-- Looker dashboard: p-value heatmap, polluted-click %, drift incidents.  
-- Code review enforced across 300+ DAGs.
+**Problem 3 – Brittle Legacy Pipelines**  
+- 300+ scattered BigQuery SQL transformations (no version control, no tests).  
+- Batch-only recommendation platform (hours of latency).  
+- No systematic data quality gates → ML team manually inspected distributions every morning.
 
-### 5. Results & Business Impact
-**During 3 major events (Feb flash sale, Lunar New Year, April promotion):**  
-- Zero bad models reached production.  
-- Polluted clicks: 11 % → 0.4 %.  
-- Online NDCG@10 + CTR variance reduced ~65 % week-over-week.  
-- ML team moved from “daily manual inspection” to “trust the pipeline”.
+**Problem 4 – No Protection at Scale**  
+During 5× traffic spikes, simple checks would fail or cause OOM; false positives would block legitimate sales.
 
-This is the exact **end-to-end feature store + data-quality shield** that turned chaotic peak-season data into trustworthy training data every single day.
+### 4. Solution Architecture (High-Level)
 
+I designed a **Lambda-style hybrid architecture** with protection at every layer:
 
 
-## 3 main types of drift
-**Here’s a deep dive into the 3 main types of drift** that every production ML system (like our Tiki search & recommendation models) must monitor. These are the ones that directly impact daily retraining and online metrics (NDCG, CTR, conversion).
 
-I’ll cover each one with:
 
-- Clear definition
-- Real-world use case in e-commerce recsys (Tiki-style)
-- Concrete example
-- Business & model implications
-- How we detect + resolve it (linking back to the tools we discussed)
 
-### 1. Covariate Drift (also called Data Drift or Feature Drift)
 
-**Definition**: The input features change their distribution (P(X) shifts), but the relationship between features and target stays the same. The model is now seeing data it has never seen in training.
 
-![Multivariate drift detection using Domain Classifier with a Python tutorial](https://usenotioncms.com/proxy/block/37282503-e443-4f17-8f67-f6ba9cd9709a%2Fdb33a217-8812-4b9f-a623-d33b0faeac96%2F63e4d430549d4a26879bdad9_Frame_2-p-800.jpg)
+**Protection layers I added**:
+- Real-time (Flink) → polluted click deduplication + intra-day drift guard
+- Batch (dbt + Airflow) → full statistical drift detection + quarantine
+- Observability (Looker + monitoring tables) → automatic alerts and incident logging
 
-[nannyml.com](https://www.nannyml.com/blog/data-drift-domain-classifier)
 
-![Navigating Data Drift in the AI Ecosystem — A Practical Guide to Detection  Methods and Monitoring Tools | by Ravi Shankar Shukla | Medium](https://miro.medium.com/v2/resize:fit:2000/1*RES-1YX16AnbwWy6h2Lcug.png)
 
-[medium.com](https://medium.com/@shukla.shankar.ravi/navigating-data-drift-in-the-ai-ecosystem-a-practical-guide-to-detection-methods-and-monitoring-cc82a3911885)
 
-**Use case in recsys**: User behavior or catalog changes (new categories, mobile traffic spikes, pricing experiments).
+### 5. Detailed Technical Solutions I Implemented
 
-**Tiki example (the one we discussed)**: Flash-sale day → ctr_mobile_7d distribution suddenly shifts right (mean 0.082 → 0.119). The feature table that feeds ranking changes, but the true relevance logic is the same.
+**A. Polluted Clicks Detection & Deduplication (Real-time + Batch)**
+- Flink job (keyed by `click_id + user_id`, 60-second tumbling window + RocksDB state) detects duplicates and extreme ratios.
+- dbt incremental staging model with `ROW_NUMBER()` + business filters (`click_timestamp > impression_timestamp + 200ms`, session duration bounds).
+- If KS test on `click_count` or `ctr_*` fails → entire partition quarantined to `quarantine_clicks` table.
 
-**Implications**:
+**B. Multi-Type Drift Detection Engine (Alibi Detect + Custom Gates)**
+- **Covariate drift**: KSDrift (Alibi Detect) on 65 features using 7-day stratified 10% baseline stored in GCS.
+- **Label drift**: KS/PSI on global conversion rate and purchase distribution.
+- **Concept drift**: Shadow-model comparison (predicted CTR vs actual live CTR) inside Airflow.
+- Seasonal adaptation: automatic baseline refresh every Sunday + dynamic `is_peak_season` feature.
 
-- Model overfits to the temporary distribution → wrong feature weights (e.g., mobile CTR becomes over-weighted).
-- Offline NDCG looks fine, but online CTR/conversion drops 2–5 % within hours.
-- Revenue loss: we calculated ~1.4 billion VND in one morning from the Feb 2025 incident.
+**C. dbt Migration & Standardization**
+- Migrated hundreds of legacy SQL transformations into version-controlled, tested dbt models (staging → intermediate → mart).
+- Added 200+ schema + statistical tests (dbt-expectations) running on every execution.
 
-**Detection & Resolution**:
+**D. Real-time Recommendation Re-architecture**
+- Switched feature generation from batch to Flink + ScyllaDB serving.
+- ClickHouse migrated to native Kafka Table Engines for streaming ingestion.
 
-- Detect: KS test / Alibi Detect KSDrift on every engineered feature (exactly what we built).
-- Resolve:
-    - Short-term: block training DAG (our Airflow gate).
-    - Long-term: add new features (e.g., is_sale_period flag), refresh baseline weekly, or use domain-adaptation techniques.
+**E. Airflow Gating & Observability**
+- Data-quality gate task after every dbt run → blocks ML training DAG via ExternalTaskSensor.
+- Full incident logging + Looker dashboard showing p-value heatmaps and polluted-click percentages.
 
-### 2. Concept Drift
+### 6. Major Challenges & How I Overcame Them
 
-**Definition**: The relationship between features and target changes (P(Y|X) shifts) while the feature distribution may stay stable. The “rules of the game” have changed — what used to be a strong signal is no longer predictive.
+**Challenge 1**: False positives during real seasonal spikes → would have blocked legitimate traffic.  
+**Solution**: Started in “warning mode”, tuned per-feature thresholds using SHAP importance, added business-rule overrides (`is_sale_period = true`).
 
-![An introduction to Model drift in machine learning - UbiOps - AI model  serving, orchestration & training](https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_828,h_466/https://ubiops.com/wp-content/uploads/2022/03/What-is-concept-drift.png)
+**Challenge 2**: Performance at 5× peak traffic.  
+**Solution**: 10% stratified sampling in BigQuery + Flink exactly-once + RocksDB state backend. Detection latency < 4 minutes.
 
-[ubiops.com](https://ubiops.com/an-introduction-to-model-drift-in-machine-learning/)
+**Challenge 3**: Maintaining baselines when feature list grows.  
+**Solution**: Versioned GCS artifacts + automated weekly refresh job + metadata table.
 
-An introduction to Model drift in machine learning - UbiOps - AI model serving, orchestration & training
+**Challenge 4**: Team adoption (engineers attached to hand-written SQL).  
+**Solution**: Lineage graphs, knowledge-sharing sessions, and demonstrated zero manual inspection after go-live.
 
-**Use case in recsys**: Sudden external events or UI/product changes that alter user intent (seasonal trends, competitor actions, algorithm updates on the platform).
+### 7. Results & Business Impact (Quantified)
 
-**Tiki example**: After a major app redesign (new recommendation carousel layout in March 2025), users started clicking differently. The same query_item_affinity_score now mapped to much lower conversion. The feature distribution stayed identical, but the true probability P(click | affinity) dropped 18 %.
+- Polluted clicks: 11% → 0.4%  
+- Online NDCG@10 & CTR variance: reduced ~65% week-over-week  
+- During three major seasonal events (Feb, Lunar New Year, April): **zero** bad models reached production  
+- ML team time saved: from 2 hours daily manual checks → 5-minute review of auto-generated report  
+- Estimated revenue protected: >5 billion VND across peak periods
 
-**Implications**:
+### 8. Key Highlights & Learnings
 
-- Model predictions become systematically wrong (high confidence on items that no longer convert).
-- Offline metrics may stay stable for days (because training data also slowly drifts), but live A/B tests crash.
-- Worst case: entire ranking model becomes useless until retrained on new concept — we saw 4–7 % drop in site-wide conversion until we reacted.
+- This is a pure **Data Engineering** success story: I protected models without writing any model code.
+- Combined streaming (Flink) + batch (dbt) + observability (Alibi Detect) into one cohesive shield.
+- Proved that robust data pipelines are the #1 prerequisite for reliable ML in high-velocity e-commerce.
 
-**Detection & Resolution**:
+This system is now the standard for all new ML feature pipelines at Tiki.
 
-- Detect: Monitor prediction vs actual labels (e.g., predicted CTR vs real CTR on live traffic) or use drift detectors on residuals. We added a daily “shadow model” comparison in Airflow.
-- Resolve:
-    - Immediate: emergency retrain with higher weight on recent data.
-    - Long-term: shorter retrain windows (we moved from daily to 6-hour micro-batches during high-volatility periods), or switch to online learning (Flink-based incremental updates).
+I’m happy to walk through any section in more depth, share GitHub structure examples, dbt model YAML snippets, Flink job logic, or the exact Looker dashboard queries. This project best represents my ability to deliver production-grade, reliable data platforms that directly drive business outcomes.
 
-### 3. Label Drift (also called Prior Drift or Target Drift)
-
-**Definition**: The distribution of the target variable itself changes (P(Y) shifts). The overall “positive rate” in the world changes, even if features and relationships stay the same.
-
-**Use case in recsys**: Seasonal or event-driven changes in overall user behavior (Black Friday, new user influx, economic downturn).
-
-**Tiki example**: During Lunar New Year 2025, overall purchase rate (the label for our conversion models) dropped from 3.2 % to 1.8 % across the entire site because users were window-shopping more. The feature distributions (ctr_7d, price, etc.) were normal, and the feature-to-label mapping was unchanged — but there were simply far fewer positive labels.
-
-**Implications**:
-
-- Model calibrated on old prior over-predicts positives → too many items ranked high that don’t convert.
-- Precision drops dramatically; recall may look okay.
-- Business impact: wasted impressions, lower ad revenue, user frustration (too many irrelevant recommendations). We saw a 12 % drop in add-to-cart rate until we adjusted.
-
-**Detection & Resolution**:
-
-- Detect: Simple statistical tests on the label distribution (KS or PSI on the target column itself) + monitoring of global metrics (site-wide CTR, conversion rate).
-- Resolve:
-    - Re-calibrate the model ( Platt scaling or isotonic regression on new prior).
-    - Adjust negative sampling ratio in training.
-    - Add a global “seasonality_factor” feature that the model can learn.
-
-### Quick Comparison Summary
-
-|Type|What changes|Typical trigger at Tiki|Detection method we used|Most dangerous because…|
-|---|---|---|---|---|
-|Covariate|P(X)|Traffic spike, new categories|KS / Alibi Detect on features|Breaks feature importance instantly|
-|Concept|P(Y|X)|UI change, competitor move|Prediction vs actual monitoring|
-|Label / Prior|P(Y)|Holidays, economic events|Label distribution + global KPIs|Model becomes poorly calibrated|
-
-All three types can happen at the same time (we saw covariate + label drift together during the flash sale).
-
-This is why we built the multi-layer monitoring we discussed earlier — one simple KS gate on features only catches #1. We layered on prediction monitoring and label checks to cover the full picture.
+Ready for questions!
