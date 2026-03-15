@@ -57,7 +57,7 @@ During 5× traffic spikes, simple checks would fail or cause OOM; false positive
 
 I designed a **Lambda-style hybrid architecture** with protection at every layer:
 
-
+![[Pasted image 20260315171825.png]]
 
 
 
@@ -68,7 +68,7 @@ I designed a **Lambda-style hybrid architecture** with protection at every layer
 - Batch (dbt + Airflow) → full statistical drift detection + quarantine
 - Observability (Looker + monitoring tables) → automatic alerts and incident logging
 
-
+![[Pasted image 20260315171915.png]]
 
 
 ### 5. Detailed Technical Solutions I Implemented
