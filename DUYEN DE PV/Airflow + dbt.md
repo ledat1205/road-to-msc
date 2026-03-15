@@ -71,3 +71,70 @@ Everything stayed in Git, with proper branching (feature/dbt-model-xxx) and code
 - Data type drift: BigQuery was forgiving with implicit casts; dbt is strict, so I had to add explicit CASTs in 50+ places.
 - Testing at scale: Running full dbt test on the entire warehouse took >2 hours initially — I optimized with dbt’s --select and sample-based tests for CI.
 - Team buy-in: Some engineers were attached to their hand-crafted SQL; I had to do knowledge-sharing sessions and show the lineage graph to win them over.
+
+
+Here is a concise **dbt concepts cheat sheet** (focused on **dbt Core**, current as of 2025–2026 best practices). It covers the most important building blocks and when to choose each one.
+
+### Core Building Blocks
+
+| Concept          | What it is                                                                 | Key Jinja / syntax                          | When to use it                                                                 | Common folder / prefix     |
+|------------------|----------------------------------------------------------------------------|---------------------------------------------|--------------------------------------------------------------------------------|----------------------------|
+| **Model**        | SQL SELECT (or Python) transformation file — the heart of dbt                | `{{ config(...) }}` at top                  | Every transformation you want to version, test & document                       | models/                    |
+| **Source**       | Raw / ingested tables you read from (not created by dbt)                    | `{{ source('source_name', 'table_name') }}` | Reference external tables safely + add freshness / loaded_at tests              | models/staging + sources.yml |
+| **Seed**         | Static CSV files loaded as tables                                           | `{{ ref('seed_name') }}`                    | Lookup / mapping tables, small manual data, constants                           | seeds/                     |
+| **Snapshot**     | SCD Type 2 slowly changing dimension capture (tracks history)               | `{% snapshot ... %}`                        | Dimension tables that change slowly and you need history (users, products…)     | snapshots/                 |
+| **Exposure**     | Downstream consumer (dashboard, notebook, app)                              | exposures.yml                               | Document lineage to BI tools / ML models                                        | exposures.yml              |
+| **Metric**       | (dbt Semantic Layer) – reusable business metric definition                   | metrics.yml                                 | Define "revenue", "active_users" once and reuse in many places                  | metrics/ (or metrics.yml)  |
+
+### Materializations – The #1 decision in dbt modeling
+
+| Materialization     | How data is stored / refreshed                                      | Build speed | Query speed | Storage cost | Best use cases                                                                                     | Default? | When **not** to use                          |
+|---------------------|---------------------------------------------------------------------|-------------|-------------|--------------|----------------------------------------------------------------------------------------------------|----------|----------------------------------------------|
+| **view**            | No table — just a saved SELECT query (recomputed on every read)     | Very fast   | Slower      | Almost none  | Small/medium data, staging layers, dev iteration, always-fresh data                                | Yes ✓    | Large tables, frequent BI queries            |
+| **table**           | Full rebuild → CREATE OR REPLACE TABLE every run                    | Slow        | Fast        | High         | Medium-sized models, complex joins, models heavily queried by BI / downstream                      | —        | Very large append-only data (use incremental)|
+| **incremental**     | Only process new/changed rows (insert/update/delete/merge)          | Fast after first run | Fast        | High         | Large event/log/fact tables, append-heavy data, expensive full refreshes, daily+ volume            | —        | Small tables, changing keys without history  |
+| **ephemeral**       | No object created — SQL inlined as CTE/subquery into downstream models | Instant (no build) | Depends on parent | None         | Reusable logic, light cleaning, intermediate steps you don’t want to expose/query directly         | —        | Anything you want to query independently     |
+| **materialized_view** (newer warehouses: BigQuery, Snowflake…) | Hybrid: precomputed + auto-refreshes (warehouse managed)           | Medium      | Very fast   | High         | Performance-critical dashboards on medium-large data without manual incremental logic              | —        | Warehouses without native support            |
+
+**Quick materialization decision tree** (most common 2025–2026 advice):
+
+1. Start with **view** (default) — almost everything in staging & intermediate.
+2. Switch to **table** when BI / downstream tools complain about speed.
+3. Switch to **incremental** when full table rebuild > 5–15 min **and** data is append-mostly or has reliable unique_key + timestamp.
+4. Use **ephemeral** for shared utility logic (e.g. clean_url macro logic, currency conversion) that multiple models need but nobody queries alone.
+5. Consider **materialized_view** only if your warehouse supports it well and you want warehouse-managed refresh.
+
+### Quick Reference – Common Patterns & When to Use
+
+- **Staging layer** → `materialized='view'` or `'ephemeral'` (clean + rename columns, add metadata)
+- **Intermediate / business logic** → `view` or `table` (joins, filters, window functions)
+- **Marts / fact / wide tables** → `table` or `incremental` (optimized for BI)
+- **Large append-only events** → `incremental` + `is_incremental()` macro + `merge` strategy
+- **Type 2 dimensions** → `snapshot` (not a normal model)
+- **Static lookups** → `seed`
+- **Reusable snippets** → macros/ or **ephemeral** models
+- **Tests + docs** → `schema.yml` next to models (don't forget `description`, `tests: unique, not_null, relationships`)
+
+### Most Useful Jinja / Macros Snippets
+
+```sql
+-- Top of file
+{{ config(
+    materialized = 'incremental',
+    unique_key = 'order_id',
+    incremental_strategy = 'merge',   -- or 'insert_overwrite', 'delete+insert'
+) }}
+
+-- Incremental logic
+{% if is_incremental() %}
+  WHERE event_ts > (SELECT MAX(event_ts) FROM {{ this }})
+{% endif %}
+
+-- Safe ref / source
+{{ ref('stg_orders') }}
+{{ source('raw', 'payments') }}
+```
+
+This cheat sheet covers ~80% of day-to-day decisions in modern dbt projects.
+
+If you want a printable/visual version or deeper dive into one area (e.g. incremental strategies, testing pyramid, Semantic Layer), just say! 🚀
