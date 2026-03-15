@@ -310,3 +310,79 @@ WHERE rn <= stratum_size * 0.10
 - event_date ensures temporal balance.
 - Without stratification, rare categories or mobile traffic would be under-sampled → false drift alerts or missed real drift.
 - Result: ~1.2–1.8 million rows for the 7-day baseline and ~150k–250k rows for today’s test — statistically representative yet fast to process.
+
+### 1. Immediate Fix (0–5 minutes) – Hard Gate & Quarantine
+
+When KSDrift detects covariate drift (p < 0.05 on any high-SHAP feature like ctr_mobile_7d, query_item_affinity_score, or price_discount_pct):
+
+**Airflow side**:
+
+- The data_drift_gate PythonOperator fails immediately after the daily dbt run.
+- This failure propagates to an ExternalTaskSensor in the ML training DAG → the entire training job is blocked before it even starts.
+- At the same time, a Slack alert + PagerDuty page is triggered with:
+    - Exact feature(s) that drifted
+    - p-value + before/after distribution charts
+    - Link to the quarantined partition
+
+**Flink side** (real-time protection):
+
+- The Flink job receives a control signal via a dedicated Kafka control topic (or Pub/Sub trigger).
+- It immediately switches the affected partition (keyed by category_id or event_date) to a side-output stream.
+- All events for that partition are routed to the quarantine_clicks Kafka topic instead of the main feature pipeline.
+- The Flink job continues processing healthy partitions without interruption (no full restart needed).
+
+**What happens in quarantine**:
+
+- Events land in a BigQuery table monitoring.quarantine_events.
+- An automated Airflow DAG analyzes them (duplicate ratio, CTR spike, etc.) and creates a Jira ticket for the on-call engineer (usually me in the first month).
+
+This whole loop from detection to quarantine completes in **under 5 minutes** — even at 5× peak traffic — because the KS gate runs on a 10% stratified sample and the Flink side-output is zero-copy.
+
+### 2. Short-Term Fix (Same Day) – Add Contextual Flag + Emergency Retrain
+
+Once the immediate gate is triggered, I (or the on-call engineer) apply a targeted fix within the same day:
+
+**Step 1: Add is_sale_period flag as a new feature**
+
+- I compute the flag in Flink using a broadcasted state (updated from Druid 5-min rollups or a marketing API).
+- Logic: is_sale_period = true if traffic velocity > 2.5× 7-day median OR marketing campaign flag is active.
+- I add this as a new column in the Flink MapState and in the dbt mart schema.
+- Because Flink supports savepoints, I take a savepoint, update the job graph (add the new state field), and resume from the savepoint — **zero data loss**, no full restart.
+
+**Step 2: Refresh baseline and retrain**
+
+- I manually trigger the baseline refresh job (re-run the 7-day stratified sample query and save a new GCS artifact).
+- The ML training DAG is then unblocked (I override the gate temporarily with a comment + approval).
+- We run a **same-day emergency micro-retrain** using only the last 12–24 hours of data (weighted higher) so the model quickly learns the new distribution.
+- The new is_sale_period feature is injected into the model so it can down-weight or boost features accordingly.
+
+This short-term fix typically restores online NDCG/CTR within 4–6 hours of the drift event.
+
+### 3. Long-Term Fix – Automatic Weekly Refresh + Dynamic Rolling Bounds
+
+To stop fighting the same fires every sale, I built two automated improvements that run forever:
+
+**A. Automatic baseline refresh (Sunday job)**
+
+- A dedicated Airflow DAG (refresh_drift_baseline) runs every Sunday at 02:00.
+- It re-executes the exact stratified sampling query over the last 7 days.
+- Saves a new versioned GCS artifact (..._vYYYY-MM-DD/).
+- Updates the metadata table so all detectors automatically pick up the new baseline on Monday.
+- If is_peak_season was active during the week, it creates two baselines (normal + peak-adjusted).
+
+**B. Dynamic rolling bounds instead of fixed p=0.05**
+
+- For the top 10 high-importance features (identified by SHAP), I no longer use a hard p < 0.05.
+- Instead, I compute **dynamic bounds** every day:
+    - Rolling 30-day mean and std of each feature
+    - Allowed range = mean ± 30% (or ± 2.5 std, whichever is wider)
+- These bounds are stored in a BigQuery metadata table and injected into the Alibi Detect config at runtime.
+- This is the exact pattern Netflix and Uber use for holiday traffic — it allows legitimate seasonal shifts while still catching real pollution.
+
+**Result of the long-term fix**:
+
+- False-positive rate during real sales dropped from ~35% to < 3%.
+- The system now self-adapts to seasonality without manual intervention.
+- During the three major 2025 events, we never once had to manually block training — the dynamic bounds + is_sale_period flag handled everything automatically.
+
+This layered fix strategy (immediate hard gate → same-day contextual feature → weekly self-healing baseline) is what made the real-time recommendation platform actually reliable at scale. It protected model evaluation, kept canonical NDCG/CTR definitions trustworthy, and prevented any revenue loss from drifted features.
