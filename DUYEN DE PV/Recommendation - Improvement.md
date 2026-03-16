@@ -1777,3 +1777,86 @@ Phase 4 (Weeks 16+): Evaluate Feast / managed feature store
 | **Current reranking** (serving) | Redis `UserBrowsing` (real-time) | Same (kept as fallback alongside learned ranker) | Real-time (no change) |
 
 | **Candidate retrieval** (serving) | Cassandra pre-computed lists (daily) | FAISS ANN on item embeddings + pre-computed lists as fallback | Daily FAISS + hourly update |
+
+
+  **Core** **Insight**
+
+  
+
+  Features fall into **3** **freshness** **tiers**, each with a different collection strategy:
+
+  
+
+  ┌────────┬─────────────────────────────────┬────────────┬─────────────────────────────────────┐
+
+  │  Tier  │            Examples             │ Freshness  │             Collection              │
+
+  ├────────┼─────────────────────────────────┼────────────┼─────────────────────────────────────┤
+
+  │ **Static** │ product name, category, seller, │ Days/weeks │ Daily BigQuery batch (keep current) │
+
+  │        │  product_tier                   │            │                                     │
+
+  ├────────┼─────────────────────────────────┼────────────┼─────────────────────────────────────┤
+
+  │ **Medium** │ price, stock, rating, view/sold │ Hours      │ **Hourly** **micro-batch** (incremental SQL │
+
+  │        │  counts, CTR                    │            │  on changed products → Cassandra)   │
+
+  ├────────┼─────────────────────────────────┼────────────┼─────────────────────────────────────┤
+
+  │ **Fast**   │ user's last 50 actions, session │ Per-action │ **Real-time** Kafka → Redis (extend     │
+
+  │        │  context, impression counts     │            │ existing UserBrowsing consumer)     │
+
+  └────────┴─────────────────────────────────┴────────────┴─────────────────────────────────────┘
+
+  
+
+  **Online** **↔** **Offline** **Sync** **(the** **key** **question** **you** **asked)**
+
+  
+
+  **Offline** **→** **Online** (daily/hourly): BigQuery features → Cassandra product_features_online table (for
+
+  learned ranker) + Redis user:{id}:propensity (for user tower). This is straightforward — bulk load
+
+   after each DAG run.
+
+  
+
+  **Online** **→** **Offline** (daily snapshot): Redis user action logs → BigQuery user_action_log_YYYYMMDD.
+
+  This is critical because:
+
+  - The two-tower user tower and SASRec need user action sequences for training
+
+  - If training reads from BigQuery core_events but serving reads from Redis, you get
+
+  **training-serving** **skew**
+
+  - Daily Redis → BigQuery snapshots ensure the training data matches what serving sees
+
+  
+
+  **Point-in-Time** **Correctness**
+
+  
+
+  Current approach has **label** **leakage** — a product with 10 views on Day 1 gets today's 100K-view
+
+  feature for historical training rows. Fix: join interactions with
+
+  product_features_v2_{interaction_date} snapshots (tables already exist with _YYYYMMDD suffix).
+
+  
+
+  **Build** **vs** **Buy**
+
+  
+
+  Start by building on existing infra (Redis + Cassandra + BigQuery) for Phases 1-3. Evaluate **Feast**
+
+  (open-source feature store) for Phase 4+ if the number of features/models grows beyond manual
+
+  management.
