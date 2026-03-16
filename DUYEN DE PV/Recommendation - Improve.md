@@ -1,11 +1,10 @@
-
-
 ## Unified Training + Serving Enhancement Roadmap
 
   
+
 This document covers end-to-end improvements across both the **SmartFlow training pipeline** (Airflow + BigQuery + K8s) and the **smarter-model-serving** inference service (Go + Cassandra/Scylla + Redis).
 
-
+  
 
 ---
 
@@ -964,3 +963,817 @@ All phases feed into the existing `recommendation_monitoring_v2` DAG:
 | Serving latency regression | All new computation paths behind BlockFlags. Monitor p99 latency. Auto-disable if p99 > 200ms. |
 
 | Daily FAISS rebuild causes serving disruption | Atomic swap: build new index in background, swap pointer. No downtime. |
+
+  
+
+---
+
+  
+
+## 7. Feature Store Architecture
+
+  
+
+### 7.1 The Problem with Current Approach
+
+  
+
+Today, **all features are computed in BigQuery batch SQL** (daily aggregation DAG). This creates several issues:
+
+  
+
+1. **Training-serving skew**: Training uses BigQuery features computed at T-1. Serving uses pre-computed recommendation lists from T-1. But user behavior at serving time is T+0. The learned ranker (Phase 2B) and two-tower user embedding (Phase 3B) need features at request time that match what the model was trained on.
+
+  
+
+2. **Redundant computation**: The same features (e.g., product view count, user purchase count) are computed from scratch every day in BigQuery, even though only the delta changed. At ~24 SQL queries over 9 source tables, this is expensive.
+
+  
+
+3. **No point-in-time correctness**: Training on `product_features_v2_20260316` uses today's aggregated features as if they were the features at the time each interaction happened. A product that had 0 views 30 days ago but 10K views today gets the 10K-view feature for all historical training rows — this is label leakage.
+
+  
+
+4. **Feature duplication**: The same raw signal (e.g., "user X viewed product Y") is stored in `core_events`, aggregated into `pdp_view_raw`, re-aggregated into `product_features_pdp_view`, then joined into `product_features_v2`. Each layer recomputes from scratch daily.
+
+  
+
+### 7.2 What Features Exist and How Fast They Change
+
+  
+
+Every feature in the system falls into one of these freshness tiers:
+
+  
+
+#### Tier 1: Static / Slow (changes days to weeks)
+
+These rarely change. Daily batch is more than sufficient.
+
+  
+
+| Feature | Current Source | Change Frequency |
+
+|---------|---------------|-----------------|
+
+| Product name, category (cate1-6), seller_id | `dim_product_full` | Days (catalog updates) |
+
+| Product tier (price segment) | `personas.product_tier` | Weeks (manually maintained) |
+
+| Category tree structure | `dim_product_full` | Months |
+
+| Business type (1P/3P), brand, is_official_store | `dim_product_full` | Rarely |
+
+| Complementary cate pairs | `vw_related_product_v2` | Manually, outdated |
+
+  
+
+**Collection**: Daily batch from BigQuery (keep current approach). Sync to online store once/day.
+
+  
+
+#### Tier 2: Medium (changes hours)
+
+These accumulate through the day. Hourly or near-real-time incremental updates provide significant freshness improvement.
+
+  
+
+| Feature | Current Source | Change Frequency | Impact of Staleness |
+
+|---------|---------------|-----------------|---------------------|
+
+| Product sale_price, stock status, is_salable | `dim_product_full` | Hours (flash sales, stock-outs) | Recommending out-of-stock or wrong-price items |
+
+| Product avg_rating, num_reviews | `ecom.review` | Hours (new reviews) | Low impact |
+
+| Product num_sold_d30, num_sold_d7 | `nmv.nmv` | Hours (new orders) | Trending products missed until tomorrow |
+
+| Product impression CTR (ctr_root_d30) | `product_impressions` | Hours | Moderate — CTR shifts with traffic patterns |
+
+| Product view count (num_root_view_d7/d30) | `core_events` + `trackity_tiki_click` | Hours | High — new/trending products invisible until tomorrow |
+
+| User propensity per category | `combine_propensity` | Daily (model output) | Moderate |
+
+| Product embeddings (two-tower item tower) | Model output | Daily (model output) | Low for existing products; high for new products (no embedding) |
+
+  
+
+**Collection**: Incremental aggregation. Two approaches:
+
+  
+
+**Option A — Hourly micro-batch in BigQuery** (simpler):
+
+```
+
+New DAG: recommendation_feature_refresh (hourly)
+
+→ Incremental SQL: only process events since last run
+
+→ Update product_features_v2 for changed products
+
+→ Sync changed features to online store (Cassandra/Redis)
+
+```
+
+  
+
+**Option B — Streaming aggregation via Kafka + Flink** (more infra, lower latency):
+
+```
+
+Kafka (core_events, product_impressions, nmv)
+
+→ Flink stateful aggregation (sliding windows: 1d, 7d, 30d)
+
+→ Write to online store (Redis) in real-time
+
+→ Periodically snapshot to offline store (BigQuery) for training
+
+```
+
+  
+
+#### Tier 3: Fast (changes per-minute / per-request)
+
+These change with every user action. Must be real-time.
+
+  
+
+| Feature | Current Source | Change Frequency | Used By |
+
+|---------|---------------|-----------------|---------|
+
+| User's last N viewed products | `core_events` (batch) / Redis `UserBrowsing` (partial) | Per-action | Two-tower user embedding, SASRec, learned ranker |
+
+| User's last N clicked products | `trackity_tiki_click` (batch) / Redis (partial) | Per-action | Learned ranker, reranking |
+
+| User's last N purchased products | `nmv` (batch) | Per-action | Filtering already-bought items |
+
+| User's last N add-to-cart products | `core_events` (batch) | Per-action | Cart-based recommendations (currently disabled) |
+
+| User's impression count per product | Redis `UserBrowsing` (already real-time) | Per-impression | Current reranking (good/bad split) |
+
+| User's click count per product | Redis `UserBrowsing` (already real-time) | Per-click | Current reranking (CTR sort) |
+
+| User's current session context | Not captured | Per-action | Session-based cold start |
+
+  
+
+**Collection**: Real-time via Kafka consumer → Redis (already partially exists for `UserBrowsing`).
+
+  
+
+### 7.3 Proposed Feature Store Design
+
+  
+
+```
+
+┌─────────────────────────────────────────────────────────────────────┐
+
+│ DATA SOURCES │
+
+│ Kafka Topics: BigQuery Tables: │
+
+│ • trackity.tiki.v2.core_events • dim_product_full │
+
+│ • trackity_tiki.product_impr. • ecom.review │
+
+│ • tiki_events_sessions • nmv.nmv │
+
+│ • (new) order_events • personas.product_tier │
+
+└────────┬──────────────────────────────────┬──────────────────────────┘
+
+│ │
+
+▼ ▼
+
+┌─────────────────────┐ ┌─────────────────────────┐
+
+│ STREAMING LAYER │ │ BATCH LAYER │
+
+│ (Kafka Consumer / │ │ (Airflow DAGs) │
+
+│ Flink / Go svc) │ │ │
+
+│ │ │ Daily: │
+
+│ Real-time: │ │ • Full feature rebuild │
+
+│ • User action log │ │ • Model training │
+
+│ → Redis │ │ • Embedding generation │
+
+│ • User browsing │ │ │
+
+│ metrics → Redis │ │ Hourly: │
+
+│ (already exists) │ │ • Incremental feature │
+
+│ │ │ refresh for changed │
+
+│ Near-real-time: │ │ products │
+
+│ • Product view/ │ │ • New product embedding │
+
+│ sold counters │ │ computation │
+
+│ → Redis │ │ │
+
+└─────────┬───────────┘ └────────────┬────────────┘
+
+│ │
+
+▼ ▼
+
+┌─────────────────────────────────────────────────────────────────────┐
+
+│ FEATURE STORES │
+
+│ │
+
+│ ┌─────────────────────────────┐ ┌──────────────────────────────┐ │
+
+│ │ ONLINE STORE │ │ OFFLINE STORE │ │
+
+│ │ (Serving time features) │ │ (Training time features) │ │
+
+│ │ │ │ │ │
+
+│ │ Redis: │ │ BigQuery: │ │
+
+│ │ • user:{id}:actions │ │ • product_features_v2_YMD │ │
+
+│ │ (last 50 actions, RT) │ │ • customer_pdp_view_YMD │ │
+
+│ │ • user:{id}:browsing │ │ • all 24 agg tables │ │
+
+│ │ (impressions/clicks, RT) │ │ • training labels │ │
+
+│ │ • user:{id}:propensity │ │ • feature snapshots (for │ │
+
+│ │ (per-cate scores, daily) │ │ point-in-time training) │ │
+
+│ │ • product:{id}:counters │ │ │ │
+
+│ │ (views/sold today, NRT) │ │ GCS: │ │
+
+│ │ │ │ • Model artifacts │ │
+
+│ │ Cassandra (Scylla): │ │ • FAISS indices │ │
+
+│ │ • item_embeddings │ │ • ONNX models │ │
+
+│ │ (64d vectors, daily │ │ │ │
+
+│ │ + hourly for new items) │ │ │ │
+
+│ │ • product_features_online │ │ │ │
+
+│ │ (price, rating, CTR, │ │ │ │
+
+│ │ cate, seller — for │ │ │ │
+
+│ │ learned ranker) │ │ │ │
+
+│ │ • p_reco_<version> │ │ │ │
+
+│ │ (pre-computed lists, │ │ │ │
+
+│ │ kept as fallback) │ │ │ │
+
+│ │ │ │ │ │
+
+│ │ In-Process (serving pod): │ │ │ │
+
+│ │ • FAISS index (~500MB) │ │ │ │
+
+│ │ • ONNX models (<100MB) │ │ │ │
+
+│ └─────────────────────────────┘ └──────────────────────────────┘ │
+
+│ │
+
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+
+│ │ SYNC MECHANISMS │ │
+
+│ │ │ │
+
+│ │ Online → Offline (for training): │ │
+
+│ │ • Daily: Snapshot Redis counters → BigQuery staging table │ │
+
+│ │ • Daily: Snapshot user action logs → BigQuery for training │ │
+
+│ │ • Purpose: Point-in-time correct training data │ │
+
+│ │ │ │
+
+│ │ Offline → Online (for serving): │ │
+
+│ │ • Daily: BigQuery product_features → Cassandra product_features│ │
+
+│ │ • Daily: Model embeddings → Cassandra + GCS │ │
+
+│ │ • Daily: User propensity scores → Redis │ │
+
+│ │ • Hourly: Changed product features → Cassandra │ │
+
+│ │ • Hourly: New product embeddings → Cassandra + FAISS │ │
+
+│ └─────────────────────────────────────────────────────────────────┘ │
+
+└─────────────────────────────────────────────────────────────────────┘
+
+```
+
+  
+
+### 7.4 Feature Registry: What Goes Where
+
+  
+
+Complete mapping of every feature to its store, freshness, and consumer:
+
+  
+
+#### Product Features
+
+  
+
+| Feature | Offline (BigQuery) | Online (Cassandra) | Online (Redis) | Freshness | Training Consumer | Serving Consumer |
+
+|---------|---|---|---|---|---|---|
+
+| product_id, name, cate1-6 | `product_features_v2` | `product_features_online` | — | Daily | Two-tower item tower, title similarity | Learned ranker |
+
+| seller_id, business_type, brand | `product_features_v2` | `product_features_online` | — | Daily | Two-tower item tower | Learned ranker |
+
+| sale_price | `product_features_v2` | `product_features_online` | — | Hourly* | Two-tower item tower, ranker training | Learned ranker |
+
+| is_salable, stock_status | `dim_product_full` | `product_features_online` | — | Hourly* | Filtering | Candidate filtering |
+
+| avg_rating, num_reviews | `product_features_v2` | `product_features_online` | — | Daily | Two-tower item tower | Learned ranker |
+
+| num_root_view_d7/d30 | `product_features_v2` | `product_features_online` | `product:{id}:counters` (today's delta) | Daily + NRT delta | Two-tower item tower | Learned ranker (daily base + NRT delta) |
+
+| num_sold_root_d30 | `product_features_v2` | `product_features_online` | `product:{id}:counters` | Daily + NRT delta | Two-tower item tower | Learned ranker |
+
+| ctr_root_d30 | `product_features_v2` | `product_features_online` | — | Daily | Two-tower item tower, ranker | Learned ranker |
+
+| product_tier | `product_features_v2` | `product_features_online` | — | Weekly | Two-tower item tower | Learned ranker |
+
+| item_embedding (64d) | GCS (model artifact) | `item_embeddings` + FAISS | — | Daily + hourly for new | — | FAISS ANN search, user embedding computation |
+
+| title_embedding (384d) | GCS (model artifact) | — | — | Daily | — | Not served directly (baked into similarity scores) |
+
+  
+
+*Hourly refresh only for products with detected changes (price update, stock-out event).
+
+  
+
+#### User Features
+
+  
+
+| Feature | Offline (BigQuery) | Online (Redis) | Freshness | Training Consumer | Serving Consumer |
+
+|---------|---|---|---|---|---|
+
+| Last 50 actions (product_id, action_type, ts) | Daily snapshot → `user_action_log_YYYYMMDD` | `user:{id}:actions` | Real-time (Kafka → Redis) | Two-tower user tower, SASRec, ranker | User embedding computation (Phase 3B), SASRec (Phase 4) |
+
+| Impression count per product | — | `browsing_{key}` → `m_p_{pid}` (already exists) | Real-time (already exists) | Ranker training (position bias) | Current reranking, learned ranker |
+
+| Click count per product | — | `browsing_{key}` (already exists) | Real-time (already exists) | Ranker training | Current reranking, learned ranker |
+
+| CTR per product | — | Derived from above (already exists) | Real-time | Ranker training | Current reranking, learned ranker |
+
+| Impression count per category | — | `browsing_{key}` (already exists) | Real-time (already exists) | — | Category group reranking |
+
+| Propensity per primary cate | `propensity_cate_YYYYMMDD` | `user:{id}:propensity` | Daily (model output) | Two-tower user tower input | Two-tower user tower, learned ranker |
+
+| Purchase history (product_ids) | `customer_purchased_YYYYMMDD` | `user:{id}:actions` (filtered) | RT for new; daily for full history | — | Already-bought filtering |
+
+| user_embedding (64d) | `user_embeddings` (warm cache) | `user:{id}:embedding` (Phase 3B-iii) or computed on-the-fly | RT (on-the-fly) or NRT (streaming) | — | FAISS ANN query |
+
+| Customer-client mapping | `map_client_customer_YYYYMMDD` | Serving uses customer_id from auth | Daily | — | Key lookup priority |
+
+  
+
+#### Interaction Features (Training Only)
+
+  
+
+| Feature | Store | Freshness | Consumer |
+
+|---------|-------|-----------|----------|
+
+| Session co-views (product pairs in same session) | `sale_orders_YYYYMMDD` (BigQuery) | Daily | LightFM / Two-tower training |
+
+| Session co-views with timestamp + weight | New: `weighted_session_coviews_YYYYMMDD` | Daily | Two-tower training (with temporal decay) |
+
+| Impression → click pairs (for ranker) | New: `ranker_training_data_YYYYMMDD` | Daily | LambdaRank training |
+
+| User action sequences (ordered by time) | New: `user_action_sequences_YYYYMMDD` | Daily | SASRec training |
+
+  
+
+### 7.5 Data Collection Strategy Per Signal
+
+  
+
+#### Real-Time Collection (Kafka → Redis)
+
+  
+
+Already exists for `UserBrowsing` metrics. Extend to cover:
+
+  
+
+```
+
+┌─────────────────────────────────────────────────────┐
+
+│ Kafka Consumer Service (Go, new or extend existing) │
+
+│ │
+
+│ Input Topics: │
+
+│ • trackity.tiki.v2.core_events │
+
+│ • trackity_tiki.product_impressions │
+
+│ │
+
+│ Outputs: │
+
+│ │
+
+│ 1. User Action Log (NEW) │
+
+│ Redis: LPUSH user:{id}:actions │
+
+│ → {product_id, action_type, timestamp} │
+
+│ → LTRIM to keep last 50 │
+
+│ → TTL: 7 days │
+
+│ │
+
+│ 2. User Browsing Metrics (ALREADY EXISTS) │
+
+│ Redis: HSET browsing_{key} m_p_{pid} ... │
+
+│ → impressions, clicks, CTR per product │
+
+│ │
+
+│ 3. Product Real-Time Counters (NEW) │
+
+│ Redis: HINCRBY product:{id}:counters │
+
+│ → views_today, clicks_today, sold_today │
+
+│ → TTL: 25 hours (reset with daily batch) │
+
+│ │
+
+│ Event filtering: │
+
+│ • view_pdp → user actions + product view counter │
+
+│ • true_impression → user browsing + product counter │
+
+│ • click → user browsing + product counter │
+
+│ • add_to_cart → user actions │
+
+│ • complete_purchase → user actions + product counter │
+
+└─────────────────────────────────────────────────────┘
+
+```
+
+  
+
+#### Near-Real-Time / Hourly Batch
+
+  
+
+New lightweight Airflow DAG: `recommendation_feature_refresh` (hourly)
+
+  
+
+```
+
+Tasks:
+
+1. Detect changed products (price, stock, salable status)
+
+→ Query dim_product_full WHERE updated_at > last_run
+
+→ Update Cassandra product_features_online for changed rows
+
+  
+
+2. Compute embeddings for new products
+
+→ Query product_features_v2 WHERE product_id NOT IN item_embeddings
+
+→ Run item tower ONNX → write to Cassandra item_embeddings
+
+→ Rebuild FAISS index, upload to GCS
+
+→ Signal serving pods to reload (or periodic reload every 1h)
+
+  
+
+3. Sync propensity scores (daily only, after train DAG)
+
+→ Read combine_propensity from BigQuery
+
+→ Write to Redis user:{id}:propensity (batch pipeline)
+
+```
+
+  
+
+#### Daily Batch (Keep Existing, Enhance)
+
+  
+
+Current aggregation DAG stays for full feature rebuild. Add:
+
+  
+
+```
+
+New tasks in recommendation_data_aggregation_daily_v2:
+
+  
+
+1. Feature snapshot for point-in-time training (NEW)
+
+→ Snapshot product_features_v2 with date key
+
+→ When training, join interactions with features AS OF interaction date
+
+→ Prevents label leakage (product with 10K views today doesn't get
+
+that feature for a training row from 30 days ago)
+
+  
+
+2. User action log snapshot (NEW)
+
+→ Daily: dump Redis user:{id}:actions → BigQuery user_action_log_YYYYMMDD
+
+→ Provides offline training data for SASRec and two-tower user tower
+
+→ Alternative: read directly from core_events (current approach),
+
+but Redis snapshot ensures training/serving feature parity
+
+  
+
+3. Ranker training data preparation (NEW, Phase 2B)
+
+→ Join impressions with clicks to create (query, impression_list, click_list) tuples
+
+→ Attach product features + user features at impression time
+
+→ Output: ranker_training_data_YYYYMMDD
+
+```
+
+  
+
+### 7.6 Online ↔ Offline Sync
+
+  
+
+The most critical design decision: **how to keep online and offline stores consistent**.
+
+  
+
+#### Offline → Online (Serving Gets Fresh Features)
+
+  
+
+| What | Frequency | Mechanism | Target |
+
+|------|-----------|-----------|--------|
+
+| Product features (full) | Daily after aggregation DAG | BigQuery → Cassandra bulk load (via K8s pod) | `product_features_online` table |
+
+| Product features (changed) | Hourly | Incremental BigQuery query → Cassandra update | Same table, changed rows only |
+
+| Item embeddings (full) | Daily after training DAG | Model output → Cassandra bulk load | `item_embeddings` table |
+
+| Item embeddings (new products) | Hourly | ONNX item tower on new products → Cassandra | Same table, new rows only |
+
+| FAISS index | Daily + hourly rebuild | GCS upload → serving pod reload | In-process memory |
+
+| User propensity scores | Daily after train_user_favorite_cate DAG | BigQuery `combine_propensity` → Redis bulk load | `user:{id}:propensity` |
+
+| ONNX models (ranker, user tower, SASRec) | Daily after training | GCS upload → serving pod reload | In-process memory |
+
+| Pre-computed reco lists (fallback) | Daily after inference DAG | BigQuery → Cassandra (existing flow) | `p_reco_<version>` (keep as fallback) |
+
+  
+
+#### Online → Offline (Training Gets Real-Time Signals)
+
+  
+
+| What | Frequency | Mechanism | Target |
+
+|------|-----------|-----------|--------|
+
+| User action logs | Daily | Redis `user:{id}:actions` → BigQuery snapshot (K8s pod) | `user_action_log_YYYYMMDD` |
+
+| Product real-time counters | Daily | Redis `product:{id}:counters` → BigQuery (append to feature snapshot) | Enrich `product_features_v2` with intra-day signals |
+
+| User browsing metrics | Not needed offline | Already in impression/click logs in BigQuery | — |
+
+  
+
+**Why Online → Offline matters**: Without this, training and serving see different data. If the serving ranker uses real-time Redis counters but training only sees daily BigQuery aggregates, the model learns on different feature distributions than it serves on. The daily snapshot closes this gap.
+
+  
+
+### 7.7 Point-in-Time Feature Correctness
+
+  
+
+For training, we need features **as they were when the interaction happened**, not as they are today.
+
+  
+
+**Current problem** (label leakage example):
+
+```
+
+Day 1: Product X has 10 views, user A views it (training positive)
+
+Day 30: Product X has 100,000 views
+
+Training: Uses product_features_v2 from Day 30 → assigns 100K views to Day 1 interaction
+
+Result: Model learns "high-view products get clicks" instead of learning real signal
+
+```
+
+  
+
+**Solution**: Daily feature snapshots + temporal join
+
+  
+
+```sql
+
+-- Training data preparation (new SQL)
+
+SELECT
+
+i.session_id,
+
+i.user_id,
+
+i.product_id,
+
+i.interaction_date,
+
+-- Join features AS OF interaction date, not today
+
+f.num_root_view_d30,
+
+f.sale_price,
+
+f.avg_rating_root_all,
+
+...
+
+FROM interaction_training_data i
+
+LEFT JOIN product_features_v2_{interaction_date_suffix} f
+
+ON i.product_id = f.product_id
+
+```
+
+  
+
+This requires keeping ~30 days of `product_features_v2_YYYYMMDD` tables (already the case with current `_YYYYMMDD` suffix convention).
+
+  
+
+### 7.8 Feature Store Implementation: Build vs Buy
+
+  
+
+| Option | Pros | Cons | Recommendation |
+
+|--------|------|------|----------------|
+
+| **Build on existing infra** (Redis + Cassandra + BigQuery) | No new infra cost; team already knows these systems; incremental migration | No feature registry/catalog; manual schema management; no built-in point-in-time joins | **Start here** — Phase 1-3 |
+
+| **Feast** (open-source feature store) | Feature registry; point-in-time joins; online/offline sync built-in; BigQuery + Redis supported as backends | New system to operate; learning curve; may be over-engineered for current scale | Consider for Phase 4+ if complexity grows |
+
+| **Vertex AI Feature Store** (GCP managed) | Fully managed; integrates with BigQuery; streaming ingestion; monitoring | Vendor lock-in; cost; may not support Cassandra/Scylla as online store | Evaluate if team prefers managed services |
+
+  
+
+**Recommended approach**: Build incrementally on existing infra (Phase 1-3), evaluate Feast adoption for Phase 4+ when the number of features and models grows beyond what manual management can handle.
+
+  
+
+### 7.9 Implementation Sequence
+
+  
+
+```
+
+Phase 1 (Weeks 1-3): No feature store changes
+
+└─ Training improvements only, existing BigQuery features sufficient
+
+  
+
+Phase 2 (Weeks 4-7): Minimal online feature additions
+
+├─ Cassandra: Add product_features_online table (for learned ranker)
+
+├─ Daily sync: BigQuery product_features_v2 → Cassandra product_features_online
+
+└─ Redis: Add user:{id}:propensity (daily sync from BigQuery)
+
+  
+
+Phase 3 (Weeks 8-15): Full online/offline feature store
+
+├─ Kafka consumer: user action log → Redis (real-time)
+
+├─ Kafka consumer: product counters → Redis (real-time)
+
+├─ Cassandra: item_embeddings table (daily + hourly for new)
+
+├─ Hourly DAG: feature refresh for changed products
+
+├─ Daily: Redis → BigQuery snapshots (online → offline sync)
+
+├─ Daily: BigQuery → Cassandra/Redis bulk sync (offline → online)
+
+└─ Point-in-time feature joins for training data
+
+  
+
+Phase 4 (Weeks 16+): Evaluate Feast / managed feature store
+
+├─ Feature registry and catalog
+
+├─ Automated feature monitoring and drift detection
+
+└─ Standardized feature serving API
+
+```
+
+  
+
+### 7.10 Summary: What Changes for Each Model
+
+  
+
+| Model/Component | Current Data Source | After Improvement | Collection Method |
+
+|-----------------|--------------------|--------------------|-------------------|
+
+| **Two-tower item tower** (training) | BigQuery `product_features_v2` (daily) | Same + point-in-time snapshots | Daily batch (existing) |
+
+| **Two-tower user tower** (training) | BigQuery `sale_orders` sessions (daily) | BigQuery `user_action_log` (snapshotted from Redis) + point-in-time product features | Daily: Redis → BigQuery snapshot |
+
+| **Two-tower user tower** (serving) | N/A (pre-computed) | Redis `user:{id}:actions` + Cassandra `item_embeddings` → on-the-fly computation | Real-time: Kafka → Redis |
+
+| **Learned ranker** (training) | N/A (doesn't exist yet) | BigQuery: impression/click pairs + product features + user metrics (point-in-time) | Daily batch |
+
+| **Learned ranker** (serving) | N/A | Cassandra `product_features_online` + Redis `user browsing` + Redis `user propensity` | Daily batch + real-time |
+
+| **SASRec** (training) | N/A | BigQuery `user_action_log` (ordered sequences) | Daily: Redis → BigQuery snapshot |
+
+| **SASRec** (serving) | N/A | Redis `user:{id}:actions` (last 50, ordered) | Real-time: Kafka → Redis |
+
+| **Title similarity** (training) | BigQuery `product_features_v2` (titles) | Same | Daily batch (no change) |
+
+| **User propensity** (training) | BigQuery `event_staging` + `nmv` (daily) | Same + enriched features from aggregation tables | Daily batch (no change, just more SQL joins) |
+
+| **User propensity** (serving) | Baked into pre-computed reco lists | Redis `user:{id}:propensity` (for ranker + user tower input) | Daily: BigQuery → Redis sync |
+
+| **Current reranking** (serving) | Redis `UserBrowsing` (real-time) | Same (kept as fallback alongside learned ranker) | Real-time (no change) |
+
+| **Candidate retrieval** (serving) | Cassandra pre-computed lists (daily) | FAISS ANN on item embeddings + pre-computed lists as fallback | Daily FAISS + hourly update |
