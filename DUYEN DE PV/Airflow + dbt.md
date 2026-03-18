@@ -137,4 +137,289 @@ Here is a concise **dbt concepts cheat sheet** (focused on **dbt Core**, current
 
 This cheat sheet covers ~80% of day-to-day decisions in modern dbt projects.
 
-If you want a printable/visual version or deeper dive into one area (e.g. incremental strategies, testing pyramid, Semantic Layer), just say! 🚀
+
+ ---
+
+  **Plan:** **Migrate** **Airflow** **BigQuery** **DAGs** **to** **dbt** **Models**
+
+  
+
+  **Context**
+
+  
+
+  - **330** **DAGs**, **2,290** **tasks** in serialized-dags.csv
+
+  - Focus operators: BigQueryExecuteQueryOperator (1,103 tasks) +
+
+  SQLToBigQueryOperator (504 tasks) = **1,607** **tasks** to migrate
+
+  - Projects: tiki-dwh, tnsl-dwh across ~20+ datasets
+
+  
+
+  ---
+
+  **Phase** **1** **—** **Parse** **&** **Inventory** **(Foundation)**
+
+  
+
+  **Goal:** Extract all SQL from the CSV into a structured inventory before touching
+
+   dbt.
+
+  
+
+  Steps:
+
+  1. Write a Python script to parse serialized-dags.csv → extract per-task:
+
+  dag_id, task_id, operator_type, sql, destination_table, write_disposition,
+
+  depends_on (upstream tasks), schedule, owner
+
+  2. Identify **write** **dispositions**: WRITE_TRUNCATE → full refresh candidates,
+
+  WRITE_APPEND → incremental candidates
+
+  3. Map **table-level** **lineage**: which task writes to which project.dataset.table,
+
+  which SQL reads from which tables → build a dependency graph
+
+  4. Flag complexity: tasks with {{ macros... }} template vars, multi-statement
+
+  SQL, partitioned tables, cross-project references
+
+  
+
+  **Output:** A spreadsheet/JSON of all 1,607 tasks ranked by migration complexity
+
+  (simple → complex).
+
+  
+
+  ---
+
+  **Phase** **2** **—** **dbt** **Project** **Scaffold**
+
+  
+
+  **Goal:** Set up the dbt project structure aligned to your existing dataset
+
+  organization.
+
+  
+
+  dbt/
+
+  ├── dbt_project.yml
+
+  ├── profiles.yml          # BigQuery connection (tiki-dwh, tnsl-dwh)
+
+  ├── models/
+
+  │   ├── staging/          # Raw source → typed, renamed (maps to staging_v2
+
+  dataset)
+
+  │   ├── intermediate/     # Complex joins, not exposed externally
+
+  │   ├── marts/
+
+  │   │   ├── ecom/         # tiki-dwh.ecom
+
+  │   │   ├── nmv/          # tiki-dwh.nmv
+
+  │   │   ├── commercial/   # tiki-dwh.commercial
+
+  │   │   ├── fna/          # tiki-dwh.fna
+
+  │   │   ├── marketplace/  # tiki-dwh.marketplace
+
+  │   │   └── ...
+
+  ├── macros/
+
+  │   └── localtz.sql       # Replicate Airflow's macros.localtz.ds()
+
+  └── tests/
+
+  
+
+  Dataset → dbt folder mapping follows existing tiki-dwh.* structure for
+
+  zero-disruption rollout.
+
+  
+
+  ---
+
+  **Phase** **3** **—** **Macro** **Translation**
+
+  
+
+  **Goal:** Replace Airflow-specific Jinja with dbt equivalents.
+
+  
+
+  ┌──────────────────────────┬──────────────────────────────────────────────┐
+
+  │         Airflow          │                dbt equivalent                │
+
+  ├──────────────────────────┼──────────────────────────────────────────────┤
+
+  │ {{ macros.localtz.ds(ti) │ {{ var('ds') }} or {{ run_started_at |       │
+
+  │  }}                      │ convert_timezone(...) }}                     │
+
+  ├──────────────────────────┼──────────────────────────────────────────────┤
+
+  │ {{ ds }}                 │ {{ var('execution_date') }}                  │
+
+  ├──────────────────────────┼──────────────────────────────────────────────┤
+
+  │ {{ next_ds }}            │ custom macro                                 │
+
+  ├──────────────────────────┼──────────────────────────────────────────────┤
+
+  │ Dynamic partition        │ dbt is_incremental() block                   │
+
+  │ filters                  │                                              │
+
+  └──────────────────────────┴──────────────────────────────────────────────┘
+
+  
+
+  Create a macros/airflow_compat.sql file to centralize these translations.
+
+  
+
+  ---
+
+  **Phase** **4** **—** **Model** **Conversion** **(Prioritized** **Batches)**
+
+  
+
+  Convert in order of complexity:
+
+  
+
+  **Batch** **A** **—** **Simple** **truncate/replace** **(no** **dependencies)**
+
+  - WRITE_TRUNCATE tasks with self-contained SQL → materialized='table'
+
+  - Easiest wins, validates the pipeline
+
+  
+
+  **Batch** **B** **—** **Chain** **dependencies** **within** **a** **single** **DAG**
+
+  - Tasks where Task B reads from Task A's output → convert both, use ref()
+
+  instead of hardcoded table names
+
+  - This is where lineage starts appearing in dbt docs
+
+  
+
+  **Batch** **C** **—** **Cross-DAG** **dependencies**
+
+  - Tasks using ExternalTaskSensor → convert to dbt source() declarations or
+
+  dbt's cross-project ref()
+
+  
+
+  **Batch** **D** **—** **Incremental** **candidates**
+
+  - WRITE_APPEND tasks or partitioned table writes → materialized='incremental'
+
+  with unique_key and partition filter
+
+  - Apply is_incremental() block to filter only new rows
+
+  
+
+  **Batch** **E** **—** **Complex** **/** **skip** **for** **now**
+
+  - KubernetesPodOperator, PythonOperator, SparkKubernetesOperator → keep in
+
+  Airflow, use dbt source() to reference their outputs
+
+  
+
+  ---
+
+  **Phase** **5** **—** **Lineage** **&** **Orchestration**
+
+  
+
+  **Goal:** Replace Airflow task dependencies with dbt's native DAG.
+
+  
+
+  - Replace {{ project.dataset.table }} hardcoded refs with {{ ref('model_name')
+
+   }} — dbt infers execution order automatically
+
+  - For tables still owned by Airflow (Phase E), declare them as sources: in
+
+  schema.yml
+
+  - Use dbt's --select and --defer for selective runs
+
+  - Orchestrate dbt runs from Airflow using BashOperator or
+
+  DbtCloudRunJobOperator — one Airflow DAG triggers dbt instead of 100s of SQL
+
+  tasks
+
+  
+
+  ---
+
+  **Phase** **6** **—** **Testing** **&** **Validation**
+
+  
+
+  For each converted model:
+
+  1. **Row** **count** **check**: compare dbt output vs. existing BigQuery table
+
+  2. **Column-level** **diff**: sample 1000 rows, assert no difference
+
+  3. Add dbt native tests: not_null, unique on key columns
+
+  4. Add freshness checks on sources
+
+  
+
+  ---
+
+  **Phase** **7** **—** **Cutover**
+
+  
+
+  1. Run dbt models in **parallel** with existing Airflow DAGs for 1–2 weeks
+
+  2. Validate parity daily
+
+  3. Pause Airflow DAGs one domain at a time (start with ecom, then nmv, etc.)
+
+  4. Keep Airflow as the scheduler, now calling dbt run --select tag:domain
+
+  
+
+  ---
+
+  **Recommended** **Starting** **Point**
+
+  
+
+  Start with the **datateam_etl_aff** or **fna_bi_tiki_monthly_report** DAGs — they have
+
+   a bounded number of tasks, clear domain ownership, and heavy
+
+  BigQueryExecuteQueryOperator usage. Proving the pattern on one full DAG gives
+
+  you a repeatable template for the rest.
