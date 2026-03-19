@@ -23,5 +23,5 @@ Literally: to cut some apart to examine it (biology)
 Figuratively: to analyze something in detail
 ex: lets dissect this problem step by step
 
-is to + verb: 
-
+is to + verb: purpose, plan
+ex: the goal is to dissect the issue 
