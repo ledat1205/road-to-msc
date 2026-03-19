@@ -14,4 +14,5 @@ ex: tease out patterns
 tease out A from B:
 tease out meaning from logs
 
-otherwise (adverb): 
+otherwise (adverb): if not
+		 (conjunction): 
