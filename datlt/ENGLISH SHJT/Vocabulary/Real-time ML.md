@@ -8,3 +8,7 @@ pattern:
 lump together
 
 tease out (v): extract, separate, discovering something carefully, especially when it’s hidden, complex, or not obvious
+pattern:
+tease out + noun:
+ex: tease out patterns
+tease out A from B:
