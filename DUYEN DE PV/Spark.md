@@ -1,8 +1,7 @@
 Architecture
 
-Concepts
 
-Cluster tuning
+## Cluster tuning
 The hierarchy in one sentence per layer:
 
 **Cluster** — the whole company. All machines combined.
@@ -25,3 +24,4 @@ The hierarchy in one sentence per layer:
 
 Optimization
 
+![[Pasted image 20260320013326.png]]
