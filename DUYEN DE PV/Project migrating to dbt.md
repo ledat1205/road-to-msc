@@ -140,7 +140,7 @@ This cheat sheet covers ~80% of day-to-day decisions in modern dbt projects.
 
  ---
 
- ### Plan **Migrate** **Airflow** **BigQuery** **DAGs** **to** **dbt** **Models**
+ #Plan: **Migrate** **Airflow** **BigQuery** **DAGs** **to** **dbt** **Models**
 
   
 
