@@ -26,4 +26,5 @@ ex: lets dissect this problem step by step
 is to + verb: purpose, plan
 ex: the goal is to dissect the issue 
 
-hamper:
+hamper (v): block, make something difficult
+ex: poor data quality hampers analysis
