@@ -6,3 +6,5 @@ featurization for X
 lump (v): put something into a group
 pattern:
 lump together
+
+tease out (v): extract, separate, discovering something carefully, especially when it’s hidden, complex, or not obvious
