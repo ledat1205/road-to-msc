@@ -1,5 +1,7 @@
-## Architecture
+## Architecture and concepts
 
+## K8S
+https://vutr.substack.com/p/lets-learn-kubernetes-by-running?utm_source=publication-search
 
 
 **Cluster** — the whole company. All machines combined.
