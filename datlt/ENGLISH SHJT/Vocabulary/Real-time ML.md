@@ -3,4 +3,6 @@ pattern:
 featurization of X
 featurization for X
 
-lump (v): group into 
+lump (v): put something into a group
+pattern:
+lump together
