@@ -19,4 +19,9 @@ otherwise (adverb): if not
 
 
 dissect (v): 
-to cut some apart to examine it (biology)
+Literally: to cut some apart to examine it (biology)
+Figuratively: to analyze something in detail
+ex: lets dissect this problem step by step
+
+is to + verb: 
+
