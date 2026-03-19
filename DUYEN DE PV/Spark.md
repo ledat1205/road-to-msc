@@ -1,4 +1,5 @@
-Architecture
+## Architecture
+
 
 **Cluster** — the whole company. All machines combined.
 
@@ -20,7 +21,7 @@ Architecture
 ![[Pasted image 20260320010953.png]]
 ![[Pasted image 20260320011054.png]]
 
-Optimization
+## Optimization
 
 ![[Pasted image 20260320013326.png]]![[Pasted image 20260320013418.png]]
 ![[Pasted image 20260320013447.png]]![[Pasted image 20260320013517.png]]
