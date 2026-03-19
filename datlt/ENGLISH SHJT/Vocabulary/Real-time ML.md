@@ -34,3 +34,7 @@ ex: safety is paramount
 
 perpetually (adverb): continuously, constantly, forever 
 ex: the system is perpetually failing 
+
+dormant (adj): not active right now but can become active later
+pattern:
+dormant for + pr
