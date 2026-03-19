@@ -1,7 +1,9 @@
 
-## Concepts - Architecture, Scheduling
-https://vutr.substack.com/p/i-spent-8-hours-learning-apache-spark?utm_source=publication-search
+## Concepts - Architecture,
+https://vutr.substack.com/p/i-spent-8-hours-learning-apache-spark?utm_source=publication-search - Scheduling
+https://vutr.substack.com/p/i-spent-6-hours-to-learn-how-apache?utm_source=publication-search - Execution Plan
 
+PyS
 ## K8S
 https://vutr.substack.com/p/lets-learn-kubernetes-by-running?utm_source=publication-search
 
