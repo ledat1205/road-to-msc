@@ -17,3 +17,6 @@ tease out meaning from logs
 otherwise (adverb): if not
 		(conjunction): if you dont follow that order or suggestion
 
+
+dissect (v): 
+to cut some apart to examine it (biology)
