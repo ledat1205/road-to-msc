@@ -29,4 +29,5 @@ ex: the goal is to dissect the issue
 hamper (v): block, make something difficult
 ex: poor data quality hampers analysis
 
-paramount (n): high priority 
+paramount (adj): highest priority
+ex: safety is paramount
