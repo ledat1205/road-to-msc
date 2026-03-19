@@ -41,3 +41,8 @@ dormant for + period of time: dormant for years
 remain / stay dormant: the service remained dormant
 
 signify(v):  to represent something
+pattern:
+X signify (signifies) Y
+signify that + clause
+	ex: the result signifies that the model is over
+
