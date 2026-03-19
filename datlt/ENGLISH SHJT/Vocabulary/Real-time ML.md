@@ -13,3 +13,5 @@ tease out + noun:
 ex: tease out patterns
 tease out A from B:
 tease out meaning from logs
+
+otherwise (adverb): 
