@@ -43,6 +43,7 @@ remain / stay dormant: the service remained dormant
 signify(v):  to represent something
 pattern:
 X signify (signifies) Y
+	ex: this metric signifies user engagement
 signify that + clause
-	ex: the result signifies that the model is over
+	ex: the result signifies that the model is overfitting
 
