@@ -31,3 +31,6 @@ ex: poor data quality hampers analysis
 
 paramount (adj): highest priority
 ex: safety is paramount
+
+perpetually (adverb): continuously, constantly, forever 
+ex: 
