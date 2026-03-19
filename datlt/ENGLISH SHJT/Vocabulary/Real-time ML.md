@@ -1,3 +1,4 @@
 featurization (n): convert raw data into features
 pattern: 
-featurization of 
+featurization of X
+featurization for X
