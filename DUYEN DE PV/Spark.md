@@ -23,10 +23,10 @@ https://vutr.substack.com/p/everything-you-need-to-know-about-46d?utm_source=pub
 
 **Task** — one unit of work. It lives on one core, processes one partition, runs one stage's logic (filter, join, aggregate), and dies when done. The next task on that core immediately starts.
 
-## Spark shuffle
+## Spark Shuffle
 https://vutr.substack.com/p/a-9-minute-simple-explanation-of?utm_source=publication-search
 
-## Cluster tuning
+## Cluster Tuning
 https://vutr.substack.com/p/i-spent-4-hours-learning-apache-spark?utm_source=publication-search - Resource allocation
 https://vutr.substack.com/p/i-spent-8-hours-understanding-apache?utm_source=publication-search - Memory management
 
