@@ -37,4 +37,5 @@ ex: the system is perpetually failing
 
 dormant (adj): not active right now but can become active later
 pattern:
-dormant for + pr
+dormant for + period of time: dormant for years
+remain / stay dormant: the service remained dormant
