@@ -39,3 +39,5 @@ dormant (adj): not active right now but can become active later
 pattern:
 dormant for + period of time: dormant for years
 remain / stay dormant: the service remained dormant
+
+signify(v):  to represent something
