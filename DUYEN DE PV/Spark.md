@@ -24,3 +24,9 @@ Optimization
 
 ![[Pasted image 20260320013326.png]]![[Pasted image 20260320013418.png]]
 ![[Pasted image 20260320013447.png]]![[Pasted image 20260320013517.png]]
+
+![[Pasted image 20260320013549.png]]
+![[Pasted image 20260320013605.png]]
+![[Pasted image 20260320013616.png]]
+
+![[Pasted image 20260320013632.png]]
