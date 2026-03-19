@@ -3,6 +3,8 @@
 ## K8S
 https://vutr.substack.com/p/lets-learn-kubernetes-by-running?utm_source=publication-search
 
+## Spark Structured Streaming
+https://vutr.substack.com/p/everything-you-need-to-know-about-46d?utm_source=publication-search
 
 **Cluster** — the whole company. All machines combined.
 
@@ -18,6 +20,7 @@ https://vutr.substack.com/p/lets-learn-kubernetes-by-running?utm_source=publicat
 https://vutr.substack.com/p/a-9-minute-simple-explanation-of?utm_source=publication-search
 
 ## Cluster tuning
+https://vutr.substack.com/p/i-spent-4-hours-learning-apache-spark?utm_source=publication-search
 ![[Pasted image 20260320012459.png]]
 ![[Pasted image 20260320010007.png]]
 ![[Pasted image 20260320010121.png]]
