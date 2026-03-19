@@ -23,3 +23,4 @@ Architecture
 Optimization
 
 ![[Pasted image 20260320013326.png]]![[Pasted image 20260320013418.png]]
+![[Pasted image 20260320013447.png]]![[Pasted image 20260320013517.png]]
