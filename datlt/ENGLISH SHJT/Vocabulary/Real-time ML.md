@@ -15,4 +15,5 @@ tease out A from B:
 tease out meaning from logs
 
 otherwise (adverb): if not
-		 (conjunction): 
+		(conjunction): if you dont follow that order or suggestion
+
