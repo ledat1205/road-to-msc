@@ -33,4 +33,4 @@ paramount (adj): highest priority
 ex: safety is paramount
 
 perpetually (adverb): continuously, constantly, forever 
-ex: 
+ex: the system is perpetually failing 
