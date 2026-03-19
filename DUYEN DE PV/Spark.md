@@ -1,4 +1,5 @@
-## Architecture and concepts
+## Scheduling
+https://vutr.substack.com/p/i-spent-8-hours-learning-apache-spark?utm_source=publication-search
 
 ## K8S
 https://vutr.substack.com/p/lets-learn-kubernetes-by-running?utm_source=publication-search
@@ -20,7 +21,9 @@ https://vutr.substack.com/p/everything-you-need-to-know-about-46d?utm_source=pub
 https://vutr.substack.com/p/a-9-minute-simple-explanation-of?utm_source=publication-search
 
 ## Cluster tuning
-https://vutr.substack.com/p/i-spent-4-hours-learning-apache-spark?utm_source=publication-search
+https://vutr.substack.com/p/i-spent-4-hours-learning-apache-spark?utm_source=publication-search - Resource allocation
+
+
 ![[Pasted image 20260320012459.png]]
 ![[Pasted image 20260320010007.png]]
 ![[Pasted image 20260320010121.png]]
