@@ -1,13 +1,13 @@
 
-## Concepts - Architecture,
-https://vutr.substack.com/p/if-youre-learning-apache-spark-this?utm_source=publication-search - Walkaround
-https://vutr.substack.com/p/i-spent-8-hours-learning-apache-spark?utm_source=publication-search - Scheduling
-https://vutr.substack.com/p/i-spent-6-hours-to-learn-how-apache?utm_source=publication-search - Execution Plan
+## Concepts 
+https://vutr.substack.com/p/if-youre-learning-apache-spark-this?utm_source=publication-search - Everything you need to know
+https://vutr.substack.com/p/i-spent-8-hours-learning-apache-spark?utm_source=publication-search - On Scheduling
+https://vutr.substack.com/p/i-spent-6-hours-to-learn-how-apache?utm_source=publication-search - On Execution Plan
 
 ## K8S
 https://vutr.substack.com/p/lets-learn-kubernetes-by-running?utm_source=publication-search
 
-PySpark
+## PySpark
 https://vutr.substack.com/p/i-spent-6-hours-learning-pyspark?utm_source=publication-search
 
 ## Spark Structured Streaming
