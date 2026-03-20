@@ -47,5 +47,8 @@ X signify (signifies) Y
 signify that + clause
 	ex: the result signifies that the model is overfitting
 
-justify (v) 
+justify (v): give a reason for something
+pattern:
+justify + noun
+	ex: these metrics justify the change 
 
