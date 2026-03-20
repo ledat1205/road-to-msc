@@ -52,5 +52,5 @@ pattern:
 justify + noun
 	ex: these metrics justify the result of campaign
 justify + doing something
-	ex: this doesn't justify changing 
+	ex: this doesn't justify changing the whole system
 
