@@ -53,4 +53,6 @@ justify + noun
 	ex: these metrics justify the result of campaign
 justify + doing something
 	ex: this doesn't justify changing the whole system
+justify + clause
+	ex: the result justify that we proceed cautiously 
 
