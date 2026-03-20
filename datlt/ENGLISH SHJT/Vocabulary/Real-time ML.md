@@ -47,3 +47,5 @@ X signify (signifies) Y
 signify that + clause
 	ex: the result signifies that the model is overfitting
 
+justify (v) 
+
