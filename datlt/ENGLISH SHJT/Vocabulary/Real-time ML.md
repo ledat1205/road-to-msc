@@ -50,5 +50,7 @@ signify that + clause
 justify (v): give a reason for something
 pattern:
 justify + noun
-	ex: these metrics justify the change 
+	ex: these metrics justify the result of campaign
+justify + doing something
+	ex: this doesn't justify changing 
 
