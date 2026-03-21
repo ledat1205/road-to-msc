@@ -1,3 +1,100 @@
+When you run **`spark-submit`** to launch a Spark application on **Kubernetes** (the most common way in modern setups, especially since Spark 2.3+ and very mature in Spark 4.x), a lot happens behind the scenes technically. I'll explain it step by step in a realistic, production-style flow (focusing on the **native** `spark-submit` method, **not** the Spark Operator — though the Operator basically automates a similar process internally).
+
+**Important note**: On Kubernetes, **only cluster mode** is fully supported and recommended for production. Client mode exists (since Spark 2.4) but is rarely used because it requires the submitter machine to stay connected and act as the driver host — which defeats many Kubernetes benefits.
+
+### High-Level Flow (What You See vs. What Really Happens)
+
+You run something like:
+
+```bash
+spark-submit \
+  --master k8s://https://kubernetes.default.svc:443 \
+  --deploy-mode cluster \
+  --name my-fraud-job \
+  --class com.example.FraudDetector \
+  --conf spark.executor.instances=10 \
+  --conf spark.kubernetes.container.image=yourcompany/spark:4.0 \
+  s3a://my-bucket/apps/fraud-detector.jar
+```
+
+Behind the curtain → here's the **technical sequence**:
+
+1. **spark-submit script starts locally** (on your laptop, CI server, or wherever you run the command)
+   - It parses all flags (`--master`, `--deploy-mode`, `--conf`, jars/files, etc.).
+   - It builds a **SparkSubmitOptionParser** internally and prepares a **SparkConf** object with all your configs + defaults.
+   - It discovers your **Kubernetes credentials** automatically:
+     - If running inside the cluster → uses in-pod service account token (`/var/run/secrets/kubernetes.io/serviceaccount/token`).
+     - If running outside → looks for `~/.kube/config` or explicit `--kubernetes-service-account` + kubeconfig.
+   - It initializes a **KubernetesClient** (using fabric8 or official Kubernetes Java client) to talk to the K8s API server.
+
+2. **Client creates the Driver Pod spec programmatically**
+   - Spark builds a full Kubernetes **Pod** definition for the **Driver** in memory:
+     - Container image = your specified one (e.g., `yourcompany/spark:4.0`)
+     - Main command = essentially runs the equivalent of:
+       ```bash
+       /opt/spark/bin/spark-class org.apache.spark.deploy.k8s.KubernetesDriverMain ...
+       ```
+     - Environment variables: all your `--conf` as `SPARK_CONF_*`, plus things like `SPARK_APPLICATION_ID`, JAR locations.
+     - Volumes: mounts for secrets, configmaps, your uploaded files/jars (Spark copies your .jar / .py / deps into a scratch volume).
+     - Ports: opens driver RPC port, block manager port, UI port (4040), etc.
+     - Resource requests/limits: driver cores/memory from your flags.
+     - Labels/annotations: `spark-app-selector`, `spark-role: driver`, etc. for discovery.
+   - Spark uploads your application JARs/files (via `--jars`, `--py-files`, main file) to a **scratch space** (configurable, often an init container or direct volume mount from PVC/emptyDir).
+
+3. **Client talks to Kubernetes API server → creates the Driver Pod**
+   - Using the Kubernetes client library → `POST /api/v1/namespaces/<ns>/pods` with the Driver Pod spec.
+   - Kubernetes API server accepts → scheduler places the pod on a node (based on resources, node selectors, affinities, taints).
+   - Pod starts → init containers (if configured) run first → then main Spark driver container starts.
+
+4. **Driver Pod boots and takes over as the real "submitter"**
+   - The driver container runs **KubernetesDriverMain** (not your app main class yet).
+   - It re-initializes Spark context with the same configs.
+   - It requests **Executor Pods** from Kubernetes API (same way the client requested the driver):
+     - Builds Executor Pod specs dynamically (cores, memory, image = same as driver usually).
+     - Creates them via API (`POST /pods`).
+     - Number: starts with your `--num-executors` / dynamic allocation min.
+   - Kubernetes schedules executor pods across nodes.
+
+5. **Driver → Executors handshake & application launch**
+   - Executors start → each runs **KubernetesExecutor** → connects back to Driver via Kubernetes pod-to-pod network (using pod IP + driver RPC port).
+   - Driver discovers executors via Kubernetes API watches (or DNS if configured).
+   - Once enough executors register → Driver launches your actual application code:
+     - Loads your JAR / Python file.
+     - Runs your `main()` / script (e.g., `com.example.FraudDetector.main()` or `fraud.py`).
+     - Builds SparkSession / SparkContext.
+     - Creates DAG → Catalyst optimizer → physical plan → submits stages/tasks to executors.
+
+6. **Job runs distributed**
+   - Tasks execute on executors (data shuffling via Netty over pod network).
+   - Dynamic allocation (if enabled): Driver watches task backlog → requests more/less executor pods dynamically.
+   - Shuffle data: uses local disk + shuffle tracking (no external shuffle service needed on K8s).
+
+7. **Job finishes → cleanup**
+   - Application completes (success/failure).
+   - Driver tells Kubernetes to delete all executor pods.
+   - Driver pod remains in "Completed" state (keeps logs) — configurable TTL via `--conf spark.kubernetes.driver.deleteOnCompletion=true` or operator/TTLAfterFinished.
+   - Spark client (your original `spark-submit` process) sees driver pod succeeded/failed → exits with status.
+
+### Key Technical Differences from YARN / Standalone
+| Aspect                  | YARN / Standalone                          | Kubernetes (native spark-submit)                  |
+|-------------------------|--------------------------------------------|---------------------------------------------------|
+| Cluster Manager         | YARN RM / Spark Master                     | Kubernetes API + Scheduler                        |
+| Driver location         | Container on NM / Worker                   | Pod (same as executors)                           |
+| Executor creation       | YARN allocates containers                  | Driver creates pods via K8s API                   |
+| Discovery               | RPC / Akka                                 | K8s API watch + pod labels / DNS                  |
+| Shuffle service         | Optional external                          | Shuffle tracking (built-in since 3.0)             |
+| Dynamic allocation      | Supported                                  | Supported + native pod scaling                    |
+| Logs / UI               | Aggregated via YARN                        | `kubectl logs` + driver pod persists              |
+
+In short: `spark-submit` on K8s acts as a **smart client** that:
+- Uses K8s API as the "resource manager"
+- Creates the driver pod first
+- Lets the driver pod create/manage everything else (executors, your app logic)
+
+This makes Spark feel native to Kubernetes — pods are first-class, auto-scaling, observable via `kubectl`, etc.
+
+If you're using **Spark Operator** instead, the flow is similar but triggered by a controller watching `SparkApplication` CRD → it runs an internal `spark-submit`-like logic from inside the cluster.
+
 
 
 ![](https://substackcdn.com/image/fetch/$s_!Ir_N!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F6489490c-01ad-4754-8323-f20738cde0e1_2000x1428.png)
