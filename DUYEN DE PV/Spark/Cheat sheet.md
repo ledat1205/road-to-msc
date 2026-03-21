@@ -9,7 +9,23 @@
 |**Yellow**|Shuffle Write Time|Time spent **writing shuffle data** to disk (serializing, partitioning, spilling if needed) so the next stage can read it.|Large output data, poor partitioning, high cardinality. Reduce: repartition smarter, use bucketing, enable AQE coalesce.|
 |**Purple**|Result Serialization Time|Time to **serialize** the final task result (after computation) before sending it back to the driver (for actions like collect/count).|Very large result sent back to driver (e.g., collect() on huge data). Avoid: never collect large datasets; use reduce/aggregate instead.|
 |**Cyan**|Getting Result Time|Time for the **driver** to **receive and process** the task result from the executor (network transfer + driver-side deserialization/aggregation).|Slow network, large results being sent back, driver overload. Avoid large driver-side collections; prefer distributed writes (saveAsTable, write.parquet).|
+### Quick Summary – Ideal vs Problematic Bar Patterns
 
+- **Healthy task** → mostly **green** (computing time dominates), very thin other colors.
+- **Scheduler bottleneck** → long **blue** at the beginning → too many concurrent tasks or slow driver.
+- **Serialization/closure issues** → noticeable **red** → optimize closures, reduce captured data.
+- **Shuffle-heavy job** → large **orange** + **yellow** → classic wide transformation (join/groupBy); tune partitions, use AQE.
+- **Driver overload** → big **purple** or **cyan** → stop collecting large data to driver.
+- **Skew** → some bars much longer than others (often green or shuffle parts huge on few tasks).
+
+### How to Read Your Specific Chart
+
+- Tasks are grouped by **executor ID** or index (0/, 1/ etc. on the left).
+- Many tasks have short **blue** (low scheduler delay) and mostly **green** → computation is the main work.
+- Some tasks show visible **orange**/**yellow** → shuffle is happening (likely a reduce-side stage).
+- Very little **purple**/**cyan** → good, results aren't huge or driver isn't bottlenecked.
+- If many bars have noticeable **red** at start → look at broadcast variables or large UDF closures
+-
 ![[Pasted image 20260320012459.png]]
 ![[Pasted image 20260320010007.png]]
 ![[Pasted image 20260320010121.png]]
