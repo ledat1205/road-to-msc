@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stream Processing Mastery — Flink · Spark · Kafka Streams</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --bg2: #0f1218;
+    --bg3: #161b24;
+    --bg4: #1c2330;
+    --border: #252d3d;
+    --border2: #2e3a50;
+    --text: #c9d4e8;
+    --text2: #7a8ba8;
+    --text3: #4a5568;
+    --flink: #e8533a;
+    --flink2: #ff6b50;
+    --flink-dim: rgba(232,83,58,0.12);
+    --spark: #f0a500;
+    --spark2: #ffc233;
+    --spark-dim: rgba(240,165,0,0.12);
+    --kafka: #33c97e;
+    --kafka2: #52e89a;
+    --kafka-dim: rgba(51,201,126,0.12);
+    --accent: #5b8af5;
+    --accent2: #7ba4ff;
+    --accent-dim: rgba(91,138,245,0.12);
+    --green: #33c97e;
+    --yellow: #f0a500;
+    --red: #e8533a;
+    --purple: #a78bfa;
+    --radius: 8px;
+    --radius2: 4px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+
+  .header-title span { color: var(--accent2); }
+
+  .header-badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .badge-flink { background: var(--flink-dim); color: var(--flink2); border: 1px solid rgba(232,83,58,0.3); }
+  .badge-spark { background: var(--spark-dim); color: var(--spark2); border: 1px solid rgba(240,165,0,0.3); }
+  .badge-kafka { background: var(--kafka-dim); color: var(--kafka2); border: 1px solid rgba(51,201,126,0.3); }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .tab:hover { color: var(--text2); background: var(--bg3); }
+  .tab.active { color: var(--accent2); border-bottom-color: var(--accent); background: rgba(91,138,245,0.06); }
+
+  /* MAIN CONTENT */
+  .content {
+    padding: 28px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* SECTION HEADER */
+  .section-header {
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .section-desc {
+    color: var(--text2);
+    font-size: 13px;
+    max-width: 800px;
+  }
+
+  /* GRID */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 3; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+
+  .card-flink { border-left: 3px solid var(--flink); }
+  .card-spark { border-left: 3px solid var(--spark); }
+  .card-kafka { border-left: 3px solid var(--kafka); }
+  .card-neutral { border-left: 3px solid var(--accent); }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .engine-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+  .el-flink { background: var(--flink-dim); color: var(--flink2); }
+  .el-spark { background: var(--spark-dim); color: var(--spark2); }
+  .el-kafka { background: var(--kafka-dim); color: var(--kafka2); }
+  .el-all { background: var(--accent-dim); color: var(--accent2); }
+
+  /* CODE BLOCKS */
+  .code {
+    background: #080b0f;
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 8px 0;
+    color: #c9d4e8;
+  }
+
+  .code .kw { color: #7ba4ff; }
+  .code .fn { color: #52e89a; }
+  .code .str { color: #f0c97a; }
+  .code .cm { color: #4a5568; font-style: italic; }
+  .code .num { color: #ff8c70; }
+  .code .type { color: #c4a0ff; }
+  .code .ann { color: #f0a500; }
+
+  /* COMPARISON TABLE */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 12px;
+  }
+
+  .comp-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--bg3);
+    border-bottom: 2px solid var(--border2);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  .comp-table th.th-flink { color: var(--flink2); }
+  .comp-table th.th-spark { color: var(--spark2); }
+  .comp-table th.th-kafka { color: var(--kafka2); }
+  .comp-table th.th-dim { color: var(--text2); }
+
+  .comp-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table tr:hover td { background: var(--bg3); }
+
+  .comp-table td.row-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text2);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  /* RATING BADGES */
+  .rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 4px;
+  }
+  .rating-a { background: rgba(51,201,126,0.15); color: #52e89a; }
+  .rating-b { background: rgba(240,165,0,0.15); color: #ffc233; }
+  .rating-c { background: rgba(232,83,58,0.15); color: #ff8c70; }
+
+  /* TAGS / PILLS */
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    margin: 2px;
+  }
+  .tag-green { background: rgba(51,201,126,0.1); border-color: rgba(51,201,126,0.3); color: var(--kafka2); }
+  .tag-red { background: rgba(232,83,58,0.1); border-color: rgba(232,83,58,0.3); color: var(--flink2); }
+  .tag-yellow { background: rgba(240,165,0,0.1); border-color: rgba(240,165,0,0.3); color: var(--spark2); }
+  .tag-blue { background: rgba(91,138,245,0.1); border-color: rgba(91,138,245,0.3); color: var(--accent2); }
+  .tag-purple { background: rgba(167,139,250,0.1); border-color: rgba(167,139,250,0.3); color: var(--purple); }
+
+  /* CALLOUTS */
+  .callout {
+    border-radius: var(--radius2);
+    padding: 12px 16px;
+    margin: 10px 0;
+    font-size: 12.5px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border: 1px solid;
+  }
+  .callout-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .callout-tip { background: rgba(51,201,126,0.06); border-color: rgba(51,201,126,0.2); }
+  .callout-warn { background: rgba(240,165,0,0.06); border-color: rgba(240,165,0,0.2); color: #e0c070; }
+  .callout-danger { background: rgba(232,83,58,0.06); border-color: rgba(232,83,58,0.2); color: #d08070; }
+  .callout-info { background: rgba(91,138,245,0.06); border-color: rgba(91,138,245,0.2); color: var(--text2); }
+
+  /* LIST */
+  .list { list-style: none; }
+  .list li {
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .list li:last-child { border-bottom: none; }
+  .list li::before { content: "▸"; color: var(--accent2); flex-shrink: 0; margin-top: 1px; font-size: 10px; }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin: 24px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .inline-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p { margin: 6px 0; color: var(--text2); font-size: 12.5px; }
+  strong { color: var(--text); }
+  h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); margin: 10px 0 6px; }
+
+  .gap { margin-top: 20px; }
+  
+  /* ARCHITECTURE DIAGRAM PLACEHOLDER STYLE */
+  .arch-box {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-align: center;
+    color: var(--text2);
+  }
+
+  .arch-arrow {
+    text-align: center;
+    color: var(--text3);
+    font-size: 16px;
+    line-height: 1;
+    margin: 4px 0;
+  }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+  }
+  .flow-box {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius2);
+    padding: 6px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .flow-arrow { color: var(--text3); font-size: 14px; }
+
+  .metric-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-name { color: var(--text2); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .metric-val { color: var(--text); font-weight: 500; }
+
+  @media (max-width: 900px) {
+    .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    .col-span-2, .col-span-3 { grid-column: span 1; }
+    .content { padding: 16px; }
+    .header { padding: 16px 16px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-title">Stream Processing <span>Mastery</span> Cheat Sheet</div>
+      <div class="header-badges">
+        <span class="badge badge-flink">Apache Flink</span>
+        <span class="badge badge-spark">Spark Structured Streaming</span>
+        <span class="badge badge-kafka">Kafka Streams</span>
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);text-align:right;margin-top:4px;">
+      BEGINNER → MASTERY<br>2024 EDITION
+    </div>
+  </div>
+  <div class="tabs" id="tabBar">
+    <button class="tab active" onclick="showTab('mental')">Mental Models</button>
+    <button class="tab" onclick="showTab('arch')">Architecture</button>
+    <button class="tab" onclick="showTab('memory')">Memory Model</button>
+    <button class="tab" onclick="showTab('concepts')">Core Concepts</button>
+    <button class="tab" onclick="showTab('time')">Time & Ordering</button>
+    <button class="tab" onclick="showTab('state')">State Management</button>
+    <button class="tab" onclick="showTab('semantics')">Processing Semantics</button>
+    <button class="tab" onclick="showTab('windows')">Windowing</button>
+    <button class="tab" onclick="showTab('apis')">APIs & Patterns</button>
+    <button class="tab" onclick="showTab('optimization')">Optimization</button>
+    <button class="tab" onclick="showTab('fault')">Fault Tolerance</button>
+    <button class="tab" onclick="showTab('debug')">Debug & Monitor</button>
+    <button class="tab" onclick="showTab('compare')">Comparison</button>
+    <button class="tab" onclick="showTab('mastery')">Mastery Patterns</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: MENTAL MODELS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section active" id="mental">
+  <div class="section-header">
+    <div class="section-title">Mental Models</div>
+    <div class="section-desc">How each framework thinks about data. Getting this right is the foundation of everything else.</div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> The Infinite Pipeline</div>
+      <p>Think of Flink as a <strong>water pipe system</strong>. Events flow continuously through operators one at a time. The pipeline is always running — operators are persistent processes that react immediately to each event.</p>
+      <div class="callout callout-info"><div class="callout-icon">💡</div><div>No concept of "batches". Every record is processed the moment it arrives. State is held in memory/RocksDB <em>between</em> events.</div></div>
+      <div class="flow">
+        <div class="flow-box">Source</div><div class="flow-arrow">→</div>
+        <div class="flow-box">map()</div><div class="flow-arrow">→</div>
+        <div class="flow-box">keyBy()</div><div class="flow-arrow">→</div>
+        <div class="flow-box">window()</div><div class="flow-arrow">→</div>
+        <div class="flow-box">Sink</div>
+      </div>
+      <p style="margin-top:8px;"><strong>Latency:</strong> <span class="tag tag-green">Sub-millisecond possible</span></p>
+      <p><strong>Processing Speed:</strong> True per-event processing. Best for real-time critical latency. No micro-batch overhead.</p>
+    </div>
+
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> The Infinite Table</div>
+      <p>Think of Spark Structured Streaming as a <strong>database table that grows forever</strong>. New data appends to the table; you query it with SQL/DataFrame APIs. Under the hood, Spark runs periodic micro-batches.</p>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Processing is fundamentally <strong>micro-batch</strong>. Continuous mode exists but is experimental. Potential disk-based shuffles add latency.</div></div>
+      <div class="flow">
+        <div class="flow-box">Batch 1</div><div class="flow-arrow">→</div>
+        <div class="flow-box">Batch 2</div><div class="flow-arrow">→</div>
+        <div class="flow-box">Batch N…</div>
+      </div>
+      <p style="margin-top:8px;"><strong>Latency:</strong> <span class="tag tag-yellow">~100ms–seconds per trigger</span></p>
+      <p><strong>Processing Speed:</strong> Micro-batch. Fixed intervals. Supports continuous mode (experimental) for ultra-low latency.</p>
+    </div>
+
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> The Log as Database</div>
+      <p>Think of Kafka Streams as a <strong>smart consumer that transforms Kafka topics</strong>. It's an embedded library — no cluster, no server. Your app IS the stream processor. Kafka topics are the source of truth.</p>
+      <div class="callout callout-tip"><div class="callout-icon">✓</div><div>Pure event-by-event processing. Relies entirely on Kafka for input/output — Kafka network latency is always a floor on your end-to-end latency.</div></div>
+      <div class="flow">
+        <div class="flow-box">Topic In</div><div class="flow-arrow">→</div>
+        <div class="flow-box">KStream DSL</div><div class="flow-arrow">→</div>
+        <div class="flow-box">Topic Out</div>
+      </div>
+      <p style="margin-top:8px;"><strong>Latency:</strong> <span class="tag tag-yellow">Low but Kafka-bound</span></p>
+      <p><strong>Processing Speed:</strong> Pure stream, per-event. But Kafka I/O adds extra latency vs Flink.</p>
+    </div>
+  </div>
+
+  <div class="section-label">How each framework thinks about time</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Time Philosophy</div>
+      <ul class="list">
+        <li>First-class <strong>event time</strong> with watermark propagation</li>
+        <li>Processing time as fallback</li>
+        <li>Per-record time tracking — minimal latency overhead</li>
+        <li>Watermarks flow through the DAG, pausing windows until caught up</li>
+      </ul>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Time Philosophy</div>
+      <ul class="list">
+        <li>Event time supported but within micro-batch windows</li>
+        <li>Watermark defined on DataFrame column</li>
+        <li>Late data handled at batch boundary</li>
+        <li>Less precise than Flink's per-record tracking</li>
+      </ul>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Time Philosophy</div>
+      <ul class="list">
+        <li>Event time via record timestamps</li>
+        <li>Wall-clock time via <code>System.currentTimeMillis()</code></li>
+        <li><strong>suppress()</strong> operator for final window results</li>
+        <li>Grace period for late data — silently drops beyond it</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">The Stream-Table Duality</div>
+  <div class="card card-neutral col-span-3">
+    <div class="card-title"><span class="engine-label el-all">ALL FRAMEWORKS</span> Fundamental Duality</div>
+    <div class="grid-3">
+      <div>
+        <h4>Stream → Table</h4>
+        <p>Accumulate all events → you get a table (state at a point in time). E.g., counting events = a running total table.</p>
+        <div class="code"><span class="cm">// Kafka Streams</span>
+stream.<span class="fn">groupByKey</span>()
+      .<span class="fn">count</span>() <span class="cm">// → KTable</span></div>
+      </div>
+      <div>
+        <h4>Table → Stream</h4>
+        <p>Every row change in a table can be emitted as a stream of change events (changelog stream).</p>
+        <div class="code"><span class="cm">// Kafka Streams</span>
+table.<span class="fn">toStream</span>()
+     .<span class="fn">to</span>(<span class="str">"output-topic"</span>)</div>
+      </div>
+      <div>
+        <h4>Why it matters</h4>
+        <p>This duality is the foundation of joins, aggregations, and CDC. A stream is a diff log of a table. A table is a materialized view of a stream.</p>
+        <div class="callout callout-tip"><div class="callout-icon">💡</div><div>Flink SQL, Spark SQL, and Kafka Streams KTable all exploit this duality.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: ARCHITECTURE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="arch">
+  <div class="section-header">
+    <div class="section-title">Architecture Deep Dive</div>
+    <div class="section-desc">Internal components, execution models, and how jobs are deployed and run.</div>
+  </div>
+
+  <div class="section-label">Flink Architecture</div>
+  <div class="grid-3">
+    <div class="card card-flink col-span-3">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Cluster Architecture</div>
+      <div class="grid-3">
+        <div>
+          <h4>JobManager (Master)</h4>
+          <ul class="list">
+            <li><strong>JobGraph</strong> compilation & optimization</li>
+            <li>Task scheduling across TaskManagers</li>
+            <li>Checkpoint coordination</li>
+            <li>Failure recovery & restart</li>
+            <li>High-availability via ZooKeeper/Kubernetes</li>
+          </ul>
+          <div class="code" style="margin-top:8px;"><span class="type">JobManager</span>
+  ├── <span class="fn">Dispatcher</span>       <span class="cm">// job submission</span>
+  ├── <span class="fn">ResourceManager</span> <span class="cm">// slot management</span>
+  └── <span class="fn">CheckpointCoordinator</span></div>
+        </div>
+        <div>
+          <h4>TaskManager (Workers)</h4>
+          <ul class="list">
+            <li>Runs <strong>Task Slots</strong> (isolated execution units)</li>
+            <li>Each slot shares one JVM but separate classloaders</li>
+            <li>Network buffers for data exchange</li>
+            <li>Manages local state (RocksDB or heap)</li>
+            <li>Reports heartbeat to JobManager</li>
+          </ul>
+          <div class="code" style="margin-top:8px;"><span class="type">TaskManager</span>
+  ├── Slot 1 → [Source | Map | Sink]
+  ├── Slot 2 → [Source | Map | Sink]
+  └── Slot N → ...</div>
+        </div>
+        <div>
+          <h4>Operator Chaining</h4>
+          <p>Consecutive operators with same parallelism are chained into a single <strong>Task</strong> — no serialization overhead between them.</p>
+          <div class="code"><span class="cm">// Flink chains automatically:</span>
+source → map → filter
+<span class="cm">// becomes ONE task, zero network</span>
+
+<span class="cm">// keyBy() BREAKS the chain</span>
+<span class="cm">// (requires shuffle/network)</span></div>
+          <div class="callout callout-tip"><div class="callout-icon">💡</div><div>Operator chaining is one of Flink's biggest performance advantages.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Spark Structured Streaming Architecture</div>
+  <div class="grid-3">
+    <div class="card card-spark col-span-3">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Cluster Architecture</div>
+      <div class="grid-3">
+        <div>
+          <h4>Driver (Master)</h4>
+          <ul class="list">
+            <li>Runs <strong>StreamingQueryManager</strong></li>
+            <li>Triggers micro-batches at intervals</li>
+            <li>Plans DAG, submits stages to scheduler</li>
+            <li>Maintains offset tracking (checkpoint)</li>
+            <li>Single point of failure (HA via restart)</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Executors (Workers)</h4>
+          <ul class="list">
+            <li>Run <strong>Tasks</strong> (one per partition)</li>
+            <li>Cache RDD data in memory/disk</li>
+            <li>Shuffle data across network for wide ops</li>
+            <li>Stateful ops store state in executor memory</li>
+            <li>Dynamic resource allocation supported</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Micro-Batch Engine</h4>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;">
+            <div class="flow-box">1. Trigger fires</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">2. Read new offsets from Kafka</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">3. Plan & execute DAG</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">4. Commit offsets + checkpoint</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">5. Emit output</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Kafka Streams Architecture</div>
+  <div class="grid-3">
+    <div class="card card-kafka col-span-3">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Embedded Library Architecture</div>
+      <div class="grid-3">
+        <div>
+          <h4>No Cluster Required</h4>
+          <ul class="list">
+            <li>Runs <strong>inside your JVM application</strong></li>
+            <li>Scales by adding more app instances</li>
+            <li>Kafka consumer groups handle partition assignment</li>
+            <li>Each instance processes assigned partitions</li>
+            <li>No cluster management overhead</li>
+          </ul>
+          <div class="callout callout-info"><div class="callout-icon">ℹ</div><div>Scalability is <strong>bounded by Kafka partitions</strong>. Max parallelism = partition count.</div></div>
+        </div>
+        <div>
+          <h4>Stream Thread Model</h4>
+          <ul class="list">
+            <li>Each instance has N <strong>StreamThreads</strong></li>
+            <li>Each thread processes one or more tasks</li>
+            <li>Task = one Kafka partition assignment</li>
+            <li>No mixing of CPU/network heavy tasks across threads</li>
+            <li>Static resource allocation model</li>
+          </ul>
+          <div class="code"><span class="type">KafkaStreams</span> app
+  ├── StreamThread-1
+  │     └── Task[0,0] → partition 0
+  ├── StreamThread-2
+  │     └── Task[0,1] → partition 1
+  └── StreamThread-N → ...</div>
+        </div>
+        <div>
+          <h4>Topology</h4>
+          <div class="flow" style="flex-direction:column;align-items:flex-start;">
+            <div class="flow-box">Source Processor (Kafka topic)</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">Processor Node (transform)</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">State Store (local RocksDB)</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box">Sink Processor (Kafka topic)</div>
+          </div>
+          <p style="margin-top:8px;">Topology is compiled at startup. No runtime DAG changes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Deployment Modes</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Deployment</div>
+      <ul class="list">
+        <li><strong>Session Mode:</strong> Long-running cluster, multiple jobs share resources</li>
+        <li><strong>Application Mode:</strong> One cluster per job, job lifecycle = cluster lifecycle</li>
+        <li><strong>Per-Job Mode:</strong> Deprecated in favor of Application Mode</li>
+        <li>Kubernetes, YARN, Standalone supported</li>
+        <li>Flink Kubernetes Operator for cloud-native</li>
+      </ul>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Deployment</div>
+      <ul class="list">
+        <li><strong>Client Mode:</strong> Driver on submitting machine</li>
+        <li><strong>Cluster Mode:</strong> Driver on cluster node</li>
+        <li>YARN, Kubernetes, Mesos, Standalone</li>
+        <li>Databricks for managed experience</li>
+        <li>Delta Live Tables for declarative pipelines</li>
+      </ul>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Deployment</div>
+      <ul class="list">
+        <li>Just deploy your <strong>JVM application</strong></li>
+        <li>Scale by increasing instance count (K8s ReplicaSet)</li>
+        <li>Kafka handles partition rebalancing automatically</li>
+        <li>No separate cluster to manage</li>
+        <li>Standby replicas for fast failover</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: MEMORY MODEL -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="memory">
+  <div class="section-header">
+    <div class="section-title">Memory Model</div>
+    <div class="section-desc">How each framework manages JVM memory, state backends, and off-heap buffers. Critical for tuning and avoiding OOM.</div>
+  </div>
+
+  <div class="section-label">Flink Memory Model</div>
+  <div class="grid-2">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> TaskManager Memory Segments</div>
+      <div class="code"><span class="cm">// Total Process Memory = </span>
+<span class="fn">Framework Heap</span>       <span class="cm">// Flink internal</span>
++ <span class="fn">Task Heap</span>           <span class="cm">// User code objects</span>
++ <span class="fn">Managed Memory</span>      <span class="cm">// Off-heap, controlled by Flink</span>
+                        <span class="cm">// Used by: RocksDB, sort, hash</span>
++ <span class="fn">Network Buffers</span>     <span class="cm">// Data exchange between tasks</span>
++ <span class="fn">JVM Metaspace</span>       <span class="cm">// Class definitions</span>
++ <span class="fn">JVM Overhead</span>        <span class="cm">// Native threads, code cache</span></div>
+      <div class="callout callout-tip"><div class="callout-icon">💡</div><div><strong>Managed Memory</strong> is key: Flink controls this off-heap region directly, bypassing GC. RocksDB state backend lives here.</div></div>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> State Backends</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">Backend</th><th class="th-dim">Storage</th><th class="th-dim">Best For</th></tr>
+        <tr><td class="row-label">HashMapStateBackend</td><td>JVM Heap</td><td>Small state, low latency</td></tr>
+        <tr><td class="row-label">EmbeddedRocksDB</td><td>Off-heap / Disk</td><td>Large state, production</td></tr>
+        <tr><td class="row-label">+ Incremental CP</td><td>RocksDB + S3</td><td>Fast recovery, huge state</td></tr>
+      </table>
+      <div class="callout callout-warn" style="margin-top:10px;"><div class="callout-icon">⚠</div><div>RocksDB adds ~2-5x latency vs heap for state reads. But enables terabytes of state. Use for large state only.</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Spark Memory Model</div>
+  <div class="grid-2">
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Unified Memory Manager</div>
+      <div class="code"><span class="cm">// Executor Memory Layout</span>
+<span class="fn">Reserved Memory</span>   = <span class="num">300MB</span>    <span class="cm">// Spark system</span>
+<span class="fn">User Memory</span>       = <span class="num">25%</span>     <span class="cm">// User data structures</span>
+<span class="fn">Unified Memory</span>    = <span class="num">75%</span>     <span class="cm">// Shared pool</span>
+  ├── <span class="fn">Execution</span>   <span class="cm">// Shuffles, sorts, joins</span>
+  └── <span class="fn">Storage</span>     <span class="cm">// RDD cache, broadcasts</span>
+<span class="cm">// Execution can borrow from Storage</span>
+<span class="cm">// spark.memory.fraction = 0.6 (default)</span></div>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Streaming state is stored in executor memory. Large state → OOM risk. Use <code>spark.sql.shuffle.partitions</code> to control parallelism.</div></div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Tungsten Engine & Off-Heap</div>
+      <ul class="list">
+        <li><strong>Tungsten:</strong> Binary data format, bypasses Java object overhead</li>
+        <li><strong>Whole-stage codegen:</strong> Fuses operators into single compiled function</li>
+        <li><strong>Off-heap (unsafe):</strong> Direct memory access, GC-free</li>
+        <li>Streaming state uses <strong>HDFSBackedStateStoreProvider</strong> by default</li>
+        <li>RocksDB state store available as plugin (Databricks: native)</li>
+      </ul>
+      <div class="code"><span class="cm">// Enable RocksDB state store</span>
+spark.conf.<span class="fn">set</span>(
+  <span class="str">"spark.sql.streaming.stateStore.providerClass"</span>,
+  <span class="str">"org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider"</span>
+)</div>
+    </div>
+  </div>
+
+  <div class="section-label">Kafka Streams Memory Model</div>
+  <div class="grid-2">
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> State Store Memory</div>
+      <div class="code"><span class="cm">// State Store types:</span>
+<span class="fn">InMemoryKeyValueStore</span>   <span class="cm">// JVM heap, fastest</span>
+<span class="fn">RocksDBStore</span>            <span class="cm">// Off-heap, large state</span>
+<span class="fn">InMemoryWindowStore</span>     <span class="cm">// Heap-based windowed</span>
+<span class="fn">RocksDBWindowStore</span>      <span class="cm">// Disk-based windowed</span>
+<span class="fn">InMemorySessionStore</span>    <span class="cm">// Heap-based sessions</span></div>
+      <p style="margin-top:8px;">RocksDB config tuning via <code>RocksDBConfigSetter</code> interface. Block cache, write buffer, compaction all tunable.</p>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Cache & Changelog</div>
+      <ul class="list">
+        <li><strong>Record Cache:</strong> Buffers records before writing to state store (default: 10MB per thread)</li>
+        <li>Higher cache = fewer store writes, higher throughput, increased latency for downstream</li>
+        <li><strong>Changelog Topics:</strong> Every state store has a backing Kafka topic for durability</li>
+        <li>On restart, state rebuilt from changelog (can be slow for large state)</li>
+        <li><strong>Standby Replicas:</strong> Pre-built copies of state on standby instances for fast failover</li>
+      </ul>
+      <div class="code"><span class="cm">// Cache config</span>
+props.<span class="fn">put</span>(<span class="type">StreamsConfig</span>.<span class="fn">STATESTORE_CACHE_MAX_BYTES_CONFIG</span>,
+           <span class="num">10 * 1024 * 1024L</span>); <span class="cm">// 10MB</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: CORE CONCEPTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="concepts">
+  <div class="section-header">
+    <div class="section-title">Core Concepts</div>
+    <div class="section-desc">The building blocks every stream processing engineer must know cold.</div>
+  </div>
+
+  <div class="section-label">Sources, Transformations & Sinks</div>
+  <div class="grid-3">
+    <div class="card card-neutral">
+      <div class="card-title">Sources</div>
+      <ul class="list">
+        <li><strong>Kafka</strong> — most common. Partitioned, ordered per partition</li>
+        <li><strong>Kinesis</strong> — AWS managed alternative</li>
+        <li><strong>Files</strong> — directory watching, batch-like ingestion</li>
+        <li><strong>Sockets / HTTP</strong> — for dev/testing only</li>
+        <li><strong>CDC</strong> (Debezium) — database change capture</li>
+        <li><strong>Custom</strong> — implement source interface</li>
+      </ul>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Transformation Types</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">Type</th><th class="th-dim">Examples</th><th class="th-dim">State?</th></tr>
+        <tr><td>Stateless</td><td>map, filter, flatMap</td><td><span class="tag tag-green">No</span></td></tr>
+        <tr><td>Stateful</td><td>groupBy, count, join</td><td><span class="tag tag-red">Yes</span></td></tr>
+        <tr><td>Windowed</td><td>window().apply()</td><td><span class="tag tag-red">Yes</span></td></tr>
+        <tr><td>Enrichment</td><td>async I/O, lookup</td><td>External</td></tr>
+      </table>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Sinks</div>
+      <ul class="list">
+        <li><strong>Kafka</strong> — publish downstream events</li>
+        <li><strong>JDBC / databases</strong> — upsert patterns needed</li>
+        <li><strong>Files / S3</strong> — Parquet, ORC, JSON</li>
+        <li><strong>Elasticsearch</strong> — search indexing</li>
+        <li><strong>Custom</strong> — implement sink interface</li>
+        <li>⚠ Exactly-once requires idempotent or transactional sinks</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">Output Modes (Spark) & Emit Strategies (Flink/Kafka)</div>
+  <div class="grid-3">
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Output Modes</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">Mode</th><th class="th-dim">Behavior</th><th class="th-dim">Use Case</th></tr>
+        <tr><td><code>append</code></td><td>Only new rows added</td><td>No aggregation, or watermarked agg</td></tr>
+        <tr><td><code>complete</code></td><td>Full result table each trigger</td><td>Small aggregation tables</td></tr>
+        <tr><td><code>update</code></td><td>Changed rows only</td><td>Aggregations with updates</td></tr>
+      </table>
+      <div class="callout callout-warn" style="margin-top:8px;"><div class="callout-icon">⚠</div><div><code>complete</code> mode holds all state forever — OOM risk for high cardinality.</div></div>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Trigger Strategies</div>
+      <ul class="list">
+        <li><strong>EventTimeTrigger</strong> — fires when watermark passes window end</li>
+        <li><strong>ProcessingTimeTrigger</strong> — fires by wall clock</li>
+        <li><strong>CountTrigger</strong> — fires after N elements</li>
+        <li><strong>ContinuousEventTimeTrigger</strong> — fires at intervals within window</li>
+        <li><strong>PurgingTrigger</strong> — wraps any trigger, purges state after firing</li>
+      </ul>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Emit Strategies</div>
+      <ul class="list">
+        <li><strong>On Change</strong> — emits whenever record processed (default)</li>
+        <li><strong>suppress(Suppressed.untilWindowCloses())</strong> — emit only final result</li>
+        <li><strong>suppress(untilTimeLimit())</strong> — buffer for time period</li>
+        <li>Grace period controls how long to wait for late data</li>
+      </ul>
+      <div class="callout callout-warn" style="margin-top:8px;"><div class="callout-icon">⚠</div><div>Without suppress(), windowed aggregations emit intermediate results with every record — noisy downstream.</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Backpressure</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Backpressure</div>
+      <p><strong>Credit-based flow control.</strong> Upstream operators slow down when downstream buffers fill. Propagates back through the entire pipeline. Dynamic throttling — producer automatically slows based on consumption rate.</p>
+      <div class="callout callout-tip"><div class="callout-icon">✓</div><div>Flink's backpressure is seamless. Monitor it in the Flink Web UI — if > 0%, investigate the bottleneck operator.</div></div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Backpressure</div>
+      <p><strong>Rate limiting via trigger interval.</strong> Spark limits Kafka fetch rate with <code>maxOffsetsPerTrigger</code>. Automatic rate adjustment with <code>spark.streaming.backpressure.enabled</code>.</p>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Requires careful tuning of micro-batch sizes vs acceptable latency. Too small = overhead. Too large = late processing.</div></div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Backpressure</div>
+      <p><strong>Pull-based model — no backpressure mechanism needed.</strong> Kafka Streams pulls records at its own pace. The side effect: slow processing causes <strong>lag to build up</strong> in intermediate Kafka topics, which can be a silent problem.</p>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Monitor consumer lag on intermediate topics. Unbounded lag = your processor is falling behind.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: TIME & ORDERING -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="time">
+  <div class="section-header">
+    <div class="section-title">Time & Event Ordering</div>
+    <div class="section-desc">The most nuanced part of stream processing. Getting time semantics wrong produces silently incorrect results.</div>
+  </div>
+
+  <div class="section-label">Three Types of Time</div>
+  <div class="grid-3">
+    <div class="card card-neutral">
+      <div class="card-title">Event Time</div>
+      <p>The timestamp <strong>embedded in the event itself</strong> — when something actually happened in the real world. Most correct for business logic.</p>
+      <div class="callout callout-tip"><div class="callout-icon">✓</div><div>Use event time for anything where ordering matters: fraud detection, billing, user sessions, SLAs.</div></div>
+      <div class="code"><span class="cm">// Flink: assign event time</span>
+stream.<span class="fn">assignTimestampsAndWatermarks</span>(
+  <span class="type">WatermarkStrategy</span>
+    .<span class="fn">forBoundedOutOfOrderness</span>(<span class="type">Duration</span>.<span class="fn">ofSeconds</span>(<span class="num">5</span>))
+    .<span class="fn">withTimestampAssigner</span>(
+      (e, t) -> e.<span class="fn">getTimestamp</span>()
+    )
+)</div>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Processing Time</div>
+      <p>The wall-clock time when the <strong>system processes the event</strong>. Simplest to implement, but wrong if events arrive out of order or late.</p>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Never use for correctness-sensitive aggregations. Results are non-deterministic on reprocessing.</div></div>
+      <div class="code"><span class="cm">// Flink: use processing time</span>
+<span class="type">TumblingProcessingTimeWindows</span>
+  .<span class="fn">of</span>(<span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">5</span>))
+
+<span class="cm">// Spark: default if no watermark</span>
+<span class="cm">// Kafka Streams: System.currentTimeMillis()</span></div>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Ingestion Time</div>
+      <p>When the event <strong>enters the streaming system</strong> (Kafka topic ingestion time). A compromise: more stable than processing time, but still not the true event time.</p>
+      <div class="code"><span class="cm">// Flink: ingestion time</span>
+env.<span class="fn">setStreamTimeCharacteristic</span>(
+  <span class="type">TimeCharacteristic</span>.<span class="fn">IngestionTime</span>
+)
+<span class="cm">// Uses Kafka topic timestamp</span>
+<span class="cm">// Good for: Kafka-based pipelines</span>
+<span class="cm">// where producer timestamps are</span>
+<span class="cm">// close to true event time</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Watermarks — The Core Mechanism</div>
+  <div class="grid-2">
+    <div class="card card-neutral">
+      <div class="card-title">What is a Watermark?</div>
+      <p>A watermark is a statement: <strong>"I believe all events with timestamp ≤ W have been seen."</strong> It's the mechanism that lets a stream processor close a window and emit results, even when events can arrive late.</p>
+      <div class="code" style="margin-top:10px;"><span class="cm">// Events arriving out of order:</span>
+[t=100] [t=95] [t=110] [t=88] [t=105]
+                 ↑
+         <span class="cm">Watermark = max_seen - lag</span>
+         <span class="cm">         = 110 - 5 = 105</span>
+<span class="cm">// When watermark > window_end,</span>
+<span class="cm">// window fires and emits result</span></div>
+      <div class="callout callout-info"><div class="callout-icon">ℹ</div><div>Watermark is a tradeoff: <strong>higher lag</strong> = more late data captured = higher latency. <strong>Lower lag</strong> = faster results = more events missed.</div></div>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Watermark Strategies</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">Strategy</th><th class="th-dim">Description</th><th class="th-dim">Use When</th></tr>
+        <tr><td><code>forMonotonousTimestamps</code></td><td>Assumes events arrive in order</td><td>Ordered sources</td></tr>
+        <tr><td><code>forBoundedOutOfOrderness</code></td><td>Max known delay</td><td>Known max lateness</td></tr>
+        <tr><td>Custom <code>WatermarkGenerator</code></td><td>Arbitrary logic</td><td>Complex sources</td></tr>
+        <tr><td>Kafka source per-partition</td><td>Per-partition watermarks, merged</td><td>Multi-partition Kafka</td></tr>
+      </table>
+      <div class="callout callout-warn" style="margin-top:8px;"><div class="callout-icon">⚠</div><div>In Kafka Streams, watermark is <strong>global across all partitions</strong> — the slowest partition blocks all windows. Kafka Streams' suppress() operator handles this.</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Late Data Handling — Per Framework</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Late Data — Most Comprehensive</div>
+      <ul class="list">
+        <li><strong>Allowed Lateness:</strong> Keep window state open for extra time after watermark passes</li>
+        <li><strong>Side Outputs:</strong> Route late events to a separate stream for special handling</li>
+        <li><strong>Re-aggregation:</strong> Trigger window re-computation when late data arrives</li>
+        <li>Correct final results even with unexpected delays</li>
+      </ul>
+      <div class="code"><span class="cm">// Flink: full late data handling</span>
+<span class="type">OutputTag</span>&lt;<span class="type">Event</span>&gt; lateTag = 
+  <span class="kw">new</span> <span class="type">OutputTag</span>&lt;&gt;(<span class="str">"late"</span>){};
+
+stream
+  .<span class="fn">keyBy</span>(e -> e.<span class="fn">userId</span>)
+  .<span class="fn">window</span>(<span class="type">TumblingEventTimeWindows</span>
+    .<span class="fn">of</span>(<span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">5</span>)))
+  .<span class="fn">allowedLateness</span>(<span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">2</span>))
+  .<span class="fn">sideOutputLateData</span>(lateTag)
+  .<span class="fn">sum</span>(<span class="str">"count"</span>);</div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Late Data — Watermark-Based</div>
+      <ul class="list">
+        <li>Watermark defined on event time column</li>
+        <li>Late data within watermark window is processed</li>
+        <li>Data outside watermark is <strong>silently dropped</strong></li>
+        <li>No side output support for late data</li>
+        <li>Best-effort flow control, less precise than Flink</li>
+      </ul>
+      <div class="code"><span class="cm">// Spark: watermark for late data</span>
+df.<span class="fn">withWatermark</span>(<span class="str">"eventTime"</span>, <span class="str">"10 minutes"</span>)
+  .<span class="fn">groupBy</span>(
+    <span class="fn">window</span>(<span class="fn">col</span>(<span class="str">"eventTime"</span>), <span class="str">"5 minutes"</span>),
+    <span class="fn">col</span>(<span class="str">"userId"</span>)
+  ).<span class="fn">count</span>()</div>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Late data past the watermark is silently dropped with no way to recover it or route it elsewhere.</div></div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Late Data — Grace Period</div>
+      <ul class="list">
+        <li>Grace period defined per window</li>
+        <li>Late events within grace period are accepted</li>
+        <li>Events past grace period are <strong>silently dropped</strong></li>
+        <li>Global watermark across all partitions (slowest partition controls)</li>
+        <li>Less control vs Flink's comprehensive approach</li>
+      </ul>
+      <div class="code"><span class="cm">// Kafka Streams: grace period</span>
+<span class="type">TimeWindows</span>.<span class="fn">ofSizeAndGrace</span>(
+  <span class="type">Duration</span>.<span class="fn">ofMinutes</span>(<span class="num">5</span>),  <span class="cm">// window</span>
+  <span class="type">Duration</span>.<span class="fn">ofMinutes</span>(<span class="num">2</span>)   <span class="cm">// grace</span>
+)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: STATE MANAGEMENT -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="state">
+  <div class="section-header">
+    <div class="section-title">State Management</div>
+    <div class="section-desc">State is what separates stream processing from simple transformations. Managing it correctly is the hardest part.</div>
+  </div>
+
+  <div class="section-label">State Types</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> State Primitives</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">State Type</th><th class="th-dim">Use Case</th></tr>
+        <tr><td><code>ValueState&lt;T&gt;</code></td><td>Single value per key</td></tr>
+        <tr><td><code>ListState&lt;T&gt;</code></td><td>List of values per key</td></tr>
+        <tr><td><code>MapState&lt;K,V&gt;</code></td><td>Map per key — most flexible</td></tr>
+        <tr><td><code>ReducingState&lt;T&gt;</code></td><td>Running reduce/aggregate</td></tr>
+        <tr><td><code>AggregatingState&lt;IN,OUT&gt;</code></td><td>Type-changing aggregate</td></tr>
+      </table>
+      <div class="code" style="margin-top:8px;"><span class="cm">// Keyed state example</span>
+<span class="kw">private</span> <span class="type">ValueState</span>&lt;<span class="type">Long</span>&gt; count;
+
+<span class="ann">@Override</span>
+<span class="kw">public void</span> <span class="fn">open</span>(<span class="type">Configuration</span> p) {
+  count = <span class="fn">getRuntimeContext</span>().<span class="fn">getState</span>(
+    <span class="kw">new</span> <span class="type">ValueStateDescriptor</span>&lt;&gt;(
+      <span class="str">"count"</span>, <span class="type">Long</span>.<span class="kw">class</span>));
+}</div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> State Stores</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">Store Type</th><th class="th-dim">Use Case</th></tr>
+        <tr><td><code>KeyValueStore</code></td><td>Point lookups, counters</td></tr>
+        <tr><td><code>WindowStore</code></td><td>Time-windowed aggregations</td></tr>
+        <tr><td><code>SessionStore</code></td><td>Session-based groupings</td></tr>
+        <tr><td><code>TimestampedStore</code></td><td>Store with timestamps</td></tr>
+      </table>
+      <div class="code" style="margin-top:8px;"><span class="cm">// Access state store in Processor API</span>
+<span class="type">KeyValueStore</span>&lt;<span class="type">String</span>, <span class="type">Long</span>&gt; store;
+
+<span class="ann">@Override</span>
+<span class="kw">public void</span> <span class="fn">init</span>(<span class="type">ProcessorContext</span> ctx) {
+  store = ctx.<span class="fn">getStateStore</span>(<span class="str">"my-store"</span>);
+}</div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> State Operations</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">API</th><th class="th-dim">Use Case</th></tr>
+        <tr><td><code>mapGroupsWithState</code></td><td>Custom state per group</td></tr>
+        <tr><td><code>flatMapGroupsWithState</code></td><td>Custom state, multiple outputs</td></tr>
+        <tr><td><code>groupBy().agg()</code></td><td>Built-in aggregations</td></tr>
+        <tr><td><code>dropDuplicates()</code></td><td>Deduplication state</td></tr>
+      </table>
+      <div class="callout callout-warn" style="margin-top:8px;"><div class="callout-icon">⚠</div><div>No stream-table joins in OSS Spark Structured Streaming. Some features only on Databricks Runtime.</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">State TTL & Eviction</div>
+  <div class="grid-2">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> State TTL</div>
+      <div class="code"><span class="cm">// Configure TTL on state descriptor</span>
+<span class="type">StateTtlConfig</span> ttl = <span class="type">StateTtlConfig</span>
+  .<span class="fn">newBuilder</span>(<span class="type">Time</span>.<span class="fn">hours</span>(<span class="num">24</span>))
+  .<span class="fn">setUpdateType</span>(
+    <span class="type">UpdateType</span>.<span class="fn">OnCreateAndWrite</span>)
+  .<span class="fn">setStateVisibility</span>(
+    <span class="type">StateVisibility</span>.<span class="fn">NeverReturnExpired</span>)
+  .<span class="fn">build</span>();
+
+descriptor.<span class="fn">enableTimeToLive</span>(ttl);</div>
+      <p style="margin-top:8px;">TTL cleanup is lazy (on access) or full (RocksDB compaction). Configure cleanup strategy carefully.</p>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> State Retention</div>
+      <ul class="list">
+        <li>Window stores automatically evict expired windows</li>
+        <li>KTable retention controlled by Kafka topic <code>retention.ms</code></li>
+        <li>Changelog topic compaction controls long-term retention</li>
+        <li>Custom stores: implement your own eviction logic</li>
+      </ul>
+      <div class="code"><span class="cm">// Changelog topic config</span>
+<span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">String</span>&gt; topicConfigs = <span class="kw">new</span> <span class="type">HashMap</span>&lt;&gt;();
+topicConfigs.<span class="fn">put</span>(<span class="str">"cleanup.policy"</span>, <span class="str">"compact"</span>);
+topicConfigs.<span class="fn">put</span>(<span class="str">"retention.ms"</span>, <span class="str">"86400000"</span>);</div>
+    </div>
+  </div>
+
+  <div class="section-label">Interactive Queries</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Queryable State <span class="tag tag-green">A</span></div>
+      <p>State is queryable <strong>across the entire cluster</strong> via built-in state server. External services can query live state without consuming a stream.</p>
+      <div class="code"><span class="cm">// Enable queryable state</span>
+descriptor.<span class="fn">setQueryable</span>(<span class="str">"my-queryable-state"</span>);
+
+<span class="cm">// Query from external client</span>
+<span class="type">QueryableStateClient</span> client = 
+  <span class="kw">new</span> <span class="type">QueryableStateClient</span>(tmHost, tmPort);
+client.<span class="fn">getKvState</span>(jobId, <span class="str">"my-queryable-state"</span>,
+                   key, ...);</div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Interactive Queries <span class="tag tag-green">A</span></div>
+      <p>State stores are <strong>queryable locally per instance</strong>. Combine with service discovery (e.g., REST endpoints) to query across instances. Foundation for building stateful microservices.</p>
+      <div class="code"><span class="cm">// Query local state store</span>
+<span class="type">ReadOnlyKeyValueStore</span>&lt;<span class="type">String</span>, <span class="type">Long</span>&gt; store =
+  streams.<span class="fn">store</span>(
+    <span class="type">StoreQueryParameters</span>.<span class="fn">fromNameAndType</span>(
+      <span class="str">"my-store"</span>,
+      <span class="type">QueryableStoreTypes</span>.<span class="fn">keyValueStore</span>()));
+
+<span class="type">Long</span> count = store.<span class="fn">get</span>(<span class="str">"user-123"</span>);</div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Interactive Queries <span class="tag tag-red">C</span></div>
+      <p>Limited support. Cannot directly query state stores. Workarounds:</p>
+      <ul class="list">
+        <li><code>foreachBatch</code> to write state snapshots to external DB</li>
+        <li>Query the output sink (e.g., Delta table, JDBC)</li>
+        <li>No native queryable state API like Flink/Kafka Streams</li>
+      </ul>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>If you need live state querying, Kafka Streams or Flink are significantly better choices.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: SEMANTICS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="semantics">
+  <div class="section-header">
+    <div class="section-title">Processing Semantics</div>
+    <div class="section-desc">Guarantees about what happens when things go wrong. The difference between at-most-once, at-least-once, and exactly-once can mean millions of dollars in a financial system.</div>
+  </div>
+
+  <div class="section-label">The Three Guarantees</div>
+  <div class="grid-3">
+    <div class="card card-neutral">
+      <div class="card-title"><span class="tag tag-red">At-Most-Once</span></div>
+      <p>Events are processed <strong>0 or 1 times</strong>. If a failure occurs, events may be lost. No retry on failure.</p>
+      <div class="callout callout-danger"><div class="callout-icon">✗</div><div>Unacceptable for most production use cases. Only appropriate for metrics/logging where some loss is acceptable.</div></div>
+      <p><strong>How:</strong> No checkpointing. Commit offsets before processing.</p>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title"><span class="tag tag-yellow">At-Least-Once</span></div>
+      <p>Events are processed <strong>1 or more times</strong>. No data loss, but duplicates are possible on failure/recovery.</p>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Acceptable if your downstream is idempotent (e.g., upserts by ID). Requires deduplication otherwise.</div></div>
+      <p><strong>How:</strong> Checkpoint state + commit offsets <em>after</em> processing.</p>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title"><span class="tag tag-green">Exactly-Once</span></div>
+      <p>Each event affects the output <strong>exactly once</strong>, even on failure. The gold standard — hardest to achieve.</p>
+      <div class="callout callout-tip"><div class="callout-icon">✓</div><div>Required for: financial transactions, inventory systems, billing, anything where duplicates = real-world consequences.</div></div>
+      <p><strong>How:</strong> Distributed transactions, 2PC, or idempotent producers.</p>
+    </div>
+  </div>
+
+  <div class="section-label">How Each Framework Achieves Exactly-Once</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Exactly-Once <span class="tag tag-green">A</span></div>
+      <h4>Kafka → Kafka (most common)</h4>
+      <ul class="list">
+        <li>Distributed snapshots (Chandy-Lamport algorithm)</li>
+        <li>Checkpoint barriers flow through the DAG</li>
+        <li>Kafka consumer offsets included in checkpoint</li>
+        <li>Kafka transactional producer for output</li>
+        <li>2PC sink protocol for external sinks</li>
+      </ul>
+      <h4 style="margin-top:12px;">External Sinks</h4>
+      <ul class="list">
+        <li>Implements <code>TwoPhaseCommitSinkFunction</code></li>
+        <li>Pre-commit on checkpoint, actual commit when checkpoint completes</li>
+        <li>Supports Kafka, JDBC, filesystems</li>
+      </ul>
+      <div class="callout callout-tip"><div class="callout-icon">✓</div><div>Most comprehensive exactly-once support of the three frameworks.</div></div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Exactly-Once <span class="tag tag-yellow">B</span></div>
+      <h4>Kafka → Kafka only</h4>
+      <ul class="list">
+        <li>Exactly-once via Kafka's transactional API (EOS v1/v2)</li>
+        <li>Read-process-write atomic transactions</li>
+        <li>Offset + state store updates committed atomically</li>
+      </ul>
+      <h4 style="margin-top:12px;">External Sinks</h4>
+      <ul class="list">
+        <li>No built-in EOS for non-Kafka sinks</li>
+        <li>Must implement idempotency out-of-band</li>
+        <li>Higher overhead vs at-least-once</li>
+      </ul>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>EOS v2 (KIP-447) reduces overhead significantly. Enable with <code>processing.guarantee=exactly_once_v2</code>.</div></div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Exactly-Once <span class="tag tag-yellow">B</span></div>
+      <h4>Within Spark (WAL-based)</h4>
+      <ul class="list">
+        <li>Write-ahead log + checkpoint for state</li>
+        <li>Kafka source tracks offsets in checkpoint</li>
+        <li>Exactly-once processing within Spark's DAG</li>
+      </ul>
+      <h4 style="margin-top:12px;">Output Guarantees</h4>
+      <ul class="list">
+        <li><strong>File sinks:</strong> Exactly-once via atomic commit</li>
+        <li><strong>Kafka sink:</strong> Exactly-once via idempotent producer in <code>foreachBatch</code></li>
+        <li><strong>JDBC/others:</strong> Need idempotent writes (upsert by offset)</li>
+      </ul>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>True end-to-end EOS requires carefully designed idempotent sinks. No native 2PC like Flink.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: WINDOWING -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="windows">
+  <div class="section-header">
+    <div class="section-title">Windowing</div>
+    <div class="section-desc">Windows turn an infinite stream into finite chunks that can be aggregated. Choosing the right window type is critical for correctness.</div>
+  </div>
+
+  <div class="section-label">Window Types</div>
+  <div class="grid-2">
+    <div class="card card-neutral">
+      <div class="card-title">Tumbling Windows</div>
+      <p>Fixed-size, <strong>non-overlapping</strong> windows. Every event belongs to exactly one window.</p>
+      <div class="code"><span class="cm">// [0-5min] [5-10min] [10-15min]</span>
+<span class="cm">// Flink:</span>
+.<span class="fn">window</span>(<span class="type">TumblingEventTimeWindows</span>.<span class="fn">of</span>(<span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">5</span>)))
+
+<span class="cm">// Spark:</span>
+.<span class="fn">groupBy</span>(<span class="fn">window</span>(<span class="fn">col</span>(<span class="str">"ts"</span>), <span class="str">"5 minutes"</span>))
+
+<span class="cm">// Kafka Streams:</span>
+<span class="type">TimeWindows</span>.<span class="fn">ofSizeWithNoGrace</span>(<span class="type">Duration</span>.<span class="fn">ofMinutes</span>(<span class="num">5</span>))</div>
+      <p><strong>Use for:</strong> Hourly/daily reports, fixed-interval metrics.</p>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Sliding Windows</div>
+      <p>Fixed-size, <strong>overlapping</strong> windows. Events can belong to multiple windows.</p>
+      <div class="code"><span class="cm">// 10min window, slides every 5min</span>
+<span class="cm">// [0-10] [5-15] [10-20] ...</span>
+<span class="cm">// Flink:</span>
+.<span class="fn">window</span>(<span class="type">SlidingEventTimeWindows</span>.<span class="fn">of</span>(
+  <span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">10</span>), <span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">5</span>)))
+
+<span class="cm">// Spark:</span>
+.<span class="fn">groupBy</span>(<span class="fn">window</span>(<span class="fn">col</span>(<span class="str">"ts"</span>),
+  <span class="str">"10 minutes"</span>, <span class="str">"5 minutes"</span>))
+
+<span class="cm">// Kafka Streams:</span>
+<span class="type">SlidingWindows</span>.<span class="fn">ofTimeDifferenceWithNoGrace</span>(
+  <span class="type">Duration</span>.<span class="fn">ofMinutes</span>(<span class="num">10</span>))</div>
+      <p><strong>Use for:</strong> Moving averages, rolling metrics, anomaly detection windows.</p>
+    </div>
+  </div>
+  <div class="grid-2 gap">
+    <div class="card card-neutral">
+      <div class="card-title">Session Windows</div>
+      <p>Dynamic-size windows that close after a <strong>gap of inactivity</strong>. Perfect for user sessions.</p>
+      <div class="code"><span class="cm">// Close window after 30min idle</span>
+<span class="cm">// Flink:</span>
+.<span class="fn">window</span>(<span class="type">EventTimeSessionWindows</span>
+  .<span class="fn">withGap</span>(<span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">30</span>)))
+
+<span class="cm">// Kafka Streams:</span>
+<span class="type">SessionWindows</span>.<span class="fn">ofInactivityGapWithNoGrace</span>(
+  <span class="type">Duration</span>.<span class="fn">ofMinutes</span>(<span class="num">30</span>))
+
+<span class="cm">// Spark: no native session windows</span>
+<span class="cm">// Use flatMapGroupsWithState instead</span></div>
+      <p><strong>Use for:</strong> User sessions, clickstreams, IoT device activity.</p>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Global Windows + Custom Triggers</div>
+      <p>One window per key, open forever. Requires a custom trigger to fire.</p>
+      <div class="code"><span class="cm">// Count-based window</span>
+.<span class="fn">window</span>(<span class="type">GlobalWindows</span>.<span class="fn">create</span>())
+.<span class="fn">trigger</span>(<span class="type">CountTrigger</span>.<span class="fn">of</span>(<span class="num">100</span>))
+.<span class="fn">aggregate</span>(...)
+
+<span class="cm">// Or custom trigger logic</span>
+.<span class="fn">trigger</span>(<span class="kw">new</span> <span class="type">MyCustomTrigger</span>())</div>
+      <p><strong>Use for:</strong> Count-based batching, custom business logic windows. Flink-only feature.</p>
+    </div>
+  </div>
+
+  <div class="section-label">Windowing & Large State Cost</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Large State Windowing <span class="tag tag-green">A</span></div>
+      <p>With <strong>RocksDB backend</strong>, even terabytes of window state is manageable. Incremental checkpoints keep snapshot time constant regardless of state size.</p>
+      <ul class="list">
+        <li>Window state stored off-heap in RocksDB</li>
+        <li>Async incremental snapshots to S3/GCS</li>
+        <li>Restore from RocksDB snapshot directly — no replay</li>
+      </ul>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Large State Windowing <span class="tag tag-yellow">B</span></div>
+      <p>RocksDB used for windowed stores, but <strong>recovery from changelog</strong> can be very slow for large state (must replay entire topic).</p>
+      <ul class="list">
+        <li>Standby replicas help but don't eliminate lag</li>
+        <li>No shared state between partitions = expensive for cross-partition windowing</li>
+        <li>Large state windowing is costly</li>
+      </ul>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Large State Windowing <span class="tag tag-yellow">B</span></div>
+      <p>Default HDFS state store for windowing. RocksDB available as plugin. Write-ahead log can cause <strong>larger checkpoint sizes</strong>.</p>
+      <ul class="list">
+        <li>State locality not guaranteed (rebuilds on different executor)</li>
+        <li>Large windows = larger micro-batch processing time</li>
+        <li>RocksDB plugin (Databricks native) helps</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: APIs & PATTERNS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="apis">
+  <div class="section-header">
+    <div class="section-title">APIs & Code Patterns</div>
+    <div class="section-desc">Practical code patterns for the most common streaming use cases.</div>
+  </div>
+
+  <div class="section-label">Flink APIs</div>
+  <div class="grid-2">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> DataStream API</div>
+      <div class="code"><span class="type">StreamExecutionEnvironment</span> env =
+  <span class="type">StreamExecutionEnvironment</span>.<span class="fn">getExecutionEnvironment</span>();
+
+<span class="cm">// Kafka source with event time</span>
+<span class="type">KafkaSource</span>&lt;<span class="type">String</span>&gt; source = <span class="type">KafkaSource</span>.&lt;<span class="type">String</span>&gt;<span class="fn">builder</span>()
+  .<span class="fn">setBootstrapServers</span>(<span class="str">"localhost:9092"</span>)
+  .<span class="fn">setTopics</span>(<span class="str">"events"</span>)
+  .<span class="fn">setStartingOffsets</span>(<span class="type">OffsetsInitializer</span>.<span class="fn">earliest</span>())
+  .<span class="fn">setValueOnlyDeserializer</span>(<span class="kw">new</span> <span class="type">SimpleStringSchema</span>())
+  .<span class="fn">build</span>();
+
+<span class="type">DataStream</span>&lt;<span class="type">String</span>&gt; stream = env.<span class="fn">fromSource</span>(
+  source,
+  <span class="type">WatermarkStrategy</span>.<span class="fn">forBoundedOutOfOrderness</span>(
+    <span class="type">Duration</span>.<span class="fn">ofSeconds</span>(<span class="num">5</span>)),
+  <span class="str">"Kafka Source"</span>);
+
+<span class="cm">// Keyed windowed aggregation</span>
+stream.<span class="fn">map</span>(<span class="type">Event</span>::<span class="fn">parse</span>)
+      .<span class="fn">keyBy</span>(<span class="type">Event</span>::<span class="fn">getUserId</span>)
+      .<span class="fn">window</span>(<span class="type">TumblingEventTimeWindows</span>.<span class="fn">of</span>(<span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">5</span>)))
+      .<span class="fn">sum</span>(<span class="str">"amount"</span>)
+      .<span class="fn">sinkTo</span>(kafkaSink);</div>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Table API / SQL</div>
+      <div class="code"><span class="type">StreamTableEnvironment</span> tEnv =
+  <span class="type">StreamTableEnvironment</span>.<span class="fn">create</span>(env);
+
+<span class="cm">// Register Kafka table</span>
+tEnv.<span class="fn">executeSql</span>(<span class="str">"""
+  CREATE TABLE events (
+    user_id STRING,
+    amount DECIMAL,
+    event_time TIMESTAMP(3),
+    WATERMARK FOR event_time
+      AS event_time - INTERVAL '5' SECOND
+  ) WITH (
+    'connector' = 'kafka',
+    'topic' = 'events',
+    'format' = 'json'
+  )
+"""</span>);
+
+<span class="cm">// SQL streaming query</span>
+tEnv.<span class="fn">executeSql</span>(<span class="str">"""
+  INSERT INTO results
+  SELECT user_id,
+         TUMBLE_START(event_time, INTERVAL '5' MINUTE) as w,
+         SUM(amount)
+  FROM events
+  GROUP BY user_id,
+    TUMBLE(event_time, INTERVAL '5' MINUTE)
+"""</span>);</div>
+    </div>
+  </div>
+
+  <div class="section-label">Spark Structured Streaming APIs</div>
+  <div class="grid-2">
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> DataFrame API</div>
+      <div class="code"><span class="type">SparkSession</span> spark = <span class="type">SparkSession</span>.<span class="fn">builder</span>()
+  .<span class="fn">appName</span>(<span class="str">"StreamingApp"</span>).<span class="fn">getOrCreate</span>();
+
+<span class="cm">// Kafka source</span>
+<span class="type">Dataset</span>&lt;<span class="type">Row</span>&gt; raw = spark.<span class="fn">readStream</span>()
+  .<span class="fn">format</span>(<span class="str">"kafka"</span>)
+  .<span class="fn">option</span>(<span class="str">"kafka.bootstrap.servers"</span>, <span class="str">"localhost:9092"</span>)
+  .<span class="fn">option</span>(<span class="str">"subscribe"</span>, <span class="str">"events"</span>)
+  .<span class="fn">load</span>();
+
+<span class="cm">// Parse and aggregate with watermark</span>
+<span class="type">Dataset</span>&lt;<span class="type">Row</span>&gt; result = raw
+  .<span class="fn">select</span>(<span class="fn">from_json</span>(<span class="fn">col</span>(<span class="str">"value"</span>).<span class="fn">cast</span>(<span class="str">"string"</span>), schema)
+    .<span class="fn">as</span>(<span class="str">"data"</span>))
+  .<span class="fn">select</span>(<span class="str">"data.*"</span>)
+  .<span class="fn">withWatermark</span>(<span class="str">"eventTime"</span>, <span class="str">"10 minutes"</span>)
+  .<span class="fn">groupBy</span>(<span class="fn">window</span>(<span class="fn">col</span>(<span class="str">"eventTime"</span>), <span class="str">"5 minutes"</span>),
+           <span class="fn">col</span>(<span class="str">"userId"</span>))
+  .<span class="fn">sum</span>(<span class="str">"amount"</span>);
+
+<span class="cm">// Write stream</span>
+result.<span class="fn">writeStream</span>()
+  .<span class="fn">format</span>(<span class="str">"kafka"</span>)
+  .<span class="fn">option</span>(<span class="str">"topic"</span>, <span class="str">"results"</span>)
+  .<span class="fn">outputMode</span>(<span class="str">"update"</span>)
+  .<span class="fn">trigger</span>(<span class="type">Trigger</span>.<span class="fn">ProcessingTime</span>(<span class="str">"30 seconds"</span>))
+  .<span class="fn">option</span>(<span class="str">"checkpointLocation"</span>, <span class="str">"s3://my-bucket/cp"</span>)
+  .<span class="fn">start</span>();</div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> foreachBatch Pattern</div>
+      <div class="code"><span class="cm">// foreachBatch: full Spark batch ops on each micro-batch</span>
+result.<span class="fn">writeStream</span>()
+  .<span class="fn">foreachBatch</span>((batchDF, batchId) -> {
+    <span class="cm">// Deduplicate within batch</span>
+    batchDF.<span class="fn">dropDuplicates</span>(<span class="str">"userId"</span>)
+    <span class="cm">// Use batch Spark APIs freely</span>
+           .<span class="fn">write</span>()
+           .<span class="fn">format</span>(<span class="str">"jdbc"</span>)
+           .<span class="fn">mode</span>(<span class="str">"append"</span>)
+           .<span class="fn">save</span>();
+  })
+  .<span class="fn">start</span>();
+
+<span class="cm">// Trigger modes</span>
+<span class="type">Trigger</span>.<span class="fn">ProcessingTime</span>(<span class="str">"30 seconds"</span>) <span class="cm">// fixed interval</span>
+<span class="type">Trigger</span>.<span class="fn">Once</span>()                        <span class="cm">// one micro-batch (batch mode)</span>
+<span class="type">Trigger</span>.<span class="fn">AvailableNow</span>()               <span class="cm">// process all available</span>
+<span class="type">Trigger</span>.<span class="fn">Continuous</span>(<span class="str">"1 second"</span>)      <span class="cm">// experimental</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Kafka Streams APIs</div>
+  <div class="grid-2">
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> DSL API</div>
+      <div class="code"><span class="type">StreamsBuilder</span> builder = <span class="kw">new</span> <span class="type">StreamsBuilder</span>();
+
+<span class="cm">// KStream: unbounded stream of records</span>
+<span class="type">KStream</span>&lt;<span class="type">String</span>, <span class="type">Order</span>&gt; orders =
+  builder.<span class="fn">stream</span>(<span class="str">"orders"</span>,
+    <span class="type">Consumed</span>.<span class="fn">with</span>(<span class="type">Serdes</span>.<span class="fn">String</span>(), orderSerde));
+
+<span class="cm">// KTable: changelog-backed table</span>
+<span class="type">KTable</span>&lt;<span class="type">String</span>, <span class="type">Long</span>&gt; orderCounts =
+  orders.<span class="fn">groupByKey</span>()
+        .<span class="fn">count</span>(<span class="type">Materialized</span>.<span class="fn">as</span>(<span class="str">"order-counts"</span>));
+
+<span class="cm">// Stream-Table join</span>
+<span class="type">KTable</span>&lt;<span class="type">String</span>, <span class="type">User</span>&gt; users =
+  builder.<span class="fn">table</span>(<span class="str">"users"</span>);
+
+orders.<span class="fn">join</span>(users,
+  (order, user) -> <span class="kw">new</span> <span class="type">EnrichedOrder</span>(order, user))
+  .<span class="fn">to</span>(<span class="str">"enriched-orders"</span>);</div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Processor API</div>
+      <div class="code"><span class="cm">// Low-level Processor API for custom logic</span>
+<span class="kw">public class</span> <span class="type">MyProcessor</span>
+    <span class="kw">implements</span> <span class="type">Processor</span>&lt;<span class="type">String</span>, <span class="type">Event</span>, <span class="type">String</span>, <span class="type">Result</span>&gt; {
+
+  <span class="kw">private</span> <span class="type">KeyValueStore</span>&lt;<span class="type">String</span>, <span class="type">Long</span>&gt; store;
+  <span class="kw">private</span> <span class="type">ProcessorContext</span>&lt;<span class="type">String</span>, <span class="type">Result</span>&gt; ctx;
+
+  <span class="ann">@Override</span>
+  <span class="kw">public void</span> <span class="fn">init</span>(<span class="type">ProcessorContext</span>&lt;...&gt; ctx) {
+    <span class="kw">this</span>.ctx = ctx;
+    store = ctx.<span class="fn">getStateStore</span>(<span class="str">"my-store"</span>);
+    <span class="cm">// Schedule a punctuation every 60s</span>
+    ctx.<span class="fn">schedule</span>(<span class="type">Duration</span>.<span class="fn">ofSeconds</span>(<span class="num">60</span>),
+      <span class="type">PunctuationType</span>.<span class="fn">WALL_CLOCK_TIME</span>,
+      ts -> <span class="fn">flushResults</span>(ts));
+  }
+
+  <span class="ann">@Override</span>
+  <span class="kw">public void</span> <span class="fn">process</span>(<span class="type">Record</span>&lt;<span class="type">String</span>, <span class="type">Event</span>&gt; record) {
+    <span class="type">Long</span> count = store.<span class="fn">get</span>(record.<span class="fn">key</span>());
+    store.<span class="fn">put</span>(record.<span class="fn">key</span>(), count == <span class="kw">null</span> ? <span class="num">1</span> : count + <span class="num">1</span>);
+  }
+}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: OPTIMIZATION -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="optimization">
+  <div class="section-header">
+    <div class="section-title">Optimization</div>
+    <div class="section-desc">Performance tuning from basic configuration to advanced architectural patterns.</div>
+  </div>
+
+  <div class="section-label">Flink Optimization</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Parallelism & Slots</div>
+      <ul class="list">
+        <li>Set <code>parallelism</code> = number of Kafka partitions for source operators</li>
+        <li>Reduce parallelism at sinks if needed</li>
+        <li>Operator chaining avoids network overhead — don't break chains unnecessarily</li>
+        <li>Use <code>disableChaining()</code> only to debug bottlenecks</li>
+      </ul>
+      <div class="code"><span class="cm">// Global parallelism</span>
+env.<span class="fn">setParallelism</span>(<span class="num">8</span>);
+<span class="cm">// Per-operator override</span>
+source.<span class="fn">setParallelism</span>(<span class="num">4</span>);</div>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Async I/O</div>
+      <p>For external lookups (DB, cache), use Async I/O to avoid blocking the pipeline.</p>
+      <div class="code"><span class="type">AsyncDataStream</span>.<span class="fn">unorderedWait</span>(
+  stream,
+  <span class="kw">new</span> <span class="type">AsyncDBLookupFunction</span>(),
+  <span class="num">1000</span>,            <span class="cm">// timeout ms</span>
+  <span class="type">TimeUnit</span>.<span class="fn">MILLISECONDS</span>,
+  <span class="num">100</span>              <span class="cm">// max concurrent requests</span>
+);</div>
+      <div class="callout callout-tip"><div class="callout-icon">💡</div><div>Async I/O can 10-100x your throughput for enrichment pipelines that hit external systems.</div></div>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Checkpoint Tuning</div>
+      <ul class="list">
+        <li><strong>Incremental checkpoints:</strong> Only delta since last checkpoint (RocksDB)</li>
+        <li><strong>Min interval:</strong> At least 2x expected processing time</li>
+        <li><strong>Aligned vs unaligned:</strong> Unaligned CP reduces backpressure impact</li>
+        <li><strong>Timeout:</strong> Must be > checkpoint interval</li>
+      </ul>
+      <div class="code"><span class="type">CheckpointConfig</span> cp = env.<span class="fn">getCheckpointConfig</span>();
+cp.<span class="fn">setCheckpointInterval</span>(<span class="num">60_000</span>);
+cp.<span class="fn">setCheckpointMode</span>(<span class="type">CheckpointingMode</span>.<span class="fn">EXACTLY_ONCE</span>);
+cp.<span class="fn">setMinPauseBetweenCheckpoints</span>(<span class="num">30_000</span>);
+cp.<span class="fn">enableUnalignedCheckpoints</span>();</div>
+    </div>
+  </div>
+
+  <div class="section-label">Spark Optimization</div>
+  <div class="grid-3">
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Key Config Knobs</div>
+      <div class="code"><span class="cm">// Reduce shuffle partitions for streaming</span>
+spark.conf.<span class="fn">set</span>(<span class="str">"spark.sql.shuffle.partitions"</span>, <span class="str">"8"</span>)
+
+<span class="cm">// Kafka fetch limits</span>
+.<span class="fn">option</span>(<span class="str">"maxOffsetsPerTrigger"</span>, <span class="num">10000</span>)
+.<span class="fn">option</span>(<span class="str">"minPartitions"</span>, <span class="num">8</span>)
+
+<span class="cm">// State store memory</span>
+spark.conf.<span class="fn">set</span>(
+  <span class="str">"spark.sql.streaming.statefulOperator.checkCorrectness.enabled"</span>,
+  <span class="str">"false"</span>) <span class="cm">// prod only after validation</span></div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Trigger Interval Tradeoffs</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">Interval</th><th class="th-dim">Latency</th><th class="th-dim">Throughput</th><th class="th-dim">Overhead</th></tr>
+        <tr><td>1s</td><td>Low</td><td>Low</td><td>High</td></tr>
+        <tr><td>30s</td><td>Medium</td><td>High</td><td>Medium</td></tr>
+        <tr><td>5min</td><td>High</td><td>Very High</td><td>Low</td></tr>
+        <tr><td>Once/AvailableNow</td><td>Batch</td><td>Highest</td><td>Lowest</td></tr>
+      </table>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Skew Handling</div>
+      <ul class="list">
+        <li>Executors may underutilize when tasks are similar type (no heterogeneous task mixing)</li>
+        <li><strong>Skewed keys</strong> waste cluster time — some partitions huge, others empty</li>
+        <li>Salt keys to distribute skew: <code>key + "_" + (random % N)</code></li>
+        <li>Use <code>SKEW JOIN HINT</code> in Spark SQL</li>
+        <li>Monitor task duration variance in Spark UI</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-label">Kafka Streams Optimization</div>
+  <div class="grid-3">
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Repartition Avoidance</div>
+      <ul class="list">
+        <li>Re-key (groupBy a new key) causes implicit repartition — new internal topic</li>
+        <li>Design your key scheme upfront to avoid repartitions</li>
+        <li>Every repartition = new Kafka topic = network round-trip</li>
+        <li>Use <code>selectKey</code> early, before stateful ops</li>
+      </ul>
+      <div class="code"><span class="cm">// Avoid: late repartition</span>
+stream.<span class="fn">groupBy</span>((k,v) -> v.<span class="fn">getNewKey</span>())
+<span class="cm">// Creates an internal repartition topic!</span>
+
+<span class="cm">// Better: key from the start</span>
+builder.<span class="fn">stream</span>(<span class="str">"topic"</span>,
+  <span class="type">Consumed</span>.<span class="fn">with</span>(keySerde, valueSerde))</div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Cache Tuning</div>
+      <div class="code"><span class="cm">// Larger cache = fewer store writes</span>
+<span class="cm">// = higher throughput, more latency</span>
+props.<span class="fn">put</span>(<span class="type">StreamsConfig</span>.
+  <span class="fn">STATESTORE_CACHE_MAX_BYTES_CONFIG</span>,
+  <span class="num">50 * 1024 * 1024L</span>); <span class="cm">// 50MB</span>
+
+<span class="cm">// Commit interval: flush to changelog</span>
+props.<span class="fn">put</span>(<span class="type">StreamsConfig</span>.
+  <span class="fn">COMMIT_INTERVAL_MS_CONFIG</span>, <span class="num">1000</span>);
+
+<span class="cm">// Standby replicas for fast failover</span>
+props.<span class="fn">put</span>(<span class="type">StreamsConfig</span>.
+  <span class="fn">NUM_STANDBY_REPLICAS_CONFIG</span>, <span class="num">1</span>);</div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> RocksDB Tuning</div>
+      <div class="code"><span class="kw">public class</span> <span class="type">MyRocksDBConfig</span>
+    <span class="kw">implements</span> <span class="type">RocksDBConfigSetter</span> {
+
+  <span class="ann">@Override</span>
+  <span class="kw">public void</span> <span class="fn">setConfig</span>(<span class="type">String</span> name,
+      <span class="type">Options</span> options, <span class="type">Map</span>&lt;?,?&gt; configs) {
+    <span class="cm">// Block cache for read-heavy workloads</span>
+    <span class="type">BlockBasedTableConfig</span> tConf =
+      <span class="kw">new</span> <span class="type">BlockBasedTableConfig</span>();
+    tConf.<span class="fn">setBlockCacheSize</span>(<span class="num">256</span> * <span class="num">1024</span> * <span class="num">1024</span>);
+    options.<span class="fn">setTableFormatConfig</span>(tConf);
+    options.<span class="fn">setWriteBufferSize</span>(<span class="num">64</span> * <span class="num">1024</span> * <span class="num">1024</span>);
+  }
+}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: FAULT TOLERANCE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="fault">
+  <div class="section-header">
+    <div class="section-title">Fault Tolerance & Recovery</div>
+    <div class="section-desc">How each framework survives failures and recovers state. This directly impacts your RTO (Recovery Time Objective).</div>
+  </div>
+
+  <div class="section-label">Checkpointing Mechanics</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Chandy-Lamport Distributed Snapshots <span class="tag tag-green">A</span></div>
+      <ul class="list">
+        <li>JobManager injects <strong>checkpoint barriers</strong> into source streams</li>
+        <li>Barriers flow through DAG with data records</li>
+        <li>Operator snapshots state when all input barriers arrive</li>
+        <li>Coordinator confirms checkpoint completion</li>
+        <li><strong>Incremental (RocksDB):</strong> Only changed SST files uploaded</li>
+        <li><strong>Recovery:</strong> Restore RocksDB snapshots directly from cloud — no replay</li>
+      </ul>
+      <div class="callout callout-tip"><div class="callout-icon">✓</div><div>With incremental checkpoints, snapshot time is <strong>constant regardless of state size</strong>. Recovery is fast.</div></div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Changelog + RocksDB <span class="tag tag-yellow">B</span></div>
+      <ul class="list">
+        <li>Every state store write → appended to changelog Kafka topic</li>
+        <li>RocksDB is the local state store (persistent)</li>
+        <li>On failure: replay changelog from last committed offset</li>
+        <li><strong>Long recovery for large state</strong> — must replay entire changelog</li>
+        <li>Standby replicas pre-build state on other instances for fast failover</li>
+        <li>Requires considerable engineering for very large state</li>
+      </ul>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Without standby replicas, recovery time scales linearly with state size. Plan accordingly.</div></div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> WAL + Checkpoint <span class="tag tag-yellow">B</span></div>
+      <ul class="list">
+        <li>Write-ahead log (WAL) for received data</li>
+        <li>Checkpoint writes state + offsets to HDFS/S3</li>
+        <li>State best-effort task locality — may rebuild on different executor</li>
+        <li>RocksDB plugin (non-Databricks: manual): snapshot checkpointing</li>
+        <li>Larger checkpoint sizes vs Flink incremental</li>
+        <li>Processing delays possible while state rebuilds</li>
+      </ul>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>State locality is best-effort. After recovery, state may land on a different executor, causing a rebuild delay.</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Restart Strategies</div>
+  <div class="grid-2">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Restart Strategies</div>
+      <div class="code"><span class="cm">// Fixed delay restart</span>
+env.<span class="fn">setRestartStrategy</span>(
+  <span class="type">RestartStrategies</span>.<span class="fn">fixedDelayRestart</span>(
+    <span class="num">3</span>,                    <span class="cm">// attempts</span>
+    <span class="type">Time</span>.<span class="fn">seconds</span>(<span class="num">10</span>)     <span class="cm">// delay</span>
+  ));
+
+<span class="cm">// Exponential backoff</span>
+env.<span class="fn">setRestartStrategy</span>(
+  <span class="type">RestartStrategies</span>.<span class="fn">exponentialDelayRestart</span>(
+    <span class="type">Time</span>.<span class="fn">seconds</span>(<span class="num">1</span>),  <span class="cm">// initial</span>
+    <span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">5</span>), <span class="cm">// max</span>
+    <span class="num">2.0</span>,              <span class="cm">// multiplier</span>
+    <span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">10</span>),<span class="cm">// reset threshold</span>
+    <span class="num">0.1</span>               <span class="cm">// jitter</span>
+  ));</div>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Savepoints</div>
+      <p>Savepoints are <strong>manually triggered checkpoints</strong> — used for planned migrations, code upgrades, and cluster migrations.</p>
+      <div class="code"><span class="cm"># CLI: trigger savepoint</span>
+flink savepoint &lt;jobId&gt; s3://bucket/savepoints/
+
+<span class="cm"># Restart from savepoint</span>
+flink run -s s3://bucket/savepoints/sp-1 \
+  myapp.jar
+
+<span class="cm"># Cancel with savepoint</span>
+flink cancel -s s3://bucket/sp/ &lt;jobId&gt;</span></div>
+      <div class="callout callout-tip"><div class="callout-icon">💡</div><div>Savepoints survive Flink upgrades. Take one before any schema or topology change. Kafka Streams has no equivalent.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: DEBUG & MONITOR -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="debug">
+  <div class="section-header">
+    <div class="section-title">Debugging & Monitoring</div>
+    <div class="section-desc">What to measure, where to look, and how to diagnose the most common streaming failures.</div>
+  </div>
+
+  <div class="section-label">Key Metrics — Per Framework</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Critical Metrics</div>
+      <div class="metric-row"><span class="metric-name">numRecordsInPerSecond</span><span class="metric-val">Throughput in</span></div>
+      <div class="metric-row"><span class="metric-name">numRecordsOutPerSecond</span><span class="metric-val">Throughput out</span></div>
+      <div class="metric-row"><span class="metric-name">backPressuredTimeMsPerSecond</span><span class="metric-val">Backpressure %. >200ms = investigate</span></div>
+      <div class="metric-row"><span class="metric-name">currentInputWatermark</span><span class="metric-val">Event time progress</span></div>
+      <div class="metric-row"><span class="metric-name">lastCheckpointDuration</span><span class="metric-val">CP health. Should be &lt; interval</span></div>
+      <div class="metric-row"><span class="metric-name">lastCheckpointSize</span><span class="metric-val">State growth over time</span></div>
+      <div class="metric-row"><span class="metric-name">numberOfCompletedCheckpoints</span><span class="metric-val">CP success rate</span></div>
+      <div class="metric-row"><span class="metric-name">JVM GC time</span><span class="metric-val">Heap pressure indicator</span></div>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">SPARK</span> Critical Metrics</div>
+      <div class="metric-row"><span class="metric-name">inputRowsPerSecond</span><span class="metric-val">Source ingestion rate</span></div>
+      <div class="metric-row"><span class="metric-name">processedRowsPerSecond</span><span class="metric-val">Processing throughput</span></div>
+      <div class="metric-row"><span class="metric-name">batchDuration</span><span class="metric-val">Must be &lt; trigger interval</span></div>
+      <div class="metric-row"><span class="metric-name">numBatchesExecuted</span><span class="metric-val">Total micro-batch count</span></div>
+      <div class="metric-row"><span class="metric-name">stateMemory</span><span class="metric-val">State store size growth</span></div>
+      <div class="metric-row"><span class="metric-name">shuffleWriteBytes</span><span class="metric-val">Shuffle cost indicator</span></div>
+      <div class="metric-row"><span class="metric-name">Kafka consumer lag</span><span class="metric-val">From Kafka JMX</span></div>
+      <div class="metric-row"><span class="metric-name">GC pause time</span><span class="metric-val">JVM health</span></div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> Critical Metrics</div>
+      <div class="metric-row"><span class="metric-name">process-rate</span><span class="metric-val">Records processed/sec</span></div>
+      <div class="metric-row"><span class="metric-name">process-latency-avg</span><span class="metric-val">Per-record process time</span></div>
+      <div class="metric-row"><span class="metric-name">commit-rate</span><span class="metric-val">Commit frequency</span></div>
+      <div class="metric-row"><span class="metric-name">records-lag-max</span><span class="metric-val">Consumer lag — most important</span></div>
+      <div class="metric-row"><span class="metric-name">state-size</span><span class="metric-val">State store disk usage</span></div>
+      <div class="metric-row"><span class="metric-name">rebalances</span><span class="metric-val">Partition rebalance frequency</span></div>
+      <div class="metric-row"><span class="metric-name">dropped-records-rate</span><span class="metric-val">Late/out-of-order drops</span></div>
+      <div class="metric-row"><span class="metric-name">rocksdb.block-cache-hit-ratio</span><span class="metric-val">RocksDB efficiency</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">Common Failure Patterns & Root Causes</div>
+  <div class="grid-2">
+    <div class="card card-neutral">
+      <div class="card-title">Failure Pattern Diagnostics</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">Symptom</th><th class="th-dim">Likely Cause</th><th class="th-dim">Fix</th></tr>
+        <tr><td>Checkpoints failing / slow</td><td>State too large, GC pauses, slow storage</td><td>Incremental CP, tune memory, faster storage</td></tr>
+        <tr><td>Backpressure &gt; 50%</td><td>Slow operator or sink, insufficient parallelism</td><td>Identify bottleneck in UI, scale operator</td></tr>
+        <tr><td>Kafka lag growing</td><td>Consumer too slow, insufficient threads/partitions</td><td>Scale out, optimize processing logic</td></tr>
+        <tr><td>OOM errors</td><td>State unbounded, GC not freeing, cache too large</td><td>Add TTL, tune memory fractions, use RocksDB</td></tr>
+        <tr><td>Watermark not advancing</td><td>Idle partitions, one slow source</td><td>Enable idle source detection, check partition balance</td></tr>
+        <tr><td>Late data high rate</td><td>Watermark too aggressive, upstream delay</td><td>Increase allowed lateness, investigate source lag</td></tr>
+        <tr><td>Rebalancing loops (KStreams)</td><td>Processing time &gt; session.timeout.ms</td><td>Increase timeout, reduce processing load</td></tr>
+        <tr><td>Results non-deterministic</td><td>Using processing time instead of event time</td><td>Switch to event time + watermarks</td></tr>
+      </table>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Monitoring Tools & UIs</div>
+      <table class="comp-table">
+        <tr><th class="th-dim">Framework</th><th class="th-dim">Built-in UI</th><th class="th-dim">External</th></tr>
+        <tr><td><span class="engine-label el-flink">FLINK</span></td><td>Flink Web UI (port 8081) — operator graph, checkpoint history, task manager stats, backpressure visualization</td><td>Prometheus + Grafana, DataDog, Splunk</td></tr>
+        <tr><td><span class="engine-label el-spark">SPARK</span></td><td>Spark UI (port 4040) — streaming tab, SQL plans, stage timelines, executor memory</td><td>Prometheus, Ganglia, Databricks Metrics</td></tr>
+        <tr><td><span class="engine-label el-kafka">KAFKA</span></td><td>JMX metrics only (no built-in UI)</td><td>Confluent Control Center, Burrow, kminion, Grafana</td></tr>
+      </table>
+      <div class="callout callout-tip" style="margin-top:10px;"><div class="callout-icon">💡</div><div>For Kafka Streams: use <strong>Burrow</strong> for lag monitoring and <strong>kminion</strong> for comprehensive Kafka metrics on Prometheus.</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Debugging Checklist</div>
+  <div class="card card-neutral">
+    <div class="card-title">Step-by-Step Debug Process</div>
+    <div class="grid-3">
+      <div>
+        <h4>1. Identify the Bottleneck</h4>
+        <ul class="list">
+          <li>Check Kafka consumer lag first</li>
+          <li>Flink: look for red operators in Web UI (backpressure)</li>
+          <li>Spark: compare batchDuration vs trigger interval</li>
+          <li>KStreams: check process-latency-avg per task</li>
+        </ul>
+      </div>
+      <div>
+        <h4>2. Check State Health</h4>
+        <ul class="list">
+          <li>Is state growing unboundedly? → Add TTL</li>
+          <li>Are checkpoints growing each run? → State leak</li>
+          <li>RocksDB hit ratio low? → Increase block cache</li>
+          <li>Checkpoint duration > interval? → Reduce state or use incremental CP</li>
+        </ul>
+      </div>
+      <div>
+        <h4>3. Check Time & Watermarks</h4>
+        <ul class="list">
+          <li>Is watermark advancing? → Check idle partitions</li>
+          <li>High late record rate? → Adjust watermark lag</li>
+          <li>Windows never closing? → Watermark stuck</li>
+          <li>Using event vs processing time correctly?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: COMPARISON -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="compare">
+  <div class="section-header">
+    <div class="section-title">Framework Comparison</div>
+    <div class="section-desc">Definitive feature-by-feature comparison based on real production characteristics.</div>
+  </div>
+
+  <div class="card card-neutral col-span-3">
+    <div class="card-title">Comprehensive Feature Matrix</div>
+    <table class="comp-table">
+      <tr>
+        <th class="th-dim" style="width:22%">Dimension</th>
+        <th class="th-flink" style="width:26%">Apache Flink</th>
+        <th class="th-kafka" style="width:26%">Kafka Streams</th>
+        <th class="th-spark" style="width:26%">Spark Structured Streaming</th>
+      </tr>
+      <tr>
+        <td class="row-label">Processing Model</td>
+        <td><span class="rating rating-a">A</span> True per-event streaming. No batching overhead.</td>
+        <td><span class="rating rating-a">A</span> True per-event. But Kafka I/O adds latency floor.</td>
+        <td><span class="rating rating-c">C</span> Micro-batch. Continuous mode experimental.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Typical Latency</td>
+        <td>Sub-millisecond to milliseconds</td>
+        <td>Low ms but Kafka-bounded</td>
+        <td>Hundreds of ms to seconds</td>
+      </tr>
+      <tr>
+        <td class="row-label">Processing Efficiency</td>
+        <td><span class="rating rating-a">A</span> Mix network & CPU tasks. Dynamic resource usage.</td>
+        <td><span class="rating rating-b">B</span> Bounded by partition count. Static allocation. No task mixing.</td>
+        <td><span class="rating rating-b">B</span> Similar tasks simultaneously. Skew wastes cluster.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Event Time Support</td>
+        <td><span class="rating rating-a">A</span> Per-record watermarks, full event-time semantics</td>
+        <td><span class="rating rating-a">A</span> Event time with suppress() for final results</td>
+        <td><span class="rating rating-a">A</span> Basic event time in all core operations</td>
+      </tr>
+      <tr>
+        <td class="row-label">Late Data Handling</td>
+        <td><span class="rating rating-a">A</span> Watermarks + side outputs + re-aggregation. Most comprehensive.</td>
+        <td><span class="rating rating-c">C</span> Grace period only. Past grace = silently dropped.</td>
+        <td><span class="rating rating-b">B</span> Watermark-based. Past watermark silently dropped. No side outputs.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Stateful Processing</td>
+        <td><span class="rating rating-a">A</span> Full suite: joins, custom ops, all state types</td>
+        <td><span class="rating rating-a">A</span> KTable-based joins, full stateful support</td>
+        <td><span class="rating rating-b">B</span> Basic ops. No stream-table joins in OSS. Some features Databricks-only.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Windowing</td>
+        <td><span class="rating rating-a">A</span> Tumbling/sliding/session/custom/global. Flexible triggers. Large state via RocksDB.</td>
+        <td><span class="rating rating-b">B</span> Tumbling/sliding/session. No shared state. Large state is expensive.</td>
+        <td><span class="rating rating-b">B</span> Tumbling/sliding/session. Large state may be expensive.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Fault Tolerance</td>
+        <td><span class="rating rating-a">A</span> Async incremental snapshots. Fast recovery from cloud storage. No replay needed.</td>
+        <td><span class="rating rating-b">B</span> Changelog + RocksDB. Long recovery for large state. Needs significant engineering.</td>
+        <td><span class="rating rating-b">B</span> WAL + checkpoint. Best-effort state locality. May rebuild on failure.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Backpressure</td>
+        <td><span class="rating rating-a">A</span> Credit-based, dynamic throttling. Propagates through pipeline.</td>
+        <td><span class="rating rating-b">B</span> Pull-based — no explicit BP. Lag builds in intermediate topics.</td>
+        <td><span class="rating rating-b">B</span> Auto rate adjustment. Needs micro-batch size tuning.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Exactly-Once</td>
+        <td><span class="rating rating-a">A</span> Kafka→Kafka + 2PC for external sinks</td>
+        <td><span class="rating rating-b">B</span> Kafka→Kafka only. External sinks need out-of-band idempotency.</td>
+        <td><span class="rating rating-b">B</span> Within Spark. File sinks + idempotent Kafka via foreachBatch.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Interactive Queries</td>
+        <td><span class="rating rating-a">A</span> Queryable state across cluster with built-in server</td>
+        <td><span class="rating rating-a">A</span> Local store queries; great for stateful microservices</td>
+        <td><span class="rating rating-c">C</span> Limited. Must write to external sink to query state.</td>
+      </tr>
+      <tr>
+        <td class="row-label">Cluster Required</td>
+        <td>Yes — JobManager + TaskManagers</td>
+        <td><strong>No</strong> — embedded in your app</td>
+        <td>Yes — Driver + Executors</td>
+      </tr>
+      <tr>
+        <td class="row-label">Max Scalability</td>
+        <td>Virtually unlimited (thousands of slots)</td>
+        <td>Bounded by Kafka partition count</td>
+        <td>Very high (Spark cluster scale)</td>
+      </tr>
+      <tr>
+        <td class="row-label">SQL Support</td>
+        <td>Flink SQL (full streaming SQL)</td>
+        <td>ksqlDB (separate product)</td>
+        <td>Spark SQL (excellent, mature)</td>
+      </tr>
+      <tr>
+        <td class="row-label">Learning Curve</td>
+        <td>High — complex APIs, many concepts</td>
+        <td>Medium — Java lib, Kafka knowledge needed</td>
+        <td>Low-Medium — familiar DataFrame API</td>
+      </tr>
+      <tr>
+        <td class="row-label">Operational Complexity</td>
+        <td>High — cluster management, checkpoint tuning</td>
+        <td>Low — deploy like any microservice</td>
+        <td>Medium — Spark cluster ops</td>
+      </tr>
+      <tr>
+        <td class="row-label">Best For</td>
+        <td>Low latency, large scale, complex stateful ops, event-time correctness</td>
+        <td>Kafka-native apps, microservices, moderate complexity</td>
+        <td>Batch-like streaming, SQL-heavy, Spark ecosystem users</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section-label gap">Decision Guide — When to Choose Which</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">CHOOSE FLINK WHEN</span></div>
+      <ul class="list">
+        <li>Latency must be sub-second (fraud detection, trading)</li>
+        <li>Complex event-time semantics with late data handling</li>
+        <li>State is very large (GB-TB) — use RocksDB backend</li>
+        <li>Need exactly-once end-to-end including external sinks</li>
+        <li>Complex joins: stream-stream, temporal joins</li>
+        <li>Custom windowing with complex triggers</li>
+        <li>Queryable state required</li>
+        <li>Team can invest in operational complexity</li>
+      </ul>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">CHOOSE KAFKA STREAMS WHEN</span></div>
+      <ul class="list">
+        <li>Already deep in Kafka ecosystem</li>
+        <li>Building stateful microservices (interactive queries)</li>
+        <li>Want library, not a cluster to manage</li>
+        <li>Input/output is purely Kafka topics</li>
+        <li>Moderate throughput and complexity</li>
+        <li>Team is Java-native</li>
+        <li>Streaming topology is relatively simple</li>
+        <li>Want to scale by just adding instances</li>
+      </ul>
+    </div>
+    <div class="card card-spark">
+      <div class="card-title"><span class="engine-label el-spark">CHOOSE SPARK WHEN</span></div>
+      <ul class="list">
+        <li>Team already uses Spark for batch — reuse skills</li>
+        <li>Latency of 30s–minutes is acceptable</li>
+        <li>Heavy SQL transformations (Spark SQL is excellent)</li>
+        <li>Using Databricks or Delta Lake ecosystem</li>
+        <li>Batch + streaming unified on one platform</li>
+        <li>ML pipelines with MLlib integration</li>
+        <li>Lambda architecture: same code for batch and stream</li>
+        <li>High throughput, lower frequency jobs</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB: MASTERY PATTERNS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="mastery">
+  <div class="section-header">
+    <div class="section-title">Mastery-Level Patterns</div>
+    <div class="section-desc">Advanced patterns used in production systems at scale. These are what separate intermediate engineers from streaming experts.</div>
+  </div>
+
+  <div class="section-label">Exactly-Once End-to-End Pipeline</div>
+  <div class="grid-2">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> True End-to-End EOS</div>
+      <div class="code"><span class="cm">// Flink EOS: Kafka → Flink → Kafka → JDBC</span>
+<span class="cm">// Step 1: Kafka source with EOS</span>
+<span class="type">KafkaSource</span>&lt;<span class="type">Order</span>&gt; source = <span class="type">KafkaSource</span>.&lt;<span class="type">Order</span>&gt;<span class="fn">builder</span>()
+  .<span class="fn">setBootstrapServers</span>(brokers)
+  .<span class="fn">setTopics</span>(<span class="str">"orders"</span>)
+  .<span class="fn">build</span>();
+
+<span class="cm">// Step 2: Enable exactly-once checkpoint</span>
+env.<span class="fn">enableCheckpointing</span>(<span class="num">60000</span>,
+  <span class="type">CheckpointingMode</span>.<span class="fn">EXACTLY_ONCE</span>);
+
+<span class="cm">// Step 3: Transactional Kafka sink</span>
+<span class="type">KafkaSink</span>&lt;<span class="type">Result</span>&gt; sink = <span class="type">KafkaSink</span>.&lt;<span class="type">Result</span>&gt;<span class="fn">builder</span>()
+  .<span class="fn">setBootstrapServers</span>(brokers)
+  .<span class="fn">setDeliveryGuarantee</span>(
+    <span class="type">DeliveryGuarantee</span>.<span class="fn">EXACTLY_ONCE</span>)
+  .<span class="fn">setTransactionalIdPrefix</span>(<span class="str">"my-app"</span>)
+  .<span class="fn">build</span>();
+
+<span class="cm">// Step 4: 2PC JDBC sink</span>
+stream.<span class="fn">addSink</span>(<span class="kw">new</span> <span class="type">TwoPhaseCommitJDBCSink</span>(...));</div>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Idempotency Patterns for Sinks Without 2PC</div>
+      <ul class="list">
+        <li><strong>Upsert by natural key:</strong> UPSERT INTO table ON CONFLICT(id) DO UPDATE</li>
+        <li><strong>Offset-based dedup:</strong> Store (topic, partition, offset) as primary key</li>
+        <li><strong>Idempotency token:</strong> Include message UUID, check-and-insert</li>
+        <li><strong>Optimistic locking:</strong> Version field, reject stale writes</li>
+      </ul>
+      <div class="code" style="margin-top:10px;"><span class="cm">-- Idempotent upsert (PostgreSQL)</span>
+<span class="kw">INSERT INTO</span> results (id, value, updated_at)
+<span class="kw">VALUES</span> (?, ?, NOW())
+<span class="kw">ON CONFLICT</span> (id) <span class="kw">DO UPDATE SET</span>
+  value = <span class="fn">EXCLUDED</span>.value,
+  updated_at = <span class="fn">EXCLUDED</span>.updated_at
+<span class="kw">WHERE</span> results.updated_at < <span class="fn">EXCLUDED</span>.updated_at;</div>
+      <div class="callout callout-tip"><div class="callout-icon">💡</div><div>The WHERE clause prevents older messages from overwriting newer ones during replay.</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Multi-Stream Joins</div>
+  <div class="grid-2">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Stream-Stream Join</div>
+      <div class="code"><span class="cm">// Join two streams within a time window</span>
+orders.<span class="fn">join</span>(shipments)
+  .<span class="fn">where</span>(<span class="type">Order</span>::<span class="fn">getOrderId</span>)
+  .<span class="fn">equalTo</span>(<span class="type">Shipment</span>::<span class="fn">getOrderId</span>)
+  .<span class="fn">window</span>(<span class="type">TumblingEventTimeWindows</span>
+    .<span class="fn">of</span>(<span class="type">Time</span>.<span class="fn">hours</span>(<span class="num">1</span>)))
+  .<span class="fn">apply</span>((order, shipment) ->
+    <span class="kw">new</span> <span class="type">EnrichedOrder</span>(order, shipment));
+
+<span class="cm">// Temporal table join (lookup at event time)</span>
+<span class="cm">// Flink SQL:</span>
+<span class="str">"""
+SELECT o.*, r.rate
+FROM orders o
+LEFT JOIN rates FOR SYSTEM_TIME AS OF o.proc_time AS r
+ON o.currency = r.currency
+"""</span></div>
+    </div>
+    <div class="card card-kafka">
+      <div class="card-title"><span class="engine-label el-kafka">KAFKA STREAMS</span> KStream-KTable & GlobalKTable</div>
+      <div class="code"><span class="cm">// KStream-KTable join (enrichment)</span>
+<span class="type">KStream</span>&lt;<span class="type">String</span>, <span class="type">Order</span>&gt; orders = ...;
+<span class="type">KTable</span>&lt;<span class="type">String</span>, <span class="type">User</span>&gt; users = ...;
+
+orders.<span class="fn">join</span>(users,
+  (order, user) -> <span class="fn">enrich</span>(order, user))
+
+<span class="cm">// GlobalKTable: replicated to ALL instances</span>
+<span class="cm">// Use for small lookup tables (currencies, configs)</span>
+<span class="type">GlobalKTable</span>&lt;<span class="type">String</span>, <span class="type">Rate</span>&gt; rates =
+  builder.<span class="fn">globalTable</span>(<span class="str">"rates"</span>);
+
+<span class="cm">// No co-partitioning required!</span>
+orders.<span class="fn">join</span>(rates,
+  (k, order) -> order.<span class="fn">getCurrency</span>(),
+  (order, rate) -> <span class="fn">convert</span>(order, rate))</div>
+    </div>
+  </div>
+
+  <div class="section-label">CDC & Schema Evolution</div>
+  <div class="grid-2">
+    <div class="card card-neutral">
+      <div class="card-title">Change Data Capture (CDC) Patterns</div>
+      <div class="code"><span class="cm">// Debezium CDC → Flink/Kafka Streams</span>
+<span class="cm">// CDC event structure:</span>
+{
+  <span class="str">"op"</span>: <span class="str">"u"</span>,           <span class="cm">// c=create, u=update, d=delete</span>
+  <span class="str">"before"</span>: { ... },  <span class="cm">// Previous state</span>
+  <span class="str">"after"</span>:  { ... },  <span class="cm">// New state</span>
+  <span class="str">"source"</span>: { <span class="str">"ts_ms"</span>: ..., <span class="str">"lsn"</span>: ... }
+}
+
+<span class="cm">// Flink: native CDC connectors</span>
+<span class="str">"""
+CREATE TABLE users (
+  id INT PRIMARY KEY NOT ENFORCED,
+  name STRING,
+  PRIMARY KEY (id) NOT ENFORCED
+) WITH ('connector' = 'mysql-cdc', ...)
+"""</span></div>
+      <p style="margin-top:8px;">Flink has native CDC source connectors (flink-cdc-connectors). Kafka Streams uses Debezium as a Kafka producer upstream.</p>
+    </div>
+    <div class="card card-neutral">
+      <div class="card-title">Schema Evolution Strategies</div>
+      <ul class="list">
+        <li><strong>Schema Registry</strong> (Confluent/Apicurio) — centralized schema versioning, backward/forward compatibility enforced at producer/consumer</li>
+        <li><strong>Avro/Protobuf</strong> — binary formats with schema embedded; support field addition/removal with defaults</li>
+        <li><strong>Flink Savepoints</strong> — take savepoint before changing state schema; use StateMigration interface</li>
+        <li><strong>Kafka Streams</strong> — no built-in state migration; must dual-run old + new topology, migrate, cut over</li>
+        <li><strong>Blue/Green deployment</strong> — run two versions in parallel, compare outputs before switching traffic</li>
+      </ul>
+      <div class="callout callout-warn"><div class="callout-icon">⚠</div><div>Never change a Kafka Streams topology without considering state migration. Adding/removing a state store without migration will fail on startup.</div></div>
+    </div>
+  </div>
+
+  <div class="section-label">Advanced Flink Patterns</div>
+  <div class="grid-3">
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> ProcessFunction (Custom Stateful)</div>
+      <div class="code"><span class="kw">public class</span> <span class="type">FraudDetector</span>
+    <span class="kw">extends</span> <span class="type">KeyedProcessFunction</span>&lt;<span class="type">String</span>, <span class="type">Txn</span>, <span class="type">Alert</span>&gt; {
+
+  <span class="kw">private</span> <span class="type">ValueState</span>&lt;<span class="type">Boolean</span>&gt; flagState;
+  <span class="kw">private</span> <span class="type">ValueState</span>&lt;<span class="type">Long</span>&gt; timerState;
+
+  <span class="ann">@Override</span>
+  <span class="kw">public void</span> <span class="fn">processElement</span>(<span class="type">Txn</span> txn,
+      <span class="type">Context</span> ctx, <span class="type">Collector</span>&lt;<span class="type">Alert</span>&gt; out) {
+    <span class="kw">if</span> (txn.<span class="fn">getAmount</span>() > <span class="num">1000</span>) {
+      flagState.<span class="fn">update</span>(<span class="kw">true</span>);
+      <span class="cm">// Register timer to clear flag after 1 min</span>
+      <span class="type">Long</span> timer = ctx.<span class="fn">timerService</span>()
+        .<span class="fn">currentProcessingTime</span>() + <span class="num">60_000</span>;
+      ctx.<span class="fn">timerService</span>().<span class="fn">registerTimer</span>(timer);
+      timerState.<span class="fn">update</span>(timer);
+    } <span class="kw">else if</span> (<span class="type">Boolean</span>.<span class="fn">TRUE</span>.<span class="fn">equals</span>(flagState.<span class="fn">value</span>())) {
+      out.<span class="fn">collect</span>(<span class="kw">new</span> <span class="type">Alert</span>(txn.<span class="fn">getKey</span>()));
+    }
+  }
+
+  <span class="ann">@Override</span>
+  <span class="kw">public void</span> <span class="fn">onTimer</span>(<span class="kw">long</span> timestamp, ...) {
+    flagState.<span class="fn">clear</span>(); <span class="cm">// clean up after timeout</span>
+  }
+}</div>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> CEP — Complex Event Processing</div>
+      <div class="code"><span class="cm">// Detect: login → purchase within 10min</span>
+<span class="type">Pattern</span>&lt;<span class="type">Event</span>, ?&gt; pattern = <span class="type">Pattern</span>.&lt;<span class="type">Event</span>&gt;<span class="fn">begin</span>(<span class="str">"login"</span>)
+  .<span class="fn">where</span>(<span class="type">SimpleCondition</span>.<span class="fn">of</span>(
+    e -> e.<span class="fn">type</span>.<span class="fn">equals</span>(<span class="str">"LOGIN"</span>)))
+  .<span class="fn">next</span>(<span class="str">"purchase"</span>)
+  .<span class="fn">where</span>(<span class="type">SimpleCondition</span>.<span class="fn">of</span>(
+    e -> e.<span class="fn">type</span>.<span class="fn">equals</span>(<span class="str">"PURCHASE"</span>)))
+  .<span class="fn">within</span>(<span class="type">Time</span>.<span class="fn">minutes</span>(<span class="num">10</span>));
+
+<span class="type">PatternStream</span>&lt;<span class="type">Event</span>&gt; patternStream =
+  <span class="type">CEP</span>.<span class="fn">pattern</span>(stream.<span class="fn">keyBy</span>(<span class="type">Event</span>::<span class="fn">userId</span>), pattern);
+
+patternStream.<span class="fn">select</span>(matchedEvents ->
+  <span class="kw">new</span> <span class="type">Conversion</span>(matchedEvents));</div>
+    </div>
+    <div class="card card-flink">
+      <div class="card-title"><span class="engine-label el-flink">FLINK</span> Broadcast State Pattern</div>
+      <div class="code"><span class="cm">// Broadcast rules to all operator instances</span>
+<span class="cm">// Classic: dynamic rule engine</span>
+<span class="type">MapStateDescriptor</span>&lt;<span class="type">String</span>, <span class="type">Rule</span>&gt; ruleDesc =
+  <span class="kw">new</span> <span class="type">MapStateDescriptor</span>&lt;&gt;(
+    <span class="str">"rules"</span>, <span class="type">String</span>.<span class="kw">class</span>, <span class="type">Rule</span>.<span class="kw">class</span>);
+
+<span class="type">BroadcastStream</span>&lt;<span class="type">Rule</span>&gt; broadcastRules =
+  ruleStream.<span class="fn">broadcast</span>(ruleDesc);
+
+transactions
+  .<span class="fn">connect</span>(broadcastRules)
+  .<span class="fn">process</span>(<span class="kw">new</span> <span class="type">RuleApplier</span>(ruleDesc));</div>
+      <p style="margin-top:8px;"><strong>Use for:</strong> Dynamic ML model updates, fraud rule changes, config push to all partitions.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
