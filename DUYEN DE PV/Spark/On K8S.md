@@ -95,9 +95,14 @@ At the heart of Kubernetes are **controllers**, which are control loops that mo
 - **Reconciliation Loop**: If there’s a difference between the desired and actual states, the Kubernetes controller reconciles this difference. It might start a new instance, replace a failed one, or perform other necessary adjustments. This feedback loop ensures that your applications always run as intended.
     
 
-K8s will continuously check (the reconciliation loop); do the users have (the actual state) what they wanted (the desired state)? If not, it tries to fix it. You need to run two instances of Airflow’s scheduler. You tell k8s to do that. It checks what you want with what is actually happening in the cluster.
-
-Suppose there are currently no instances of Airflow’s scheduler. K8s initiates two Airflow scheduler instances to match the state. But at some point, one goes down. Compared to what you want, K8s sees it’s missing 1 Airflow’s scheduler instance. It then created 1 one more instance to ensure satisfying the desired state.
+K8s will continuously check (the reconciliation loop); do the users have (the actual state) what they wanted (the desired state)? If not, it tries to fix it. You ne| Feature                 | Native spark-submit | Spark Operator (Apache/Kubeflow)         |
+| ----------------------- | ------------------- | ---------------------------------------- |
+| Style                   | Imperative CLI      | Declarative CRD/YAML                     |
+| Job as K8s object       | No                  | Yes                                      |
+| GitOps                  | Hard                | Excellent                                |
+| Restart/Cron            | Manual              | Built-in                                 |
+| Dynamic alloc + shuffle | Yes (tracking)      | Yes (tracking)                           |
+| Production choice       | Simple/legacy       | Most teams (scalability + observability) |ant, K8s sees it’s missing 1 Airflow’s scheduler instance. It then created 1 one more instance to ensure satisfying the desired state.
 
 ## The overview architecture
 
