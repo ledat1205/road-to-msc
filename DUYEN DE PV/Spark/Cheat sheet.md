@@ -1,5 +1,15 @@
 ![[spark_cheatsheet (2).html]]
 
+|Color in your chart|Name in legend / Spark UI|What it actually measures|Typical meaning / when it's large / how to optimize|
+|---|---|---|---|
+|**Blue**|Scheduler Delay|Time between when the task was **submitted** by the driver (to the cluster scheduler) and when the executor actually **started running** it.|Queuing in the driver → high values = too many tasks at once, small executor cores, slow driver, dynamic allocation lag, or resource contention on K8s. Reduce partitions or increase driver resources.|
+|**Red**|Task Deserialization Time|Time spent **deserializing** the task object (code + closure + variables captured from driver) on the executor before it can run.|Large broadcast variables, big user-defined functions (UDFs), or complex closures. Optimize: avoid capturing large objects, use broadcast wisely, prefer column expressions over UDFs.|
+|**Orange**|Shuffle Read Time|Time spent **reading shuffle data** from previous stage (fetching map outputs over network + local disk if spilled). Includes decompress/decode time.|Large shuffles, network congestion, slow disk, skew. Mitigate: increase shuffle partitions, enable AQE, use compression, fix data skew (salting).|
+|**Green**|Executor Computing Time|The **actual useful work** — running your transformation logic (filter, map, aggregate, etc.) on the data partition. This is the part you want to dominate the bar.|High = heavy computation (complex UDFs, large data per partition). Optimize: better algorithms, caching, push down filters/projections, use native Spark functions.|
+|**Yellow**|Shuffle Write Time|Time spent **writing shuffle data** to disk (serializing, partitioning, spilling if needed) so the next stage can read it.|Large output data, poor partitioning, high cardinality. Reduce: repartition smarter, use bucketing, enable AQE coalesce.|
+|**Purple**|Result Serialization Time|Time to **serialize** the final task result (after computation) before sending it back to the driver (for actions like collect/count).|Very large result sent back to driver (e.g., collect() on huge data). Avoid: never collect large datasets; use reduce/aggregate instead.|
+|**Cyan**|Getting Result Time|Time for the **driver** to **receive and process** the task result from the executor (network transfer + driver-side deserialization/aggregation).|Slow network, large results being sent back, driver overload. Avoid large driver-side collections; prefer distributed writes (saveAsTable, write.parquet).|
+
 ![[Pasted image 20260320012459.png]]
 ![[Pasted image 20260320010007.png]]
 ![[Pasted image 20260320010121.png]]
