@@ -1,1 +1,1 @@
-![[kafka_cheatsheet.docx]]
+![[kafka_cheatsheet.html]]

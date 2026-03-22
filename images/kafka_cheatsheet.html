@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apache Kafka — Data Engineer Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #0f1526;
+    --bg3: #141b30;
+    --surface: #1a2240;
+    --surface2: #1f2a4a;
+    --border: #2a3a6a;
+    --border2: #3a4e8a;
+    --accent: #4f8ef7;
+    --accent2: #7eb3ff;
+    --accent3: #a5c8ff;
+    --green: #3ecf8e;
+    --yellow: #f5c842;
+    --red: #f56565;
+    --purple: #b48ef7;
+    --orange: #f7954f;
+    --text: #e2e8f4;
+    --text2: #9aa8c8;
+    --text3: #6677a0;
+    --code-bg: #070c18;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --display: 'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0d1530 40%, #111e42 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(79,142,247,.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 10% 80%, rgba(126,179,255,.06) 0%, transparent 60%);
+  }
+  .hero-inner { position: relative; max-width: 1200px; margin: 0 auto; }
+  .hero-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(79,142,247,.12);
+    border: 1px solid rgba(79,142,247,.3);
+    border-radius: 4px;
+    padding: 4px 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--text2);
+    font-weight: 300;
+    margin-bottom: 36px;
+    max-width: 540px;
+  }
+  .hero-pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+    font-weight: 600;
+    letter-spacing: .05em;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .pill:hover { transform: translateY(-1px); }
+  .pill-blue  { color: var(--accent2);  border-color: rgba(126,179,255,.3);  background: rgba(79,142,247,.08); }
+  .pill-green { color: var(--green);    border-color: rgba(62,207,142,.3);   background: rgba(62,207,142,.07); }
+  .pill-yellow{ color: var(--yellow);   border-color: rgba(245,200,66,.3);   background: rgba(245,200,66,.07); }
+  .pill-purple{ color: var(--purple);   border-color: rgba(180,142,247,.3);  background: rgba(180,142,247,.07); }
+  .pill-orange{ color: var(--orange);   border-color: rgba(247,149,79,.3);   background: rgba(247,149,79,.07); }
+
+  /* ── NAV ── */
+  .nav-wrap {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,14,26,.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; gap: 2px; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 600;
+    color: var(--text3);
+    background: none; border: none;
+    padding: 14px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ── LAYOUT ── */
+  .main { max-width: 1200px; margin: 0 auto; padding: 40px 40px 80px; }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-bottom: 60px;
+    animation: fadeUp .5s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    color: var(--accent);
+    background: rgba(79,142,247,.12);
+    border: 1px solid rgba(79,142,247,.25);
+    border-radius: 6px;
+    padding: 4px 8px;
+    letter-spacing: .05em;
+  }
+  .section-title {
+    font-family: var(--display);
+    font-size: 22px; font-weight: 700;
+    color: #fff;
+    letter-spacing: -.01em;
+  }
+
+  .subsection { margin-bottom: 32px; }
+  .sub-title {
+    font-family: var(--display);
+    font-size: 15px; font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sub-title::before {
+    content: '';
+    display: inline-block; width: 3px; height: 14px;
+    background: var(--accent); border-radius: 2px;
+  }
+
+  /* ── TABLES ── */
+  .tbl-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--surface); }
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em;
+    color: var(--accent2);
+    padding: 11px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid rgba(42,58,106,.5); transition: background .15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(79,142,247,.04); }
+  td {
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--text);
+    vertical-align: top;
+  }
+  td:first-child {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent3);
+    white-space: nowrap;
+  }
+  .td-plain td:first-child { font-family: var(--sans); font-size: 13px; color: var(--text); white-space: normal; font-weight: 400; }
+
+  .badge {
+    display: inline-block; font-family: var(--mono);
+    font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+  .badge-green  { background: rgba(62,207,142,.15);  color: var(--green);  border: 1px solid rgba(62,207,142,.3); }
+  .badge-yellow { background: rgba(245,200,66,.12);  color: var(--yellow); border: 1px solid rgba(245,200,66,.3); }
+  .badge-red    { background: rgba(245,101,101,.12); color: var(--red);    border: 1px solid rgba(245,101,101,.3); }
+  .badge-blue   { background: rgba(79,142,247,.12);  color: var(--accent2);border: 1px solid rgba(79,142,247,.3); }
+  .badge-purple { background: rgba(180,142,247,.12); color: var(--purple); border: 1px solid rgba(180,142,247,.3); }
+  .badge-orange { background: rgba(247,149,79,.12);  color: var(--orange); border: 1px solid rgba(247,149,79,.3); }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .code-header {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface);
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase; letter-spacing: .08em;
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .code-dots span:nth-child(1) { background: #f56565; }
+  .code-dots span:nth-child(2) { background: #f5c842; }
+  .code-dots span:nth-child(3) { background: #3ecf8e; }
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: #a8c0e8;
+  }
+  .kw  { color: #7eb3ff; font-weight: 600; }
+  .str { color: #a3e0a3; }
+  .cmt { color: #4a5a88; font-style: italic; }
+  .fn  { color: #f7954f; }
+  .num { color: #f5c842; }
+  .var { color: #c8a8f0; }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    padding: 14px 18px;
+    border-radius: 8px;
+    border-left: 3px solid;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  .callout-tip    { background: rgba(79,142,247,.07);  border-color: var(--accent);  color: var(--text2); }
+  .callout-warn   { background: rgba(245,200,66,.07);  border-color: var(--yellow);  color: var(--text2); }
+  .callout-danger { background: rgba(245,101,101,.07); border-color: var(--red);     color: var(--text2); }
+  .callout-success{ background: rgba(62,207,142,.07);  border-color: var(--green);   color: var(--text2); }
+  .callout-label  { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+  .callout-tip    .callout-label { color: var(--accent); }
+  .callout-warn   .callout-label { color: var(--yellow); }
+  .callout-danger .callout-label { color: var(--red); }
+  .callout-success .callout-label { color: var(--green); }
+
+  /* ── GRID / CARDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media(max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .card:hover { border-color: var(--border2); box-shadow: 0 4px 20px rgba(0,0,0,.3); }
+  .card-title {
+    font-family: var(--display);
+    font-size: 13px; font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-icon { font-size: 16px; }
+
+  /* ── BULLET LISTS ── */
+  .bullet-list { list-style: none; margin: 0 0 12px 0; }
+  .bullet-list li {
+    padding: 5px 0 5px 20px;
+    position: relative;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .bullet-list li::before {
+    content: '▸';
+    position: absolute; left: 0;
+    color: var(--accent);
+    font-size: 11px;
+    top: 7px;
+  }
+
+  /* ── DELIVERY SEMANTIC CARDS ── */
+  .delivery-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 16px; }
+  @media(max-width:700px) { .delivery-grid { grid-template-columns: 1fr; } }
+  .delivery-card {
+    border-radius: 10px; padding: 18px;
+    border: 1px solid;
+    position: relative; overflow: hidden;
+  }
+  .delivery-card::before {
+    content: ''; position: absolute; top:0; left:0; right:0; height: 3px;
+  }
+  .dc-red    { background: rgba(245,101,101,.07); border-color: rgba(245,101,101,.25); }
+  .dc-red::before    { background: var(--red); }
+  .dc-yellow { background: rgba(245,200,66,.07);  border-color: rgba(245,200,66,.25); }
+  .dc-yellow::before { background: var(--yellow); }
+  .dc-green  { background: rgba(62,207,142,.07);  border-color: rgba(62,207,142,.25); }
+  .dc-green::before  { background: var(--green); }
+  .dc-title  { font-family: var(--display); font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .dc-red .dc-title    { color: var(--red); }
+  .dc-yellow .dc-title { color: var(--yellow); }
+  .dc-green .dc-title  { color: var(--green); }
+  .dc-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; font-size: 12px; }
+  .dc-key { color: var(--text3); font-family: var(--mono); font-size: 11px; margin-right: 8px; white-space: nowrap; }
+  .dc-val { color: var(--text2); text-align: right; font-family: var(--mono); font-size: 11px; }
+
+  /* ── GOLDEN RULES ── */
+  .rules-list { list-style: none; }
+  .rules-list li {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(42,58,106,.4);
+    font-size: 13px; color: var(--text2);
+  }
+  .rules-list li:last-child { border-bottom: none; }
+  .rule-num {
+    font-family: var(--mono);
+    font-size: 11px; font-weight: 700;
+    color: var(--accent);
+    background: rgba(79,142,247,.12);
+    border: 1px solid rgba(79,142,247,.2);
+    border-radius: 4px;
+    padding: 2px 7px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Q&A ── */
+  .qa-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .qa-q {
+    background: var(--surface);
+    padding: 14px 18px;
+    font-size: 13px; font-weight: 500;
+    color: var(--accent2);
+    cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    user-select: none;
+    transition: background .15s;
+  }
+  .qa-q:hover { background: var(--surface2); }
+  .qa-q .chevron {
+    font-size: 10px; color: var(--text3);
+    transition: transform .25s;
+  }
+  .qa-a {
+    padding: 14px 18px;
+    font-size: 13px; color: var(--text2);
+    border-top: 1px solid var(--border);
+    display: none;
+    line-height: 1.7;
+  }
+  .qa-item.open .qa-q { background: rgba(79,142,247,.08); }
+  .qa-item.open .chevron { transform: rotate(180deg); }
+  .qa-item.open .qa-a { display: block; }
+
+  /* ── MONITORING METRICS ── */
+  .metric-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(42,58,106,.4);
+    font-size: 13px;
+  }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-name { font-family: var(--mono); font-size: 12px; color: var(--accent3); flex: 2; }
+  .metric-cat  { flex: 1; color: var(--text3); font-size: 12px; }
+  .metric-alert{ flex: 1.5; font-size: 12px; color: var(--red); font-family: var(--mono); }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    text-align: center;
+    padding: 32px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text3);
+  }
+  .footer strong { color: var(--accent); }
+
+  /* ── INLINE CODE ── */
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(79,142,247,.1);
+    border: 1px solid rgba(79,142,247,.2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent2);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Data Engineer Interview Prep</div>
+    <h1>Apache <span>Kafka</span><br>Cheat Sheet</h1>
+    <p class="hero-sub">From fundamentals to mastery — everything you need to ace your Kafka interview.</p>
+    <div class="hero-pills">
+      <span class="pill pill-blue">Core Concepts</span>
+      <span class="pill pill-green">Producers &amp; Consumers</span>
+      <span class="pill pill-yellow">Kafka Streams</span>
+      <span class="pill pill-purple">Schema Registry</span>
+      <span class="pill pill-orange">Performance Tuning</span>
+      <span class="pill pill-blue">Exactly-Once</span>
+      <span class="pill pill-green">Kafka Connect</span>
+      <span class="pill pill-purple">Monitoring</span>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-wrap">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="scrollTo('s1')">Architecture</button>
+    <button class="nav-btn" onclick="scrollTo('s2')">Producers</button>
+    <button class="nav-btn" onclick="scrollTo('s3')">Consumers</button>
+    <button class="nav-btn" onclick="scrollTo('s4')">Delivery</button>
+    <button class="nav-btn" onclick="scrollTo('s5')">Streams</button>
+    <button class="nav-btn" onclick="scrollTo('s6')">Connect</button>
+    <button class="nav-btn" onclick="scrollTo('s7')">Schema</button>
+    <button class="nav-btn" onclick="scrollTo('s8')">Tuning</button>
+    <button class="nav-btn" onclick="scrollTo('s9')">Security</button>
+    <button class="nav-btn" onclick="scrollTo('s10')">CLI</button>
+    <button class="nav-btn" onclick="scrollTo('s11')">Interview Q&amp;A</button>
+    <button class="nav-btn" onclick="scrollTo('s12')">Monitoring</button>
+    <button class="nav-btn" onclick="scrollTo('s13')">Reference</button>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- ═══ SECTION 1: ARCHITECTURE ═══ -->
+<section class="section" id="s1">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Core Concepts &amp; Architecture</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">What is Apache Kafka?</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="card-icon">⚡</span>Definition</div>
+        <p style="color:var(--text2);font-size:13px;">Distributed, fault-tolerant, high-throughput publish-subscribe messaging system for real-time data streaming. Originally developed at LinkedIn.</p>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="card-icon">🎯</span>Core Use Cases</div>
+        <ul class="bullet-list">
+          <li>Event streaming &amp; real-time pipelines</li>
+          <li>Log aggregation &amp; metrics</li>
+          <li>Change Data Capture (CDC)</li>
+          <li>Stream processing &amp; data integration</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Component Reference</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Component</th><th>Role</th><th>Key Facts</th></tr></thead>
+        <tbody>
+          <tr><td>Broker</td><td>Server storing &amp; serving messages</td><td>Identified by <code>broker.id</code>; handles all I/O</td></tr>
+          <tr><td>Producer</td><td>Publishes messages to topics</td><td>Push model; batches messages for throughput</td></tr>
+          <tr><td>Consumer</td><td>Subscribes to and reads messages</td><td>Pull model; tracks offset position</td></tr>
+          <tr><td>Topic</td><td>Named feed / category for messages</td><td>Logical grouping of events</td></tr>
+          <tr><td>Partition</td><td>Ordered, immutable sequence of records</td><td>Unit of parallelism in Kafka</td></tr>
+          <tr><td>ZooKeeper / KRaft</td><td>Cluster coordination &amp; metadata</td><td>KRaft replaces ZooKeeper in 3.x+</td></tr>
+          <tr><td>Consumer Group</td><td>Group of consumers sharing load</td><td>Each partition consumed by one member only</td></tr>
+          <tr><td>Offset</td><td>Position of a record in a partition</td><td>Monotonically increasing integer per partition</td></tr>
+          <tr><td>ISR</td><td>In-Sync Replicas fully caught up to leader</td><td>New leader elected from ISR on failure</td></tr>
+          <tr><td>Controller</td><td>Broker managing leader elections</td><td>Exactly one per cluster at all times</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Topic &amp; Partition Deep Dive</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Concept</th><th>Explanation</th></tr></thead>
+        <tbody>
+          <tr><td>Partition</td><td>Each topic is split into N partitions. Each partition is an ordered, immutable append-only log.</td></tr>
+          <tr><td>Replication Factor</td><td>Number of copies of each partition across brokers. Recommended: <strong style="color:var(--green)">3</strong> for production.</td></tr>
+          <tr><td>Leader Partition</td><td>Handles all reads/writes for a partition. Elected by ZooKeeper/KRaft.</td></tr>
+          <tr><td>ISR</td><td>Set of replicas fully caught up with the leader. If leader fails, new leader elected from ISR.</td></tr>
+          <tr><td>Log Retention</td><td><code>retention.ms</code> or <code>retention.bytes</code> controls how long/how much data is kept. Default: 7 days.</td></tr>
+          <tr><td>Log Compaction</td><td>Keeps only the latest value per key. Set <code>log.cleanup.policy=compact</code>. Used for KTable topics, CDC.</td></tr>
+          <tr><td>Segment</td><td>Each partition is divided into segment files. Default segment size: 1 GB.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-tip">
+      <span class="callout-label">💡 Interview Tip</span>
+      Know the difference between <strong>partition</strong> (physical log file) and <strong>topic</strong> (logical group). More partitions = more parallelism, but also more overhead (file handles, replication traffic, leader election time).
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 2: PRODUCERS ═══ -->
+<section class="section" id="s2">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Producers — Deep Dive</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Critical Producer Configuration</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Config Key</th><th>Default</th><th>Impact</th></tr></thead>
+        <tbody>
+          <tr><td>acks</td><td><code>1</code></td><td>Durability vs latency tradeoff. Use <code>all</code> for production.</td></tr>
+          <tr><td>retries</td><td><code>2147483647</code></td><td>Auto-retry on transient failures.</td></tr>
+          <tr><td>batch.size</td><td><code>16384</code> bytes</td><td>Larger batch = better throughput, higher latency.</td></tr>
+          <tr><td>linger.ms</td><td><code>0</code></td><td>Wait before sending to allow batching. Set 5–20ms for throughput.</td></tr>
+          <tr><td>compression.type</td><td><code>none</code></td><td>snappy/lz4/zstd reduce network I/O significantly.</td></tr>
+          <tr><td>buffer.memory</td><td><code>33554432</code></td><td>Total buffer for records awaiting send.</td></tr>
+          <tr><td>enable.idempotence</td><td><code>false</code></td><td>Exactly-once delivery per partition.</td></tr>
+          <tr><td>transactional.id</td><td>—</td><td>Required for full EOS transactions.</td></tr>
+          <tr><td>max.in.flight.requests<br>.per.connection</td><td><code>5</code></td><td>Set to 1 to preserve strict ordering without idempotence.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">acks Explained</div>
+    <div class="grid-3">
+      <div class="delivery-card dc-red">
+        <div class="dc-title">acks = 0</div>
+        <div class="dc-row"><span class="dc-key">Speed</span><span class="dc-val">Fastest</span></div>
+        <div class="dc-row"><span class="dc-key">Durability</span><span class="dc-val">None</span></div>
+        <div class="dc-row"><span class="dc-key">Risk</span><span class="dc-val">Data loss</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;">Fire and forget. No acknowledgment from broker.</div>
+      </div>
+      <div class="delivery-card dc-yellow">
+        <div class="dc-title">acks = 1</div>
+        <div class="dc-row"><span class="dc-key">Speed</span><span class="dc-val">Fast</span></div>
+        <div class="dc-row"><span class="dc-key">Durability</span><span class="dc-val">Leader only</span></div>
+        <div class="dc-row"><span class="dc-key">Risk</span><span class="dc-val">Leader failure</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;">Leader acknowledges. Loss if leader fails before replication.</div>
+      </div>
+      <div class="delivery-card dc-green">
+        <div class="dc-title">acks = all</div>
+        <div class="dc-row"><span class="dc-key">Speed</span><span class="dc-val">Slowest</span></div>
+        <div class="dc-row"><span class="dc-key">Durability</span><span class="dc-val">All ISR</span></div>
+        <div class="dc-row"><span class="dc-key">Risk</span><span class="dc-val">Latency</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;">All ISR replicas acknowledge. Use with <code>min.insync.replicas=2</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Partitioning Strategy</div>
+    <ul class="bullet-list">
+      <li><strong style="color:var(--accent2)">Key specified:</strong> <code>murmur2(key) % numPartitions</code> — same key always goes to same partition (ordering guarantee)</li>
+      <li><strong style="color:var(--accent2)">No key:</strong> Sticky partitioner (Kafka 2.4+) — batches to one partition, then switches</li>
+      <li><strong style="color:var(--accent2)">Custom:</strong> Implement <code>Partitioner</code> interface for custom routing logic</li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Java Producer Pattern</div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre><span class="var">Properties</span> props = <span class="kw">new</span> <span class="fn">Properties</span>();
+props.<span class="fn">put</span>(<span class="var">ProducerConfig</span>.BOOTSTRAP_SERVERS_CONFIG, <span class="str">"broker1:9092"</span>);
+props.<span class="fn">put</span>(<span class="var">ProducerConfig</span>.KEY_SERIALIZER_CLASS_CONFIG, <span class="var">StringSerializer</span>.<span class="kw">class</span>);
+props.<span class="fn">put</span>(<span class="var">ProducerConfig</span>.VALUE_SERIALIZER_CLASS_CONFIG, <span class="var">StringSerializer</span>.<span class="kw">class</span>);
+props.<span class="fn">put</span>(<span class="var">ProducerConfig</span>.ACKS_CONFIG, <span class="str">"all"</span>);
+props.<span class="fn">put</span>(<span class="var">ProducerConfig</span>.ENABLE_IDEMPOTENCE_CONFIG, <span class="kw">true</span>);
+props.<span class="fn">put</span>(<span class="var">ProducerConfig</span>.COMPRESSION_TYPE_CONFIG, <span class="str">"snappy"</span>);
+props.<span class="fn">put</span>(<span class="var">ProducerConfig</span>.LINGER_MS_CONFIG, <span class="num">20</span>);
+props.<span class="fn">put</span>(<span class="var">ProducerConfig</span>.BATCH_SIZE_CONFIG, <span class="num">65536</span>);
+
+<span class="var">KafkaProducer</span>&lt;<span class="var">String</span>, <span class="var">String</span>&gt; producer = <span class="kw">new</span> <span class="fn">KafkaProducer</span>&lt;&gt;(props);
+<span class="var">ProducerRecord</span>&lt;<span class="var">String</span>, <span class="var">String</span>&gt; record = <span class="kw">new</span> <span class="fn">ProducerRecord</span>&lt;&gt;(<span class="str">"my-topic"</span>, <span class="str">"key"</span>, <span class="str">"value"</span>);
+producer.<span class="fn">send</span>(record, (metadata, exception) -&gt; {
+    <span class="kw">if</span> (exception == <span class="kw">null</span>)
+        <span class="var">System</span>.out.<span class="fn">println</span>(<span class="str">"Sent to partition "</span> + metadata.<span class="fn">partition</span>() + <span class="str">" offset "</span> + metadata.<span class="fn">offset</span>());
+    <span class="kw">else</span> exception.<span class="fn">printStackTrace</span>();
+});
+producer.<span class="fn">flush</span>(); producer.<span class="fn">close</span>();</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 3: CONSUMERS ═══ -->
+<section class="section" id="s3">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Consumers &amp; Consumer Groups</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Consumer Group Mechanics</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Partition Assignment Rules</div>
+        <ul class="bullet-list">
+          <li>Each partition → exactly ONE consumer per group</li>
+          <li>Multiple groups can read the same topic independently</li>
+          <li>Active consumers ≤ partition count (extras idle)</li>
+          <li>Group Coordinator: broker managing membership</li>
+          <li>Group Leader: first consumer to join; assigns partitions</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Rebalance Triggers</div>
+        <ul class="bullet-list">
+          <li>Consumer joins or leaves the group</li>
+          <li>Consumer crashes / heartbeat timeout</li>
+          <li>Topic partition count changes</li>
+          <li>Subscription pattern change</li>
+          <li>Poll interval exceeded (<code>max.poll.interval.ms</code>)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Critical Consumer Configuration</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Config</th><th>Default</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>group.id</td><td>— (required)</td><td>Consumer group identifier</td></tr>
+          <tr><td>auto.offset.reset</td><td><code>latest</code></td><td><code>earliest</code>/<code>latest</code>/<code>none</code> — behavior when no committed offset found</td></tr>
+          <tr><td>enable.auto.commit</td><td><code>true</code></td><td>Auto-commit periodically. Disable for manual control.</td></tr>
+          <tr><td>auto.commit.interval.ms</td><td><code>5000</code></td><td>Frequency of auto-commit</td></tr>
+          <tr><td>max.poll.records</td><td><code>500</code></td><td>Max records returned per <code>poll()</code> call</td></tr>
+          <tr><td>max.poll.interval.ms</td><td><code>300000</code></td><td>Max time between polls — exceeding triggers rebalance</td></tr>
+          <tr><td>session.timeout.ms</td><td><code>45000</code></td><td>Heartbeat timeout before consumer considered dead</td></tr>
+          <tr><td>heartbeat.interval.ms</td><td><code>3000</code></td><td>Frequency of heartbeats. Must be &lt; session.timeout / 3</td></tr>
+          <tr><td>fetch.min.bytes</td><td><code>1</code></td><td>Min data to fetch; increase for throughput</td></tr>
+          <tr><td>fetch.max.wait.ms</td><td><code>500</code></td><td>Max wait if fetch.min.bytes not satisfied</td></tr>
+          <tr><td>isolation.level</td><td><code>read_uncommitted</code></td><td>Set <code>read_committed</code> for EOS transaction support</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Offset Management Strategies</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Strategy</th><th>How</th><th>Guarantee</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr><td>Auto Commit</td><td><code>enable.auto.commit=true</code></td><td><span class="badge badge-yellow">At-Least-Once</span></td><td>Can re-process if crash between commit &amp; process</td></tr>
+          <tr><td>Manual Sync</td><td><code>commitSync()</code> after processing</td><td><span class="badge badge-green">At-Least-Once</span></td><td>Blocks thread; slow but safe</td></tr>
+          <tr><td>Manual Async</td><td><code>commitAsync(callback)</code></td><td><span class="badge badge-blue">At-Least-Once</span></td><td>Non-blocking; use <code>commitSync()</code> on close</td></tr>
+          <tr><td>Specific Offsets</td><td><code>Map&lt;TopicPartition, OffsetAndMetadata&gt;</code></td><td><span class="badge badge-green">Precise</span></td><td>Most control; most code</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Rebalance Protocols</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Protocol</th><th>Version</th><th>Behavior</th></tr></thead>
+        <tbody>
+          <tr><td>Eager</td><td>&lt; 2.4</td><td><span class="badge badge-red">Stop-the-World</span> — All consumers stop, release all partitions, rejoin. High latency spike.</td></tr>
+          <tr><td>Cooperative (Incremental)</td><td>≥ 2.4</td><td><span class="badge badge-green">Incremental</span> — Only revoked partitions transfer. Others continue processing.</td></tr>
+          <tr><td>Static Membership</td><td>≥ 2.3</td><td><span class="badge badge-blue">Rebalance-Free</span> — <code>group.instance.id</code> prevents rebalance on restart within session timeout.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-tip">
+      <span class="callout-label">💡 Interview Tip</span>
+      Minimize rebalances: use cooperative rebalance + static membership, tune <code>session.timeout.ms</code> and <code>max.poll.interval.ms</code>, optimize processing time. Rebalances cause consumer lag spikes and pause processing.
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Python Consumer Pattern</div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Python</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre><span class="kw">from</span> confluent_kafka <span class="kw">import</span> <span class="var">Consumer</span>, <span class="var">KafkaError</span>
+
+conf = {
+    <span class="str">'bootstrap.servers'</span>: <span class="str">'broker1:9092'</span>,
+    <span class="str">'group.id'</span>: <span class="str">'my-consumer-group'</span>,
+    <span class="str">'auto.offset.reset'</span>: <span class="str">'earliest'</span>,
+    <span class="str">'enable.auto.commit'</span>: <span class="kw">False</span>,
+    <span class="str">'max.poll.interval.ms'</span>: <span class="num">300000</span>
+}
+consumer = <span class="var">Consumer</span>(conf)
+consumer.<span class="fn">subscribe</span>([<span class="str">'my-topic'</span>])
+
+<span class="kw">try</span>:
+    <span class="kw">while</span> <span class="kw">True</span>:
+        msg = consumer.<span class="fn">poll</span>(timeout=<span class="num">1.0</span>)
+        <span class="kw">if</span> msg <span class="kw">is</span> <span class="kw">None</span>: <span class="kw">continue</span>
+        <span class="kw">if</span> msg.<span class="fn">error</span>(): <span class="fn">handle_error</span>(msg.<span class="fn">error</span>()); <span class="kw">continue</span>
+        <span class="fn">process</span>(msg.<span class="fn">value</span>().<span class="fn">decode</span>(<span class="str">'utf-8'</span>))
+        consumer.<span class="fn">commit</span>(asynchronous=<span class="kw">False</span>)  <span class="cmt"># manual commit after processing</span>
+<span class="kw">finally</span>:
+    consumer.<span class="fn">close</span>()  <span class="cmt"># always close to trigger final sync commit</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 4: DELIVERY SEMANTICS ═══ -->
+<section class="section" id="s4">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Delivery Semantics &amp; Exactly-Once</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">The Three Delivery Guarantees</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Semantic</th><th>Producer</th><th>Consumer</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-red">At-Most-Once</span></td>
+            <td><code>acks=0, retries=0</code></td>
+            <td>Commit before processing</td>
+            <td style="color:var(--red)">Data loss</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-yellow">At-Least-Once</span></td>
+            <td><code>acks=all, retries=MAX</code></td>
+            <td>Commit after processing</td>
+            <td style="color:var(--yellow)">Duplicates</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">Exactly-Once (EOS)</span></td>
+            <td><code>enable.idempotence=true</code> + transactions</td>
+            <td><code>isolation.level=read_committed</code></td>
+            <td style="color:var(--green)">Complex setup</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">How EOS Works</div>
+    <div class="grid-2">
+      <div>
+        <ul class="bullet-list">
+          <li><strong style="color:var(--accent2)">Idempotent Producer:</strong> Each producer gets PID + sequence number. Broker deduplicates retries automatically.</li>
+          <li><strong style="color:var(--accent2)">Transactions:</strong> Group multiple topic/partition writes into atomic units using <code>transactional.id</code>.</li>
+          <li><strong style="color:var(--accent2)">Transaction Coordinator:</strong> Special broker partition managing transaction state (begin/commit/abort).</li>
+          <li><strong style="color:var(--accent2)">Consumer Isolation:</strong> <code>read_committed</code> ignores uncommitted/aborted records.</li>
+          <li><strong style="color:var(--accent2)">Kafka Streams EOS:</strong> Set <code>processing.guarantee=exactly_once_v2</code> — built-in, no manual work.</li>
+        </ul>
+      </div>
+      <div class="code-block" style="margin:0">
+        <div class="code-header"><span class="code-lang">Java — Transactions</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <pre>props.<span class="fn">put</span>(<span class="str">"enable.idempotence"</span>, <span class="str">"true"</span>);
+props.<span class="fn">put</span>(<span class="str">"transactional.id"</span>, <span class="str">"txn-id-001"</span>);
+producer.<span class="fn">initTransactions</span>();
+producer.<span class="fn">beginTransaction</span>();
+<span class="kw">try</span> {
+    producer.<span class="fn">send</span>(record1);
+    producer.<span class="fn">send</span>(record2);
+    producer.<span class="fn">sendOffsetsToTransaction</span>(
+        offsets, consumerGroupMetadata);
+    producer.<span class="fn">commitTransaction</span>();
+} <span class="kw">catch</span> (<span class="var">ProducerFencedException</span> e) {
+    producer.<span class="fn">close</span>();
+} <span class="kw">catch</span> (<span class="var">KafkaException</span> e) {
+    producer.<span class="fn">abortTransaction</span>();
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 5: KAFKA STREAMS ═══ -->
+<section class="section" id="s5">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Kafka Streams</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Core Abstractions</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Abstraction</th><th>Semantics</th><th>Backed By</th></tr></thead>
+        <tbody>
+          <tr><td>KStream</td><td>Unbounded event stream. Each record = independent insert.</td><td>Source topic partitions</td></tr>
+          <tr><td>KTable</td><td>Changelog / materialized view. Latest value per key = upsert.</td><td>State store + changelog topic</td></tr>
+          <tr><td>GlobalKTable</td><td>Full copy on ALL stream instances. Broadcast join/lookup.</td><td>State store (no repartition)</td></tr>
+          <tr><td>StateStore</td><td>Local RocksDB store for stateful operations.</td><td>Backed by compacted changelog topic</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-tip">
+      <span class="callout-label">💡 Key Distinction</span>
+      KStream join requires repartition if keys change. GlobalKTable avoids repartition — full table on every instance. Use GlobalKTable for small lookup tables; KTable for large, partitioned state.
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Stream Operations Cheat Sheet</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>map / mapValues</td><td><span class="badge badge-blue">Stateless</span></td><td>Transform records; <code>map</code> can change key → triggers repartition</td></tr>
+          <tr><td>filter / filterNot</td><td><span class="badge badge-blue">Stateless</span></td><td>Retain records matching predicate</td></tr>
+          <tr><td>flatMap</td><td><span class="badge badge-blue">Stateless</span></td><td>One-to-many transformation</td></tr>
+          <tr><td>selectKey</td><td><span class="badge badge-blue">Stateless</span></td><td>Change key; triggers repartition downstream</td></tr>
+          <tr><td>groupByKey / groupBy</td><td><span class="badge badge-blue">Stateless</span></td><td>Group for aggregation</td></tr>
+          <tr><td>count / reduce / aggregate</td><td><span class="badge badge-purple">Stateful</span></td><td>Aggregations backed by state store</td></tr>
+          <tr><td>windowed aggregation</td><td><span class="badge badge-purple">Stateful</span></td><td>Time-bounded aggregations</td></tr>
+          <tr><td>join (stream-stream)</td><td><span class="badge badge-purple">Stateful</span></td><td>Join two streams within a time window</td></tr>
+          <tr><td>join (stream-table)</td><td><span class="badge badge-purple">Stateful</span></td><td>Enrich stream with KTable lookup</td></tr>
+          <tr><td>suppress</td><td><span class="badge badge-purple">Stateful</span></td><td>Emit final windowed result only; suppress intermediates</td></tr>
+          <tr><td>merge</td><td><span class="badge badge-blue">Stateless</span></td><td>Combine two KStreams</td></tr>
+          <tr><td>branch</td><td><span class="badge badge-blue">Stateless</span></td><td>Split stream into multiple streams by predicate</td></tr>
+          <tr><td>peek</td><td><span class="badge badge-blue">Stateless</span></td><td>Side-effect without modifying stream (debugging/logging)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Windowing Types</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Tumbling Window</div>
+        <p style="color:var(--text2);font-size:12px;">Fixed-size, non-overlapping. Every record falls in exactly one window. <em>e.g., hourly reports.</em></p>
+        <code style="display:block;margin-top:8px;font-size:11px;">TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(5))</code>
+      </div>
+      <div class="card">
+        <div class="card-title">Hopping Window</div>
+        <p style="color:var(--text2);font-size:12px;">Fixed-size, overlapping. Advance &lt; size. Records can be in multiple windows. <em>e.g., 5-min window, 1-min hop.</em></p>
+        <code style="display:block;margin-top:8px;font-size:11px;">TimeWindows.of(Duration.ofMinutes(5)).advanceBy(Duration.ofMinutes(1))</code>
+      </div>
+      <div class="card">
+        <div class="card-title">Session Window</div>
+        <p style="color:var(--text2);font-size:12px;">Variable-size based on activity gaps. Merges windows within inactivity period. <em>e.g., user sessions.</em></p>
+        <code style="display:block;margin-top:8px;font-size:11px;">SessionWindows.ofInactivityGapWithNoGrace(Duration.ofMinutes(30))</code>
+      </div>
+      <div class="card">
+        <div class="card-title">Sliding Window</div>
+        <p style="color:var(--text2);font-size:12px;">Created based on record timestamps. Window defined by maxTimeDifference between records. <em>e.g., per-record context.</em></p>
+        <code style="display:block;margin-top:8px;font-size:11px;">SlidingWindows.ofTimeDifferenceWithNoGrace(Duration.ofMinutes(5))</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Kafka Streams Code Example</div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java — Word Count with Windowing</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre><span class="var">StreamsBuilder</span> builder = <span class="kw">new</span> <span class="fn">StreamsBuilder</span>();
+
+<span class="var">KStream</span>&lt;<span class="var">String</span>, <span class="var">String</span>&gt; events = builder.<span class="fn">stream</span>(<span class="str">"input-topic"</span>);
+
+<span class="var">KTable</span>&lt;<span class="var">Windowed</span>&lt;<span class="var">String</span>&gt;, <span class="var">Long</span>&gt; wordCounts = events
+    .<span class="fn">flatMapValues</span>(v -&gt; <span class="var">Arrays</span>.<span class="fn">asList</span>(v.<span class="fn">toLowerCase</span>().<span class="fn">split</span>(<span class="str">"\\s+"</span>)))
+    .<span class="fn">groupBy</span>((k, word) -&gt; word)
+    .<span class="fn">windowedBy</span>(<span class="var">TimeWindows</span>.<span class="fn">ofSizeWithNoGrace</span>(<span class="var">Duration</span>.<span class="fn">ofMinutes</span>(<span class="num">1</span>)))
+    .<span class="fn">count</span>(<span class="var">Materialized</span>.<span class="fn">as</span>(<span class="str">"word-count-store"</span>));
+
+wordCounts.<span class="fn">toStream</span>()
+    .<span class="fn">map</span>((window, count) -&gt; <span class="kw">new</span> <span class="fn">KeyValue</span>&lt;&gt;(window.<span class="fn">key</span>(), count.<span class="fn">toString</span>()))
+    .<span class="fn">to</span>(<span class="str">"output-topic"</span>, <span class="var">Produced</span>.<span class="fn">with</span>(<span class="var">Serdes</span>.<span class="fn">String</span>(), <span class="var">Serdes</span>.<span class="fn">String</span>()));
+
+<span class="var">Properties</span> props = <span class="kw">new</span> <span class="fn">Properties</span>();
+props.<span class="fn">put</span>(<span class="var">StreamsConfig</span>.APPLICATION_ID_CONFIG, <span class="str">"word-count-app"</span>);
+props.<span class="fn">put</span>(<span class="var">StreamsConfig</span>.BOOTSTRAP_SERVERS_CONFIG, <span class="str">"broker:9092"</span>);
+props.<span class="fn">put</span>(<span class="var">StreamsConfig</span>.PROCESSING_GUARANTEE_CONFIG, <span class="var">StreamsConfig</span>.EXACTLY_ONCE_V2);
+
+<span class="var">KafkaStreams</span> streams = <span class="kw">new</span> <span class="fn">KafkaStreams</span>(builder.<span class="fn">build</span>(), props);
+streams.<span class="fn">start</span>();</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 6: KAFKA CONNECT ═══ -->
+<section class="section" id="s6">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2 class="section-title">Kafka Connect</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Connect Architecture</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Component</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Source Connector</td><td>Ingests data FROM external system INTO Kafka (DB, S3, API, logs)</td></tr>
+          <tr><td>Sink Connector</td><td>Exports data FROM Kafka TO external system (HDFS, Elasticsearch, DB)</td></tr>
+          <tr><td>Worker</td><td>JVM process running connectors. Standalone (dev) or Distributed (prod) mode.</td></tr>
+          <tr><td>Task</td><td>Unit of work. Connector splits work into N tasks for parallelism.</td></tr>
+          <tr><td>Converter</td><td>Serializes/deserializes data (Avro, JSON, Protobuf). Configured at worker level.</td></tr>
+          <tr><td>SMT</td><td>Single Message Transform. Lightweight in-flight transformation without writing custom code.</td></tr>
+          <tr><td>DLQ</td><td>Dead Letter Queue. Routes failed/malformed records for inspection &amp; retry.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Popular Connectors</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Connector</th><th>Direction</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Debezium (CDC)</td><td><span class="badge badge-green">Source</span></td><td>Reads DB binlogs (MySQL, Postgres, MongoDB). Change Data Capture. Low-latency CDC.</td></tr>
+          <tr><td>JDBC Connector</td><td><span class="badge badge-blue">Source/Sink</span></td><td>Polls DB tables. Supports timestamp/incrementing/bulk modes.</td></tr>
+          <tr><td>S3 Sink</td><td><span class="badge badge-orange">Sink</span></td><td>Partitions data by time/field. ORC/Parquet/JSON formats. Ideal for data lakes.</td></tr>
+          <tr><td>HDFS Connector</td><td><span class="badge badge-orange">Sink</span></td><td>Writes to HDFS with Hive integration. Partitioning support.</td></tr>
+          <tr><td>Elasticsearch Sink</td><td><span class="badge badge-orange">Sink</span></td><td>Indexes Kafka records into Elasticsearch. Schema mapping.</td></tr>
+          <tr><td>MirrorMaker 2</td><td><span class="badge badge-green">Source</span></td><td>Cross-cluster replication. Active-active &amp; active-passive topologies.</td></tr>
+          <tr><td>BigQuery Sink</td><td><span class="badge badge-orange">Sink</span></td><td>Streams Kafka records to BigQuery tables with schema auto-detection.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Common SMTs (Single Message Transforms)</div>
+    <div class="grid-2">
+      <ul class="bullet-list">
+        <li><code>ReplaceField</code> — rename or drop fields</li>
+        <li><code>MaskField</code> — mask sensitive data</li>
+        <li><code>InsertField</code> — add static or metadata fields</li>
+        <li><code>ExtractField</code> — pull value from nested struct</li>
+      </ul>
+      <ul class="bullet-list">
+        <li><code>TimestampConverter</code> — convert timestamp formats</li>
+        <li><code>Filter</code> — drop records by predicate</li>
+        <li><code>ValueToKey</code> — promote record fields to message key</li>
+        <li><code>Flatten</code> — flatten nested struct into flat schema</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 7: SCHEMA REGISTRY ═══ -->
+<section class="section" id="s7">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2 class="section-title">Schema Registry &amp; Serialization</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Compatibility Modes</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Mode</th><th>Description</th><th>Safe Changes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-green">BACKWARD</span> (default)</td>
+            <td>New schema can read data written with previous schema</td>
+            <td>Delete fields, add optional fields with defaults</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">FORWARD</span></td>
+            <td>Previous schema can read data written with new schema</td>
+            <td>Add fields, delete optional fields</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-purple">FULL</span></td>
+            <td>Both backward and forward compatible</td>
+            <td>Only add/remove optional fields with defaults</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">BACKWARD_TRANSITIVE</span></td>
+            <td>Compatible with ALL previous versions (not just last)</td>
+            <td>Strictest backward; best for long-term safety</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-red">NONE</span></td>
+            <td>No compatibility checks</td>
+            <td>Any schema change (use only in dev)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-tip">
+      <span class="callout-label">💡 Wire Format</span>
+      Every message serialized with Schema Registry has a 5-byte prefix: <strong>[Magic Byte 0x00] [4-byte Schema ID]</strong> followed by the Avro/Protobuf payload. Consumers use the schema ID to look up the correct schema dynamically.
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 8: PERFORMANCE ═══ -->
+<section class="section" id="s8">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2 class="section-title">Performance Tuning</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Tuning Cheat Sheet</div>
+    <div class="grid-2">
+      <div>
+        <div class="sub-title" style="font-size:13px;">Producer Throughput</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Parameter</th><th>Direction</th></tr></thead>
+            <tbody>
+              <tr><td>batch.size</td><td>↑ 64KB–1MB</td></tr>
+              <tr><td>linger.ms</td><td>↑ 5–20ms</td></tr>
+              <tr><td>compression.type</td><td>snappy / lz4</td></tr>
+              <tr><td>buffer.memory</td><td>↑ if blocking</td></tr>
+              <tr><td>acks</td><td>1 (tradeoff)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="sub-title" style="font-size:13px;">Consumer Throughput</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Parameter</th><th>Direction</th></tr></thead>
+            <tbody>
+              <tr><td>fetch.min.bytes</td><td>↑ 1MB+</td></tr>
+              <tr><td>fetch.max.wait.ms</td><td>↑ 500ms</td></tr>
+              <tr><td>max.poll.records</td><td>↑ 1000–5000</td></tr>
+              <tr><td>num.consumers</td><td>= partition count</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Broker Configuration (Production Defaults)</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Parameter</th><th>Recommended</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>num.partitions</td><td>3–12 per topic</td><td>Base parallelism; can only increase later</td></tr>
+          <tr><td>default.replication.factor</td><td>3</td><td>Survive one broker failure</td></tr>
+          <tr><td>min.insync.replicas</td><td>2 (with RF=3)</td><td>Required with acks=all for safety guarantee</td></tr>
+          <tr><td>log.retention.hours</td><td>168 (7 days)</td><td>Adjust per storage budget</td></tr>
+          <tr><td>log.segment.bytes</td><td>1GB</td><td>Balance between compaction speed and file count</td></tr>
+          <tr><td>unclean.leader.election.enable</td><td>false</td><td>Prevent out-of-sync replica from becoming leader</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Consumer Lag Monitoring</div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">CLI</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre><span class="cmt"># Describe consumer group lag</span>
+kafka-consumer-groups.sh --bootstrap-server broker:<span class="num">9092</span> \
+  --describe --group my-consumer-group
+
+<span class="cmt"># Output columns:</span>
+<span class="cmt"># TOPIC  PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG  CONSUMER-ID</span>
+
+<span class="cmt"># Lag = LOG-END-OFFSET - CURRENT-OFFSET</span>
+<span class="cmt"># A growing lag means consumers can't keep up with producers</span></pre>
+    </div>
+    <div class="callout callout-warn">
+      <span class="callout-label">⚠️ Lag Alert</span>
+      Growing consumer lag is the most critical SLA metric. Remediation: add more partitions + scale consumers proportionally, optimize processing logic, use async processing, or reduce message size.
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 9: SECURITY ═══ -->
+<section class="section" id="s9">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2 class="section-title">Security</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Authentication Mechanisms</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Mechanism</th><th>Layer</th><th>Use Case</th></tr></thead>
+        <tbody>
+          <tr><td>SSL/TLS</td><td><span class="badge badge-blue">Transport</span></td><td>Encryption in transit. mTLS for mutual certificate auth.</td></tr>
+          <tr><td>SASL/PLAIN</td><td><span class="badge badge-yellow">App</span></td><td>Username/password. Always combine with SSL in production.</td></tr>
+          <tr><td>SASL/SCRAM-SHA-256/512</td><td><span class="badge badge-yellow">App</span></td><td>Challenge-response. Credentials stored in ZooKeeper/KRaft.</td></tr>
+          <tr><td>SASL/GSSAPI</td><td><span class="badge badge-yellow">App</span></td><td>Kerberos. Enterprise standard. High complexity.</td></tr>
+          <tr><td>SASL/OAUTHBEARER</td><td><span class="badge badge-yellow">App</span></td><td>OAuth2 tokens. Cloud / modern environments.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">ACL Management</div>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">CLI — ACLs</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+      <pre><span class="cmt"># Grant produce access</span>
+kafka-acls.sh --bootstrap-server broker:<span class="num">9092</span> --add \
+  --allow-principal User:alice \
+  --operation Write --topic my-topic
+
+<span class="cmt"># Grant consume access (topic + consumer group)</span>
+kafka-acls.sh --bootstrap-server broker:<span class="num">9092</span> --add \
+  --allow-principal User:alice \
+  --operation Read --topic my-topic
+
+kafka-acls.sh --bootstrap-server broker:<span class="num">9092</span> --add \
+  --allow-principal User:alice \
+  --operation Read --group my-group
+
+<span class="cmt"># List ACLs for topic</span>
+kafka-acls.sh --bootstrap-server broker:<span class="num">9092</span> \
+  --list --topic my-topic</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 10: CLI ═══ -->
+<section class="section" id="s10">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2 class="section-title">Essential CLI Commands</h2>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="sub-title">Topic Management</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">kafka-topics.sh</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <pre><span class="cmt"># Create topic</span>
+kafka-topics.sh --bootstrap-server broker:<span class="num">9092</span> \
+  --create --topic my-topic \
+  --partitions <span class="num">6</span> --replication-factor <span class="num">3</span>
+
+<span class="cmt"># List all topics</span>
+kafka-topics.sh --bootstrap-server broker:<span class="num">9092</span> --list
+
+<span class="cmt"># Describe topic</span>
+kafka-topics.sh --bootstrap-server broker:<span class="num">9092</span> \
+  --describe --topic my-topic
+
+<span class="cmt"># Alter partitions (increase only)</span>
+kafka-topics.sh --bootstrap-server broker:<span class="num">9092</span> \
+  --alter --topic my-topic --partitions <span class="num">12</span>
+
+<span class="cmt"># Delete topic</span>
+kafka-topics.sh --bootstrap-server broker:<span class="num">9092</span> \
+  --delete --topic my-topic</pre>
+      </div>
+    </div>
+    <div>
+      <div class="sub-title">Consumer Groups</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">kafka-consumer-groups.sh</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <pre><span class="cmt"># List all consumer groups</span>
+kafka-consumer-groups.sh \
+  --bootstrap-server broker:<span class="num">9092</span> --list
+
+<span class="cmt"># Describe group (shows lag)</span>
+kafka-consumer-groups.sh \
+  --bootstrap-server broker:<span class="num">9092</span> \
+  --describe --group my-group
+
+<span class="cmt"># Reset offsets to earliest</span>
+kafka-consumer-groups.sh \
+  --bootstrap-server broker:<span class="num">9092</span> \
+  --group my-group --topic my-topic \
+  --reset-offsets --to-earliest --execute
+
+<span class="cmt"># Reset to specific offset</span>
+kafka-consumer-groups.sh \
+  --bootstrap-server broker:<span class="num">9092</span> \
+  --group my-group --topic my-topic \
+  --reset-offsets --to-offset <span class="num">1000</span> --execute</pre>
+      </div>
+    </div>
+    <div>
+      <div class="sub-title">Producer &amp; Consumer Testing</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Console Tools</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <pre><span class="cmt"># Console producer with key</span>
+kafka-console-producer.sh \
+  --bootstrap-server broker:<span class="num">9092</span> \
+  --topic my-topic \
+  --property <span class="str">'key.separator=:'</span> \
+  --property <span class="str">'parse.key=true'</span>
+
+<span class="cmt"># Console consumer from beginning</span>
+kafka-console-consumer.sh \
+  --bootstrap-server broker:<span class="num">9092</span> \
+  --topic my-topic --from-beginning \
+  --property print.key=<span class="kw">true</span> \
+  --property print.timestamp=<span class="kw">true</span></pre>
+      </div>
+    </div>
+    <div>
+      <div class="sub-title">Performance Testing</div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Perf Tests</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+        <pre><span class="cmt"># Producer perf test</span>
+kafka-producer-perf-test.sh \
+  --topic test-topic \
+  --num-records <span class="num">1000000</span> \
+  --record-size <span class="num">1000</span> \
+  --throughput <span class="num">-1</span> \
+  --producer-props bootstrap.servers=broker:<span class="num">9092</span>
+
+<span class="cmt"># Consumer perf test</span>
+kafka-consumer-perf-test.sh \
+  --bootstrap-server broker:<span class="num">9092</span> \
+  --topic test-topic \
+  --messages <span class="num">1000000</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 11: INTERVIEW Q&A ═══ -->
+<section class="section" id="s11">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2 class="section-title">Top Interview Questions &amp; Answers</h2>
+  </div>
+  <p style="color:var(--text3);font-size:12px;margin-bottom:20px;font-family:var(--mono);">Click to expand answers ▾</p>
+
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">Why is Kafka so fast? What makes it performant?<span class="chevron">▼</span></div>
+    <div class="qa-a"><strong style="color:var(--accent2)">Sequential disk I/O</strong> — Kafka appends to log files sequentially; modern disks do sequential writes at 600MB/s+ vs ~100MB/s random. <strong style="color:var(--accent2)">Zero-copy</strong> — uses Linux <code>sendfile()</code> syscall to transfer data directly from page cache to network socket, bypassing user space. <strong style="color:var(--accent2)">Batching</strong> — producers/consumers batch messages, amortizing per-message overhead. <strong style="color:var(--accent2)">Compression</strong> — snappy/lz4/zstd reduce network I/O. <strong style="color:var(--accent2)">OS Page Cache</strong> — Kafka defers to the OS page cache rather than managing its own in-memory cache.</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">How does Kafka guarantee message ordering?<span class="chevron">▼</span></div>
+    <div class="qa-a">Ordering is guaranteed <strong style="color:var(--green)">per partition</strong>, not globally across a topic. To guarantee global ordering: use 1 partition (sacrifices parallelism). For per-key ordering: use message keys — same key always routes to same partition via <code>murmur2(key) % numPartitions</code>. With idempotent producer, set <code>max.in.flight.requests.per.connection=5</code> (safe with idempotence); without it, set to 1.</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">What happens when a Kafka broker fails?<span class="chevron">▼</span></div>
+    <div class="qa-a">1. ZooKeeper/KRaft detects broker failure (session timeout). 2. Controller broker receives notification. 3. Controller elects new leaders for all partitions where the failed broker was leader — choosing from the ISR. 4. Controller propagates updated metadata to all brokers. 5. Producers/consumers get <code>NotLeaderForPartitionException</code>, fetch new metadata, and reconnect to new leaders automatically. Data loss only occurs if leader fails before ISR replication AND <code>unclean.leader.election=true</code>.</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">Explain the difference between KStream, KTable, and GlobalKTable.<span class="chevron">▼</span></div>
+    <div class="qa-a"><strong style="color:var(--accent2)">KStream</strong>: Event stream — each record is an independent insert event. Think of a stream of clicks or transactions. <strong style="color:var(--accent2)">KTable</strong>: Changelog stream (materialized view) — each record is an upsert; latest value per key wins. Think of a user profile table. Partitioned like the source topic. <strong style="color:var(--accent2)">GlobalKTable</strong>: Full table replicated on ALL instances. No repartition needed for joins. Use for small lookup tables. Key join difference: KTable join uses co-partitioned data (requires same partition count + key serializer); GlobalKTable is always available locally.</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">How do you choose the right number of partitions?<span class="chevron">▼</span></div>
+    <div class="qa-a">Formula: <code>max(target_throughput / producer_throughput_per_partition, target_throughput / consumer_throughput_per_partition)</code>. Rule of thumb: ~10MB/s write per partition, ~50MB/s read. Also consider: max consumer parallelism needed, retention period × throughput × replication factor for disk estimate, number of brokers (partitions should spread evenly). <strong style="color:var(--yellow)">You can increase partitions but never decrease</strong> — plan upfront. Too many partitions: more file handles, slower failover, more memory.</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">What causes consumer lag and how do you fix it?<span class="chevron">▼</span></div>
+    <div class="qa-a"><strong>Causes:</strong> slow message processing, insufficient consumer parallelism, complex business logic, external I/O calls (DB lookups), GC pauses, rebalances. <strong>Fixes:</strong> 1. Increase partition count + scale consumer group proportionally. 2. Optimize processing (async I/O, batching). 3. Reduce <code>max.poll.records</code> if processing takes too long. 4. Horizontal scaling. 5. Use Kafka Streams with state stores for complex logic instead of external lookups. 6. Profile and remove bottlenecks in the processing pipeline.</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">Explain log compaction and when to use it.<span class="chevron">▼</span></div>
+    <div class="qa-a">Log compaction keeps at least the latest value for each message key, removing older records with the same key. Set <code>log.cleanup.policy=compact</code>. Kafka runs a background log cleaner thread that merges log segments. Use cases: KTable changelog topics, CDC (latest DB row state), user preference stores, any scenario needing "latest state" semantics. <strong style="color:var(--yellow)">NOT for</strong>: append-only event logs, audit trails, time-series data where every event matters. Null value = tombstone (delete the key from the log after compaction).</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">Kafka vs traditional message queues (RabbitMQ, SQS)?<span class="chevron">▼</span></div>
+    <div class="qa-a"><strong style="color:var(--accent2)">Kafka:</strong> Distributed log. Messages persist after consumption. Multiple consumer groups read independently. Supports replay. Partitioned for parallelism. Optimized for throughput (millions/sec). Pull-based. Great for event streaming, event sourcing, CDC. <strong style="color:var(--accent2)">Traditional MQs:</strong> Delete messages after consumption (typically). One consumer per message. Lower throughput. Push-based. Better for task queues, RPC, complex routing. <strong>Choose Kafka</strong> when you need: multiple consumers, replay, high throughput, event sourcing, durable pub/sub.</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">Design a real-time ETL pipeline using Kafka.<span class="chevron">▼</span></div>
+    <div class="qa-a">Architecture: <strong>Source DB → Debezium CDC (Connect Source) → Raw Kafka Topic → Kafka Streams (transform/enrich/filter) → Processed Topic → Sink Connector → Data Warehouse/Lake.</strong> Key considerations: Use Schema Registry with BACKWARD compatibility for schema governance. Partition by business key (customer_id, order_id) for ordering. Monitor consumer lag. Use exactly_once_v2 in Kafka Streams for correctness. Sink connector handles backpressure. Dead Letter Queue for malformed records. Separate topics per entity type. Use log compaction for latest-state topics feeding dimensions.</div>
+  </div>
+  <div class="qa-item" onclick="toggleQA(this)">
+    <div class="qa-q">What is KRaft and why does it matter?<span class="chevron">▼</span></div>
+    <div class="qa-a">KRaft (Kafka Raft) is Kafka's built-in metadata consensus protocol replacing ZooKeeper. Available production-ready since Kafka 3.3+. Benefits: simplified operations (one less system to manage), faster controller failover (&lt;1s vs minutes), dramatically higher scalability (millions of partitions vs tens of thousands), self-describing metadata via internal <code>__cluster_metadata</code> topic. Node roles: <code>controller</code> (metadata quorum), <code>broker</code> (data), or <code>combined</code> (both — for smaller deployments). ZooKeeper still supported but is being deprecated.</div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 12: MONITORING ═══ -->
+<section class="section" id="s12">
+  <div class="section-header">
+    <span class="section-num">12</span>
+    <h2 class="section-title">Monitoring &amp; Observability</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Critical JMX Metrics</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:12px 18px;background:var(--surface);">
+        <div style="display:grid;grid-template-columns:2fr 1fr 2fr;gap:8px;">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Metric</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Category</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Alert When</span>
+        </div>
+      </div>
+      <div style="padding:8px 18px;">
+        <div class="metric-row"><span class="metric-name">UnderReplicatedPartitions</span><span class="metric-cat">Broker</span><span class="metric-alert">&gt; 0 for 30s+</span></div>
+        <div class="metric-row"><span class="metric-name">ActiveControllerCount</span><span class="metric-cat">Broker</span><span class="metric-alert">!= 1 in cluster</span></div>
+        <div class="metric-row"><span class="metric-name">OfflinePartitionsCount</span><span class="metric-cat">Broker</span><span class="metric-alert">&gt; 0 (critical)</span></div>
+        <div class="metric-row"><span class="metric-name">BytesInPerSec / BytesOutPerSec</span><span class="metric-cat">Broker</span><span class="metric-alert">Near NIC capacity</span></div>
+        <div class="metric-row"><span class="metric-name">RequestHandlerAvgIdlePercent</span><span class="metric-cat">Broker</span><span class="metric-alert">&lt; 30%</span></div>
+        <div class="metric-row"><span class="metric-name">records-lag-max</span><span class="metric-cat">Consumer</span><span class="metric-alert">Growing trend</span></div>
+        <div class="metric-row"><span class="metric-name">fetch-latency-avg</span><span class="metric-cat">Consumer</span><span class="metric-alert">Abnormal spike</span></div>
+        <div class="metric-row"><span class="metric-name">record-error-rate</span><span class="metric-cat">Producer</span><span class="metric-alert">&gt; 0</span></div>
+        <div class="metric-row"><span class="metric-name">request-latency-avg</span><span class="metric-cat">Producer</span><span class="metric-alert">Abnormal spike</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Monitoring Tools</div>
+    <div class="grid-3">
+      <div class="card"><div class="card-title">Confluent Control Center</div><p style="color:var(--text2);font-size:12px;">Full observability for Confluent Platform. Schema Registry UI, consumer lag, connector status.</p></div>
+      <div class="card"><div class="card-title">Prometheus + Grafana</div><p style="color:var(--text2);font-size:12px;">JMX Exporter → Prometheus scrape → custom Grafana dashboards. Open source standard.</p></div>
+      <div class="card"><div class="card-title">AKHQ / Kafka UI</div><p style="color:var(--text2);font-size:12px;">Open source topic browser, consumer group management, schema registry, connector management.</p></div>
+      <div class="card"><div class="card-title">Burrow</div><p style="color:var(--text2);font-size:12px;">LinkedIn's consumer lag evaluation service. HTTP API for lag status per group.</p></div>
+      <div class="card"><div class="card-title">Cruise Control</div><p style="color:var(--text2);font-size:12px;">Automated partition rebalancing for Kafka clusters. LinkedIn open source.</p></div>
+      <div class="card"><div class="card-title">Datadog / New Relic</div><p style="color:var(--text2);font-size:12px;">SaaS monitoring with Kafka integrations. Auto-discovery, anomaly detection.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 13: REFERENCE ═══ -->
+<section class="section" id="s13">
+  <div class="section-header">
+    <span class="section-num">13</span>
+    <h2 class="section-title">Quick Reference</h2>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">10 Golden Rules for Kafka</div>
+    <ul class="rules-list">
+      <li><span class="rule-num">01</span>Partitions are the unit of parallelism — scale partitions to scale throughput</li>
+      <li><span class="rule-num">02</span>Same key = same partition = ordering guarantee per key</li>
+      <li><span class="rule-num">03</span>Max consumer parallelism per group = number of partitions</li>
+      <li><span class="rule-num">04</span><code>acks=all</code> + <code>min.insync.replicas=2</code> + <code>enable.idempotence=true</code> = production durability</li>
+      <li><span class="rule-num">05</span>Never decrease partition count — plan upfront or you'll regret it</li>
+      <li><span class="rule-num">06</span>Consumer lag is your most critical SLA metric — alert on sustained growth</li>
+      <li><span class="rule-num">07</span>KTable topics must use <code>log.cleanup.policy=compact</code>, not delete</li>
+      <li><span class="rule-num">08</span>ISR must have ≥ <code>min.insync.replicas</code> brokers or producers with <code>acks=all</code> will throw</li>
+      <li><span class="rule-num">09</span>Rebalances cause processing pauses — use cooperative rebalance + static membership</li>
+      <li><span class="rule-num">10</span>Schema Registry with BACKWARD_TRANSITIVE = safe rolling schema upgrades</li>
+    </ul>
+  </div>
+
+  <div class="subsection">
+    <div class="sub-title">Port Reference &amp; Formulas</div>
+    <div class="grid-2">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Port</th><th>Service</th></tr></thead>
+          <tbody>
+            <tr><td>9092</td><td>Kafka Broker (PLAINTEXT)</td></tr>
+            <tr><td>9093</td><td>Kafka Broker (SSL)</td></tr>
+            <tr><td>9094</td><td>Kafka Broker (SASL_SSL)</td></tr>
+            <tr><td>2181</td><td>ZooKeeper</td></tr>
+            <tr><td>8081</td><td>Confluent Schema Registry</td></tr>
+            <tr><td>8083</td><td>Kafka Connect REST API</td></tr>
+            <tr><td>8088</td><td>ksqlDB Server</td></tr>
+            <tr><td>9021</td><td>Confluent Control Center</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="code-block" style="margin:0">
+          <div class="code-header"><span class="code-lang">Sizing Formulas</span><div class="code-dots"><span></span><span></span><span></span></div></div>
+          <pre><span class="cmt"># Disk usage per topic</span>
+disk = avg_msg_size × msg_per_sec
+     × retention_secs × replication_factor
+
+<span class="cmt"># Example: 1KB, 10K/sec, 7 days, RF=3</span>
+<span class="cmt"># = 1024 × 10000 × 604800 × 3 ≈ 18 TB</span>
+
+<span class="cmt"># Minimum partition count</span>
+num_partitions ≥ target_throughput / <span class="num">10</span>MB/s
+
+<span class="cmt"># Consumer throughput per partition</span>
+<span class="cmt"># ~50 MB/s read (depends on processing)</span>
+
+<span class="cmt"># Heartbeat must satisfy:</span>
+heartbeat.interval.ms &lt; session.timeout.ms / <span class="num">3</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <strong>Apache Kafka Cheat Sheet</strong> — Data Engineer Interview Prep &nbsp;·&nbsp; Beginner to Mastery
+</footer>
+
+<script>
+  function scrollTo(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function toggleQA(el) {
+    el.classList.toggle('open');
+  }
+
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('.section[id]');
+  const navBtns  = document.querySelectorAll('.nav-btn');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = [...sections].indexOf(e.target);
+        navBtns.forEach((b, i) => b.classList.toggle('active', i === idx));
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-60px 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  // Stagger section animations
+  const allSections = document.querySelectorAll('.section');
+  allSections.forEach((s, i) => { s.style.animationDelay = `${i * 0.04}s`; });
+</script>
+</body>
+</html>
