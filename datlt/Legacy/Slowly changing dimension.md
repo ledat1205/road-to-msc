@@ -5,4 +5,9 @@ Always overwrite when records change. The user always observe the latest state o
 
 ![[Pasted image 20260323031255.png]]
 
-Useful when we don't care about keeping track of historical data.
+Useful when we don't care about keeping track of history
+
+# Type 2: Adding new rows
+
+Note: most used one
+
