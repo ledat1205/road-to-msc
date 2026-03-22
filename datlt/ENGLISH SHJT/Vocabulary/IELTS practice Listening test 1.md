@@ -6,6 +6,9 @@ pattern:
 	ferry + object
 	ex: they ferry passengers across the river
 	ferry A to B
-	ex: 
+	ex: he ferried goods to warehouse
 	ferry A between B and C
+	ex: boats ferry tourist between islands 
+
+
 	
