@@ -23,3 +23,8 @@ pattern:
 	counsellor for + purpose/group
 	counsellor at + place
 	talk to/ speak with a counsellor 
+
+leisure (n): free time
+pattern:
+	leisure time:
+	
