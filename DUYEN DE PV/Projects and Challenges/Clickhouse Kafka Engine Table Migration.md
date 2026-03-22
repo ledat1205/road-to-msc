@@ -1748,6 +1748,7 @@ events_local INSERT
   
 
 When a Kafka Engine MV inserts a block into `events_local`, all 10 downstream MVs also fire. If any downstream MV fails (e.g., target table disk full), the **entire Kafka Engine block fails** and the offset is not committed.
+"By default, ClickHouse MVs are best-effort — if a downstream MV fails, the primary insert still succeeds and the Kafka offset is committed, which means **silent data gaps in aggregation tables**. We set `materialized_views_ignore_errors = 0` so that any MV failure rolls back the entire block and Kafka Engine retries it. The tradeoff is that one broken MV (e.g., disk full on `campaigns_summary`) stalls ingestion for **all** tables. We accepted this because data consistency across all 10 MVs is more important than availability of the events pipeline."
 
   
 
