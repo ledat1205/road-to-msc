@@ -11,4 +11,5 @@ pattern:
 	ex: boats ferry tourist between islands 
 
 
-	
+commute (v): to travel regularly between home and work (or school)
+			
