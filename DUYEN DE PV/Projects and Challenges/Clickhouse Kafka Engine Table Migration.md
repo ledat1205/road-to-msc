@@ -2192,7 +2192,169 @@ ON CLUSTER '{cluster}' -- but only attach on ingestion shard
 
 This way, query-serving replicas aren't burdened with JSON parsing and MV execution.
 
+### The Problem With `ON CLUSTER
+
+`CREATE TABLE ... ON CLUSTER '{cluster}'` creates the table on **every node** in the cluster. If you create a Kafka Engine table ON CLUSTER, **every node** becomes a Kafka consumer. That's the opposite of what you want.
+
+```sql
+-- THIS IS WRONG: every node starts consuming from Kafka
+CREATE TABLE events_kafka ON CLUSTER '{cluster}' 
+ENGINE = Kafka SETTINGS kafka_group_name = 'ch_events' ...;
+-- Result: all 4 nodes join the same consumer group,
+-- each processes a subset of partitions — ALL nodes stressed
+```
+
+## How ClickHouse Replication Actually Works
+
+Typical cluster: **2 shards × 2 replicas = 4 nodes**
+
+```
+Shard 1:  replica 1a  ←──replication──→  replica 1b
+Shard 2:  replica 2a  ←──replication──→  replica 2b
+```
+
+`ReplicatedMergeTree` replicates data between replicas of the **same shard** via ZooKeeper. If replica 1a inserts a block, replica 1b gets it automatically.
+
+## The Actual Solution: Create Kafka Engine on Specific Nodes Only
+
+**Don't use `ON CLUSTER` for the Kafka Engine table.** Connect directly to the designated ingestion nodes and create it there:
+
+```sql
+-- Step 1: events_local exists on ALL nodes (created with ON CLUSTER, as usual)
+CREATE TABLE tiki_ads.events_local ON CLUSTER '{cluster}' (...)
+ENGINE = ReplicatedMergeTree(...)
+
+-- Step 2: Kafka Engine table ONLY on ingestion replicas
+-- Connect directly to replica 1a:
+CREATE TABLE tiki_ads.events_kafka (...) ENGINE = Kafka
+SETTINGS kafka_broker_list = '...', kafka_group_name = 'ch_events',
+         kafka_num_consumers = 2, ...;
+
+CREATE MATERIALIZED VIEW tiki_ads.events_kafka_mv TO tiki_ads.events_local
+AS SELECT ... FROM tiki_ads.events_kafka;
+
+-- Connect directly to replica 2a: (same DDL)
+CREATE TABLE tiki_ads.events_kafka (...) ENGINE = Kafka ...;
+CREATE MATERIALIZED VIEW tiki_ads.events_kafka_mv TO tiki_ads.events_local ...;
+
+-- replica 1b and 2b: NO Kafka Engine table created
+-- They receive data via ReplicatedMergeTree replication
+```
+
+The result:
+
+```
+                    Kafka (10 partitions)
+                     │           │
+            ┌────────┘           └────────┐
+            ▼                             ▼
+┌───────────────────┐          ┌───────────────────┐
+│ Shard 1            │          │ Shard 2            │
+│                    │          │                    │
+│ replica 1a (INGEST)│          │ replica 2a (INGEST)│
+│ • events_kafka ✓   │          │ • events_kafka ✓   │
+│ • events_kafka_mv ✓│          │ • events_kafka_mv ✓│
+│ • events_local     │          │ • events_local     │
+│ • JSON parse here  │          │ • JSON parse here  │
+│ • MV cascade here  │          │ • MV cascade here  │
+│        │           │          │        │           │
+│   replication      │          │   replication      │
+│        │           │          │        │           │
+│        ▼           │          │        ▼           │
+│ replica 1b (QUERY) │          │ replica 2b (QUERY) │
+│ • events_kafka ✗   │          │ • events_kafka ✗   │
+│ • events_local     │          │ • events_local     │
+│ • serves dashboards│          │ • serves dashboards│
+└───────────────────┘          └───────────────────┘
+```
+
+## The Kafka Consumer Group Coordination
+
+Both ingestion replicas (1a and 2a) join the **same** `kafka_group_name = 'ch_events'`. Kafka's consumer group protocol splits the 10 partitions between them:
+
+```
+replica 1a: consumes partitions 0-4  (kafka_num_consumers = 2 threads)
+replica 2a: consumes partitions 5-9  (kafka_num_consumers = 2 threads)
+```
+
+Total: 4 consumer threads across 2 nodes, handling 10 partitions.
+
+## What About the Downstream MVs?
+
+This is the tricky part. The 10 downstream MVs (businesses_summary, campaigns_summary, etc.) are triggered when data is inserted into `events_local`. The question is: **on which node do they fire?**
+
+**Answer: only on the node that does the INSERT** — i.e., the ingestion replicas. ReplicatedMergeTree replication sends the **already-merged data parts** to the query replicas, not the raw INSERT. So:
+
+```
+replica 1a (ingest):
+  events_kafka_mv INSERT into events_local → triggers 10 MVs ← CPU here
   
+replica 1b (query):
+  receives replicated data parts for events_local → MVs NOT triggered
+  BUT: also doesn't get MV target data (businesses_summary, etc.)!
+```
+
+**Problem**: the SummingMergeTree tables (`businesses_summary_local`, etc.) are also `Replicated*MergeTree`. They get populated on replica 1a (via MV trigger), and that data replicates to replica 1b. So it works — but you need to verify that **all MV target tables are also replicated**.
+
+```
+replica 1a:                              replica 1b:
+events_local ──(replicated)──────────→   events_local ✓
+businesses_summary_local ──(replicated)→ businesses_summary_local ✓
+campaigns_summary_local ──(replicated)─→ campaigns_summary_local ✓
+... all 10 MV targets replicate ...
+```
+
+This is already the case in your setup — all your MV target tables use `ReplicatedSummingMergeTree`.
+
+## Alternative: Cluster Groups in Config
+
+A cleaner approach is to define two cluster sub-groups in the ClickHouse config:
+
+```xml
+<!-- /etc/clickhouse-server/config.d/clusters.xml -->
+<clickhouse>
+  <remote_servers>
+    <!-- Full cluster: all nodes (for ReplicatedMergeTree tables) -->
+    <ads_cluster>
+      <shard>
+        <replica><host>ch-1a</host></replica>
+        <replica><host>ch-1b</host></replica>
+      </shard>
+      <shard>
+        <replica><host>ch-2a</host></replica>
+        <replica><host>ch-2b</host></replica>
+      </shard>
+    </ads_cluster>
+
+    <!-- Ingestion-only: one replica per shard (for Kafka Engine) -->
+    <ads_cluster_ingest>
+      <shard>
+        <replica><host>ch-1a</host></replica>
+      </shard>
+      <shard>
+        <replica><host>ch-2a</host></replica>
+      </shard>
+    </ads_cluster_ingest>
+  </remote_servers>
+</clickhouse>
+```
+
+Then you can use `ON CLUSTER` cleanly:
+
+```sql
+-- All nodes
+CREATE TABLE events_local ON CLUSTER 'ads_cluster' ...;
+
+-- Ingestion nodes only
+CREATE TABLE events_kafka ON CLUSTER 'ads_cluster_ingest' ...;
+CREATE MATERIALIZED VIEW events_kafka_mv ON CLUSTER 'ads_cluster_ingest' ...;
+```
+
+This is the proper way — DDL is version-controlled and uses `ON CLUSTER`, no manual per-node SSH needed.
+
+## What to Say in the Interview
+
+"To separate ingestion from query workload, we defined two cluster groups in ClickHouse config — `ads_cluster` for all replicated tables, and `ads_cluster_ingest` with one replica per shard for Kafka Engine tables. The ingestion replicas handle Kafka consumption, JSON/Protobuf parsing, and MV cascade execution. Query replicas receive the final data via ReplicatedMergeTree replication and serve dashboards without any ingestion CPU overhead."
 
 ---
 
