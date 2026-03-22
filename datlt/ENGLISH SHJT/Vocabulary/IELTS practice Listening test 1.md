@@ -31,4 +31,4 @@ pattern:
 	at leisure
 	ex: you can review this at your leisure
 
-narrator (n): a person who tells a story or describes a
+narrator (n): a person who tells a story or describes events
