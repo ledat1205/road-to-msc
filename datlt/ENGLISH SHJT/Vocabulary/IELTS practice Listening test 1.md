@@ -22,4 +22,4 @@ counsellor (n): a person who gives advice, guidance and support, especially for 
 pattern:
 	counsellor for + purpose/group
 	counsellor at + place
-	
+	talk to/ speak with a counsellor 
