@@ -4,6 +4,8 @@ ferry (n): boat or ship used to carry people or vehicles
 	(v): transport people or things from one place to another, usually back and forth
 pattern: 
 	ferry + object
+	ex: they ferry passengers across the river
 	ferry A to B
+	ex: 
 	ferry A between B and C
 	
