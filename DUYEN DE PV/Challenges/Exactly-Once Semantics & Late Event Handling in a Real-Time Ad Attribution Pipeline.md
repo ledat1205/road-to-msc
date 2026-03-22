@@ -221,3 +221,7 @@ When the interviewer probes, here are the technical anchors:
 ## 8. One-Line Pitch to Open the Story
 
 > _"I worked on a real-time attribution pipeline where an ad click had to be correctly credited to a purchase across three independent Kafka streams — clicks, logins, and orders. The system worked well at low traffic, but under failure conditions it violated exactly-once semantics in a way that was completely silent: no errors, no alerts, just wrong numbers in the advertiser dashboard. Walking through how I identified that and what a proper solution looks like is what I want to talk about today."_
+
+
+
+
