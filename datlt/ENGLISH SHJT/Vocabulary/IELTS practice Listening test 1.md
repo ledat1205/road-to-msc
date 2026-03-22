@@ -30,3 +30,5 @@ pattern:
 	ex: i read books in my leisure time
 	at leisure
 	ex: you can review this at your leisure
+
+narrator (n): a person who tells a story or describes a
