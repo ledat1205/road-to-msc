@@ -1,14 +1,3 @@
-# Migrating ClickHouse Workloads to Kafka Engine Tables
-
-  
-
-**Author**: Duyen Dang | **Role**: Data Engineer | **Date**: March 2026
-
-  
-
----
-
-  
 
 ## Table of Contents
 
