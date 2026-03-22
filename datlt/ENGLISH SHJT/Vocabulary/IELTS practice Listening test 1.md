@@ -14,5 +14,6 @@ pattern:
 commute (v): to travel regularly between home and work (or school)
 		(n): the journey 
 pattern: 
-	commute + to place: 
-	ex: 
+	commute + to place
+	commute from A to B
+	commute by + transport 
