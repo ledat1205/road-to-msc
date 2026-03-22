@@ -6,3 +6,4 @@ interoperability
 counterpoint
 pioneer
 maturity
+paradigm
