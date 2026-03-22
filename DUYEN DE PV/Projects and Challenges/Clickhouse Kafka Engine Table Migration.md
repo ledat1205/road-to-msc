@@ -1,82 +1,28 @@
+## Table of Contents
 
+1. [System Overview](#1-system-overview)
 
-## 1. The Problem: Bimodal Duplicate Distribution
+2. [The Legacy Architecture](#2-the-legacy-architecture)
 
-  
+3. [Problem Statement](#3-problem-statement)
 
-```
+4. [Root Cause Analysis](#4-root-cause-analysis)
 
-Distribution of duplicate event_ids over time gap (in seconds)
+5. [Solution Design](#5-solution-design)
 
-═══════════════════════════════════════════════════════════════
+6. [Implementation Deep Dive](#6-implementation-deep-dive)
 
-  
+7. [BigQuery Error Handling Fix](#7-bigquery-error-handling-fix)
 
-Count of event_ids
+8. [Testing Strategy](#8-testing-strategy)
 
-│
+9. [ClickHouse Schema & Materialized Views](#9-clickhouse-schema--materialized-views)
 
-│ ╭─────────────────╮
+10. [Results & Impact](#10-results--impact)
 
-│ │ KAFKA RETRY │ 4,243 event_ids
+11. [Future Work & Tradeoffs](#11-future-work--tradeoffs)
 
-│ │ DUPLICATES │ (0 seconds apart)
-
-│ │ Gap: 0s │
-
-│ ╰─────────────────╯
-
-│ ▲
-
-│ │
-
-│ │
-
-│ 5,000├─────●
-
-│ │ │
-
-│ │ │
-
-│ │ │ NOTHING HERE!
-
-│ │ │
-
-│ │ │ (Redis working)
-
-│ │ │
-
-│ 3,600│──────●────────────────────────────────────╮
-
-│ │ │
-
-│ │ ╭──────────────────────╮ │
-
-│ │ │ BOT REPLAY AFTER │ 29,021 event_ids
-
-│ │ │ REDIS TTL EXPIRES │ Gap: 1h-30d
-
-│ 1,000├─────│ (1h-30d apart) │
-
-│ │ ╰──────────────────────╯
-
-│ │
-
-│ 0 └──────────────────────────────────────────────┬────── Time Gap (s)
-
-│ 0 1h 1d 7d 30d
-
-  
-
-KEY INSIGHT:
-
-• Gap at 0s → Kafka fault tolerance (at-least-once retries)
-
-• Gap at 1h+ → Business problem (bot replays after TTL)
-
-• NO gap between 1s-3599s → Redis is working perfectly!
-
-```
+12. [Key Talking Points for Interview](#12-key-talking-points-for-interview)
 
   
 
@@ -84,901 +30,337 @@ KEY INSIGHT:
 
   
 
-## 2. Data Flow: Before vs. After
+## 1. System Overview
 
   
 
-### BEFORE (Broken)
-
-```
-
-User searches Ad served Pixel fired
-
-│ │ │
-
-▼ ▼ ▼
-
-┌─────────────────┐ ┌────────────────┐ ┌──────────────────┐
-
-│ Searcher │ │ Pixel Service │ │ Client │
-
-│ │ │ │ │ Browser/App │
-
-│ Generate UUID │ │ Redis dedup │ │ │
-
-│ event_id=XYZ │ │ (1h TTL) │ │ User clicks │
-
-└────────┬────────┘ │ ✓ Check key │ │ pixel URL │
-
-│ │ ✗ If missing │ │ Multiple times │
-
-│ │ → write │ │ (or bot replays) │
-
-│ │ to Kafka │ │ │
-
-│ └────────┬───────┘ │ │
-
-│ │ └────────┬─────────┘
-
-└────────────────────┴────────────────────┘
-
-│
-
-▼ Kafka Topic
-
-┌───────────────────┐
-
-│ [msg1: event_id] │ ← partition:offset = 5:10000
-
-│ [msg2: event_id] │ ← partition:offset = 5:10001
-
-│ [msg3: event_id] │ ← partition:offset = 5:10002
-
-└────────┬──────────┘
-
-│
-
-WORKER CRASHES HERE
-
-(before committing offset)
-
-│
-
-┌────────▼────────────┐
-
-│ Redelivers same │
-
-│ messages again │
-
-│ (partition:offset │
-
-│ still 5:10000-02) │
-
-└────────┬────────────┘
-
-│
-
-┌──────────────────┼──────────────────┐
-
-│ │ │
-
-▼ ▼ ▼
-
-┌──────────────────┐ ┌──────────────┐ ┌──────────────────┐
-
-│ ClickHouse │ │ BigQuery │ │ Logs (audit) │
-
-│ │ │ │ │ │
-
-│ PROBLEM: │ │ PROBLEM: │ │ ✓ Has complete │
-
-│ ✗ Duplicates │ │ ✗ Duplicates │ │ record │
-
-│ inserted │ │ (1min │ │ (but slow) │
-
-│ again │ │ window) │ │ │
-
-│ │ │ ✗ Silent │ │ BOTTLENECK: │
-
-│ event_id used │ │ data loss │ │ Slow to query │
-
-│ as dedup key │ │ (quota) │ │ Real-time not │
-
-│ (WRONG!) │ │ │ │ possible │
-
-│ │ │ InsertID= │ │ │
-
-│ Row count: │ │ event_id │ │ │
-
-│ 6 + 3 = 9 │ │ (WRONG!) │ │ │
-
-│ (should be 6) │ │ │ │ │
-
-│ │ │ Row count: │ │ │
-
-│ │ │ Varies │ │ │
-
-│ │ │ (missing │ │ │
-
-│ │ │ days on │ │ │
-
-│ │ │ quota) │ │ │
-
-└──────────────────┘ └──────────────┘ └──────────────────┘
-
-```
+### What the System Does
 
   
 
-### AFTER (Fixed)
-
-```
-
-User searches Ad served Pixel fired
-
-│ │ │
-
-▼ ▼ ▼
-
-┌─────────────────┐ ┌────────────────┐ ┌──────────────────┐
-
-│ Searcher │ │ Pixel Service │ │ Client │
-
-│ │ │ │ │ Browser/App │
-
-│ Generate UUID │ │ Redis dedup │ │ │
-
-│ event_id=XYZ │ │ (1h TTL) │ │ User clicks │
-
-└────────┬────────┘ │ ✓ Check key │ │ pixel URL │
-
-│ │ ✗ If missing │ │ Multiple times │
-
-│ │ → write │ │ (or bot replays) │
-
-│ │ to Kafka │ │ │
-
-│ └────────┬───────┘ │ │
-
-│ │ └────────┬─────────┘
-
-└────────────────────┴────────────────────┘
-
-│
-
-▼ Kafka Topic
-
-┌───────────────────┐
-
-│ [msg1] │ ← partition:offset = 5:10000
-
-│ [msg2] │ ← partition:offset = 5:10001
-
-│ [msg3] │ ← partition:offset = 5:10002
-
-└────────┬──────────┘
-
-│
-
-PROCESSOR READS & COMPUTES
-
-┌──────────────────────────┐
-
-│ Token = "p5:o10000-10002"│
-
-│ (partition:offset range) │
-
-│ (deterministic!) │
-
-│ (unique per batch!) │
-
-└────────┬─────────────────┘
-
-│
-
-WORKER CRASHES HERE
-
-(before committing offset)
-
-│
-
-┌────────▼────────────┐
-
-│ Redelivers same │
-
-│ messages again │
-
-│ (SAME TOKEN!) │
-
-│ Token = "p5:o10000 │
-
-│ -10002" (identical) │
-
-└────────┬────────────┘
-
-│
-
-┌────────────┼──────────────┐
-
-│ │ │
-
-▼ ▼ ▼
-
-┌─────────────┐ ┌──────────────┐ ┌─────────────┐
-
-│ ClickHouse │ │ BigQuery │ │ Logs │
-
-│ │ │ │ │ │
-
-│ ✓ Token set │ │ ✓ InsertID │ │ ✓ Complete │
-
-│ in │ │ = partition│ │ record │
-
-│ session │ │ :offset │ │ │
-
-│ │ │ (unique) │ │ ✓ No more │
-
-│ ✓ Duplicates│ │ │ │ gaps │
-
-│ detected │ │ ✓ All-fail │ │ │
-
-│ & skipped │ │ returns │ │ │
-
-│ (dedup │ │ error │ │ │
-
-│ works!) │ │ (no silent │ │ │
-
-│ │ │ loss!) │ │ │
-
-│ ✓ Row count │ │ │ │ │
-
-│ 6 │ │ ✓ Row count │ │ │
-
-│ (correct) │ │ 6 │ │ │
-
-│ │ │ (correct) │ │ │
-
-└─────────────┘ └──────────────┘ └─────────────┘
-
-```
+This is the **ad attribution and measurement pipeline** for Tiki's advertising platform. It tracks every ad impression (SHOW), viewability event (VIEW), and click (CLICK) across the marketplace, enabling:
 
   
 
----
+- **Real-time spend tracking** for advertisers (CPC/CPM billing)
+
+- **Attribution modeling** (which ad click led to a purchase)
+
+- **Fraud detection** (bot clicks, rate limiting, repetition detection)
+
+- **Dashboard analytics** (business/campaign/ad group-level metrics via materialized views)
 
   
 
-## 3. Root Causes: Side-by-Side Comparison
+### End-to-End Data Flow
 
   
 
 ```
 
-╔════════════════════════════╦═════════════════════════════╦══════════════════════════════╗
-
-║ ROOT CAUSE 1 ║ ROOT CAUSE 2 ║ ROOT CAUSE 3 ║
-
-║ Kafka At-Least-Once ║ Bot Replay After TTL ║ Silent Data Loss in BQ ║
-
-╠════════════════════════════╬═════════════════════════════╬══════════════════════════════╣
-
-║ TIME GAP: 0 seconds ║ TIME GAP: 1h-30d ║ TIME GAP: Variable ║
-
-║ COUNT: ~4,243 event_ids ║ COUNT: ~29,021 event_ids ║ COUNT: Entire days lost ║
-
-║ ║ ║ ║
-
-║ MECHANISM: ║ MECHANISM: ║ MECHANISM: ║
-
-║ ║ ║ ║
-
-║ 1. Worker processes batch ║ 1. Bot fires pixel at T=0s ║ 1. Worker sends 2K rows to ║
-
-║ 2. Inserts to CH/BQ ✓ ║ 2. Redis key set (1h TTL) ║ BigQuery Inserter.Put() ║
-
-║ 3. CRASHES (mid-commit) ║ 3. Message sent to Kafka ║ 2. Quota exceeded ║
-
-║ 4. Offset NOT committed ║ 4. Inserted to CH/BQ ║ 3. Returns PutMultiError ║
-
-║ 5. Kafka redelivers same ║ ║ (all rows rejected) ║
-
-║ batch (partition:offset ║ 5. At T=3600s: Redis key ║ 4. Code logs error but ║
-
-║ unchanged) ║ expires ║ doesn't return it ║
-
-║ 6. Same rows inserted ║ 6. Bot fires again ║ 5. Falls through → returns ║
-
-║ again with 0s gap ║ 7. Passes repetition ║ nil (success!) ║
-
-║ ║ detector → new Kafka ║ 6. Offset committed ║
-
-║ SOLUTION: ║ message ║ 7. ALL rows silently ║
-
-║ ║ 8. Inserted again ║ dropped! ║
-
-║ Use partition:offset as ║ (1h+ gap) ║ ║
-
-║ dedup token. When batch ║ ║ SOLUTION: ║
-
-║ redelivered, token is ║ SOLUTION: ║ ║
-
-║ IDENTICAL. ClickHouse/BQ ║ ║ Check if len(multiErr) == ║
-
-║ dedup tokens → skips ║ Option 1 (preferred): ║ len(queue). If yes, return ║
-
-║ duplicate insert. ║ Accept as fraud measurement ║ error → don't commit offset ║
-
-║ ║ (same ad, different day = ║ → batch retried on restart. ║
-
-║ VERIFICATION: ║ legitimate view) ║ ║
-
-║ ║ ║ VERIFICATION: ║
-
-║ Kill worker mid-batch. ║ Option 2 (future): ║ ║
-
-║ Restart. Row count = ║ Use ReplacingMergeTree to ║ Check CloudLogging for ║
-
-║ same (idempotent!). ║ auto-dedupe on key. ║ RESOURCE_EXHAUSTED errors. ║
-
-║ ║ ║ ║
-
-║ ║ Option 3 (future): ║ After fix, no more gaps ║
-
-║ ║ Increase Redis TTL to 24h ║ in BQ dashboard. ║
-
-║ ║ (reduces window, not ║ ║
-
-║ ║ eliminates). ║ ║
-
-╚════════════════════════════╩═════════════════════════════╩══════════════════════════════╝
-
-```
-
-  
-
----
-
-  
-
-## 4. The Dedup Token Pattern
-
-  
-
-```
-
-┌─────────────────────────────────────────────────────────────────────────┐
-
-│ DEDUP TOKEN GENERATION │
-
-└─────────────────────────────────────────────────────────────────────────┘
-
-  
-
-Kafka Messages (batch)
-
-═════════════════════════════
-
-┌──────────┐
-
-│ msg0 │ Partition: 5
-
-│ Offset: 10000
-
-└──────────┘
-
-┌──────────┐
-
-│ msg1 │ Partition: 5
-
-│ Offset: 10001
-
-└──────────┘
-
-┌──────────┐
-
-│ msg2 │ Partition: 5
-
-│ Offset: 10002
-
-└──────────┘
+Searcher Service (ranks ads, generates UUID event_id)
 
 │
 
 ▼
 
-┌─────────────────────────┐
+Pixel Service (golang/cmd/pixel/)
 
-│ batchDedupToken() │
+│
 
-│ │
+├─ HTTP GET /pixel?data=<encoded>&pos=1&redirect=<url>
 
-│ first = msg[0] │
+│
 
-│ last = msg[len-1] │
+├─ preparePixel()
 
-│ │
+│ ├─ Unmarshal encrypted pixel data
 
-│ token = sprintf( │
+│ ├─ Validate match/advert entities from storage
 
-│ "p%d:o%d-%d", │
+│ ├─ Determine status (ACTIVE | NO_BALANCE | NOT_FOUND_*)
 
-│ first.Partition, │
+│ └─ Recompute pricing if budget insufficient
 
-│ first.Offset, │
+│
 
-│ last.Offset) │
+├─ Repetition Detector (Redis SetNX, 1h TTL)
 
-│ │
+│ └─ Blocks same event_id for 1 hour
 
-│ token = "p5:o10000-10002"
+│
 
-└─────────────────────────┘
+├─ PostProcessPixel()
+
+│ ├─ Fill ranking factors from Redis cache (set by searcher)
+
+│ ├─ Cache viewed ads per user (10-min Redis window)
+
+│ ├─ Multi-fraud detection pipeline:
+
+│ │ ├─ EventTooOld (reject stale pixels)
+
+│ │ ├─ ConsecutiveEvents (same advert click < 1min)
+
+│ │ ├─ RateLimiter (per-customer/business thresholds)
+
+│ │ └─ ViewedDetector (click without preceding view = bot)
+
+│ ├─ Frequency capping event tracking
+
+│ └─ Write to Kafka (partitioned by cookie/trackity hash)
+
+│
+
+└─ Returns: 1x1 transparent GIF + optional redirect URL
 
 │
 
 ▼
 
-┌─────────────────────────┐
-
-│ Attach to context │
-
-│ │
-
-│ ctx = WithDedupToken( │
-
-│ ctx, token) │
-
-│ │
-
-│ Carry through pipeline: │
-
-│ Processor → Writer │
-
-└─────────────────────────┘
+Kafka Topics (ad_events / msp_events)
 
 │
 
-▼
+┌────────┴────────┐
 
-┌─────────────────────────┐
+▼ ▼
 
-│ Extract from context │
+CH Worker BQ Worker
 
-│ │
-
-│ token, ok := │
-
-│ dedupTokenFromCtx(ctx)│
-
-│ │
-
-│ if ok { │
-
-│ writeWithDedupToken() │
-
-│ } │
-
-└─────────────────────────┘
-
-│
-
-▼
-
-┌───────────────────────────────────────────────────────────────────────────┐
-
-│ ClickHouse Session-Level Dedup │
-
-│ ═══════════════════════════════════════════ │
-
-│ │
-
-│ Step 1: Pin exclusive connection │
-
-│ ──────────────────────────────────── │
-
-│ conn := db.Conn(ctx) │
-
-│ defer conn.Close() │
-
-│ │
-
-│ Step 2: Set token in THIS connection's session │
-
-│ ──────────────────────────────────────────── │
-
-│ conn.ExecContext(ctx, │
-
-│ "SET insert_deduplication_token='p5:o10000-10002'") │
-
-│ │
-
-│ Step 3: Begin transaction IN THE SAME SESSION │
-
-│ ─────────────────────────────────────────────── │
-
-│ tx := conn.BeginTx(ctx, nil) ← Same connection, same session │
-
-│ │
-
-│ Step 4: Insert rows (inherits SET from earlier) │
-
-│ ────────────────────────────────────────────── │
-
-│ For each row: │
-
-│ prepare.Exec(values...) ← Runs in session with token set │
-
-│ │
-
-│ Step 5: Commit transaction │
-
-│ ──────────────────────────── │
-
-│ tx.Commit() │
-
-│ │
-
-│ RESULT: ClickHouse dedup table records (token, block_hash) │
-
-│ ══════════════════════════════════════════════════════════════ │
-
-│ On 1st call: INSERT → rows added, token stored │
-
-│ On 2nd call: INSERT with same token → rows skipped (idempotent!) │
-
-│ │
-
-└───────────────────────────────────────────────────────────────────────────┘
-
-```
-
-  
-
----
-
-  
-
-## 5. Idempotency Guarantee Timeline
-
-  
-
-```
-
-SCENARIO: Worker crashes mid-commit, then restarts
-
-  
-
-Timeline (Real Wall Clock)
-
-═════════════════════════════════════════════════════════════════════════════
-
-  
-
-T=0s
-
-├─ Kafka Consumer polls
-
-│ └─ Receives: [msg0(p5:o10000), msg1(p5:o10001), msg2(p5:o10002)]
-
-│ (3 messages from partition 5, offsets 10000-10002)
-
-│
-
-├─ Processor.bulkProcess()
-
-│ └─ Computes: token = "p5:o10000-10002"
-
-│ └─ Calls: ctx = WithDedupToken(ctx, token)
-
-│
-
-├─ Writer.Write(ctx)
-
-│ └─ Extracts: token from context ✓
-
-│ └─ Calls: writeWithDedupToken(ctx, token, messages)
-
-│
-
-├─ writeWithDedupToken()
-
-│ ├─ Pins connection: conn := db.Conn(ctx)
-
-│ │
-
-│ ├─ Set token: conn.ExecContext("SET insert_deduplication_token=...")
-
-│ │ └─ ClickHouse server stores token in session
-
-│ │
-
-│ ├─ Begin transaction: tx := conn.BeginTx()
-
-│ │ └─ Transaction begins in SAME session
-
-│ │
-
-│ └─ Execute inserts
-
-│ ├─ prepare.Exec(row1) → ClickHouse inserts row1
-
-│ │ └─ ClickHouse records (token, block_hash_1) in dedup table
-
-│ ├─ prepare.Exec(row2) → ClickHouse inserts row2
-
-│ │ └─ ClickHouse records (token, block_hash_2) in dedup table
-
-│ └─ prepare.Exec(row3) → ClickHouse inserts row3
-
-│ └─ ClickHouse records (token, block_hash_3) in dedup table
-
-│
-
-├─ tx.Commit() → rows persisted ✓
-
-│
-
-├─ Reader.CommitMessages() → offset marked as processed
-
-│ └─ ... BUT CRASHES BEFORE COMPLETING!
-
-│
-
-└─ 💥 WORKER CRASHED 💥
-
-  
-
-═════════════════════════════════════════════════════════════════════════════
-
-  
-
-T=10s
-
-├─ Worker restarts
-
-│ └─ Reconnects to Kafka broker
-
-│
-
-├─ Consumer Group rebalancing
-
-│ └─ Consumer requests offset for partition 5
-
-│ └─ Kafka returns: offset 10000 (NOT COMMITTED, so rollback to last commit)
-
-│
-
-├─ Kafka Consumer polls
-
-│ └─ Receives: [msg0(p5:o10000), msg1(p5:o10001), msg2(p5:o10002)]
-
-│ (SAME messages, SAME partition:offset)
-
-│
-
-├─ Processor.bulkProcess()
-
-│ └─ Computes: token = "p5:o10000-10002"
-
-│ (SAME TOKEN! Because same partition:offset)
-
-│
-
-├─ Writer.Write(ctx)
-
-│ └─ Calls: writeWithDedupToken(ctx, token, messages)
-
-│
-
-├─ writeWithDedupToken()
-
-│ ├─ Pins connection: conn := db.Conn(ctx)
-
-│ │
-
-│ ├─ Set token: conn.ExecContext("SET insert_deduplication_token=...")
-
-│ │ └─ ClickHouse server stores token in session
-
-│ │
-
-│ ├─ Begin transaction: tx := conn.BeginTx()
-
-│ │
-
-│ └─ Execute inserts
-
-│ ├─ prepare.Exec(row1) → ClickHouse checks dedup table
-
-│ │ └─ (token, block_hash_1) already exists!
-
-│ │ └─ ❌ SKIPPED (not inserted)
-
-│ ├─ prepare.Exec(row2) → ClickHouse checks dedup table
-
-│ │ └─ (token, block_hash_2) already exists!
-
-│ │ └─ ❌ SKIPPED (not inserted)
-
-│ └─ prepare.Exec(row3) → ClickHouse checks dedup table
-
-│ └─ (token, block_hash_3) already exists!
-
-│ └─ ❌ SKIPPED (not inserted)
-
-│
-
-├─ tx.Commit() → 0 rows inserted (but transaction succeeds!)
-
-│
-
-├─ Reader.CommitMessages() → offset marked as processed
-
-│ └─ ✓ SUCCEEDS this time
-
-│
-
-└─ 🎉 IDEMPOTENCY ACHIEVED 🎉
-
-  
-
-═════════════════════════════════════════════════════════════════════════════
-
-  
-
-VERIFICATION (after T=10s):
-
-─────────────────────────
-
-  
-
-Before crash (T=0-5s):
-
-SELECT count() FROM tiki_ads.events → 3 rows
-
-  
-
-After restart (T=10s):
-
-SELECT count() FROM tiki_ads.events → still 3 rows (not 6!)
-
-  
-
-Conclusion: Same batch processed twice → same final row count
-
-= IDEMPOTENT = SAFE ✓
-
-```
-
-  
-
----
-
-  
-
-## 6. Error Handling Logic
-
-  
-
-```
-
-┌─────────────────────────────────────────────────────┐
-
-│ BigQuery Write with Error Handling │
-
-└─────────────────────────────────────────────────────┘
-
-  
-
-Worker.writeToBQ(batch of 2K rows)
-
-│
-
-▼
-
-bigquery.Inserter.Put(rows)
-
-│
-
-┌─────────────┴──────────────┐
-
-│ │
-
-✓ nil ❌ error (some or all rows rejected)
-
-│ │
-
-return nil Inspect error type
-
-│ │
-
-offset │
-
-committed ┌─────┴─────────┐
-
-│ │
-
-Type A Type B
-
-(Network, Auth) (PutMultiError)
-
-error rows failed
-
-│ │
-
-return err ┌─────┴──────────┐
-
-│ │ │
-
-offset NOT len(err) == len(batch)
-
-committed (all rows rejected)
+(adevents) (adevents)
 
 │ │
 
 ▼ ▼
 
-RETRY return err
+ClickHouse BigQuery
 
-on restart (quota exceeded,
-
-schema mismatch,
-
-table locked)
-
-│
-
-offset NOT
-
-committed
+(events_local) (tikiads.events)
 
 │
 
 ▼
 
-RETRY
+Materialized Views
 
-on restart
+(businesses_summary_mv, campaigns_summary_mv, adgroups_summary_mv)
+
+```
 
   
 
-len(err) < len(batch)
+### Technology Stack
 
-(partial failure,
+  
 
-some rows invalid)
+| Component | Technology |
 
-│
+|-----------|-----------|
 
-▼
+| Pixel Service | Go HTTP service |
 
-Log failures:
+| Message Queue | Apache Kafka (segmentio/kafka-go) |
 
-for _, rowErr := range err {
+| OLAP Store (primary) | ClickHouse (ReplicatedMergeTree, clustered) |
 
-log(rowErr)
+| OLAP Store (secondary) | Google BigQuery |
+
+| Caching / Dedup | Redis Cluster (SetNX for repetition detection) |
+
+| Attribution Index | MySQL (click/view lookups for order attribution) |
+
+| Serialization | JSON (Kafka messages), Protobuf (internal) |
+
+  
+
+---
+
+  
+
+## 2. The Legacy Architecture
+
+  
+
+### Kafka Consumer Worker (`golang/cmd/worker/adevents/`)
+
+  
+
+The worker is a long-running Go process that:
+
+  
+
+1. **Consumes** messages from a Kafka topic using `segmentio/kafka-go`
+
+2. **Batches** messages by size (`QueueSize`) or time (`MaxTimeInQueue`)
+
+3. **Writes** the batch to either ClickHouse or BigQuery (selected via `writer_type` env var)
+
+4. **Commits** Kafka offsets only after successful write
+
+  
+
+```go
+
+// processor.go - Core processing loop
+
+func (p *Processor) Process(ctx context.Context) error {
+
+for {
+
+m, err := p.reader.FetchMessage(ctx)
+
+// ... error handling ...
+
+p.queue = append(p.queue, m)
+
+if len(p.queue) >= p.batchQueueSize || time.Since(p.lastFlush) > p.maxTimeInQueue {
+
+if err := p.flush(); err != nil {
+
+return err
 
 }
 
-│
+}
 
-▼
+}
+
+}
+
+  
+
+func (p *Processor) flush() error {
+
+// Step 1: Write to database
+
+if err := p.bulkProcess(p.queue); err != nil { return err }
+
+// Step 2: Commit offsets (only if write succeeded)
+
+if err := p.commitKafka(p.queue); err != nil { return err }
+
+p.queue = p.queue[:0]
 
 return nil
 
-(implicit success)
+}
 
-│
+```
 
-▼
+  
 
-offset
+### Writer Composition Pattern (Generics)
 
-committed
+  
 
-(accept loss
+The codebase uses a composable, generic writer pattern:
 
-of bad rows)
+  
+
+```go
+
+// Writer interface (golang/pkg/db/writer/writer.go)
+
+type Writer[T any] interface {
+
+Write(ctx context.Context, messages ...T) error
+
+Close() error
+
+}
+
+  
+
+// Type-safe transformation
+
+func Map[A, B any](w Writer[B], f func(A) B) Writer[A]
+
+```
+
+  
+
+**ClickHouse writer chain:**
+
+```
+
+PixelView → Map(convert2ClickhouseDTO) → AutoRetryWriter(2 retries, 10s sleep)
+
+→ MultiWriters (multiple CH clusters, fail-soft on secondaries)
+
+→ DBWriter (sql.DB bulk INSERT via prepared statements)
+
+```
+
+  
+
+**BigQuery writer chain:**
+
+```
+
+PixelView → BQWriter (bigquery.Inserter.Put with StructSaver)
+
+```
+
+  
+
+### ClickHouse Table Schema
+
+  
+
+```sql
+
+-- scripts/db/clickhouse/events.sql
+
+CREATE TABLE tiki_ads.events_local ON CLUSTER '{cluster}' (
+
+received_date Date,
+
+request_id String,
+
+type Enum8('SHOW'=1, 'CLICK'=2, 'VIEW'=3, 'NESTED_VIEW'=4),
+
+zone_id String,
+
+status String,
+
+position UInt64,
+
+fraud_code UInt64,
+
+business_id UInt64,
+
+campaign_id UInt64,
+
+ad_group_id UInt64,
+
+advert_id UInt64,
+
+match_id UInt64,
+
+event_id UUID,
+
+price Float64,
+
+-- ... 25+ more columns
+
+) ENGINE = ReplicatedMergeTree(...)
+
+PARTITION BY toYYYYMMDD(received_date)
+
+ORDER BY (received_date, type, zone_id, status, position, fraud_code,
+
+campaign_id, ad_group_id, advert_id, match_id, ...);
+
+  
+
+-- Distributed table for cross-shard queries
+
+CREATE TABLE tiki_ads.events ON CLUSTER '{cluster}'
+
+AS tiki_ads.events_local
+
+ENGINE = Distributed('{cluster}', 'tiki_ads', 'events_local', rand());
 
 ```
 
@@ -988,167 +370,557 @@ of bad rows)
 
   
 
-## 7. Interview Flow (12-Minute Version)
+## 3. Problem Statement
+
+  
+
+### Observed Symptoms
+
+  
+
+1. **~33,264 duplicate event_ids in ClickHouse** over a 30-day window
+
+2. **~26,494 duplicate event_ids in BigQuery** over the same window
+
+3. **Missing data in BigQuery** on certain days (entire days with no rows)
+
+4. **Dashboard inconsistency** between ClickHouse and BigQuery totals
+
+  
+
+### Data Investigation: Bimodal Distribution
+
+  
+
+By querying the time gap between duplicate event_ids, a clear bimodal pattern emerged:
+
+  
+
+| Time Gap Bucket | ClickHouse event_ids | BigQuery event_ids | Root Cause |
+
+|----------------|---------------------|-------------------|------------|
+
+| **0 seconds** | 4,243 | 2,795 | Kafka at-least-once retries |
+
+| **1 second - 1 hour** | 0 | 0 | (Redis working perfectly) |
+
+| **1 hour - 1 day** | 25,713 | 21,026 | Bot replay after Redis TTL |
+
+| **1 day - 30 days** | 3,308 | 2,673 | Bot replay (longer interval) |
+
+  
+
+**Key insight**: The gap between 0s and 1h (zero duplicates) proves Redis repetition detection works correctly within its TTL window.
+
+  
+
+---
+
+  
+
+## 4. Root Cause Analysis
+
+  
+
+### Root Cause 1: Kafka At-Least-Once Delivery (0s gap duplicates)
+
+  
+
+**Mechanism:**
+
+1. Worker processes a batch of N messages from Kafka
+
+2. Successfully writes rows to ClickHouse/BigQuery
+
+3. **Crashes before committing the Kafka offset**
+
+4. On restart, Kafka redelivers the same batch (same partition:offset)
+
+5. Same rows inserted again → duplicates with 0-second time gap
+
+  
+
+**Why it's a problem**: The legacy code used `event_id` (a business-level UUID) as the deduplication key. But `event_id` is **not** a transport-level identifier—it's generated by the Searcher service and represents a business event, not a Kafka delivery attempt.
+
+  
+
+### Root Cause 2: Bot Replay After Redis TTL (1h+ gap duplicates)
+
+  
+
+**Mechanism:**
+
+1. Bot fires pixel at T=0 → Redis key set with 1-hour TTL → event enters Kafka
+
+2. At T=3600s: Redis key expires
+
+3. Bot fires same pixel again → passes repetition detector → new Kafka message
+
+4. Same `event_id`, different Kafka message → duplicate row with 1h+ gap
+
+  
+
+**Why this is actually correct behavior**: These represent separate measurement events. A bot clicking the same ad on different days should be counted for fraud measurement purposes, not silently deduplicated.
+
+  
+
+### Root Cause 3: Silent Data Loss in BigQuery
+
+  
+
+**The bug** (in `event_bigquery_writer.go`):
+
+  
+
+```go
+
+// BEFORE (broken)
+
+func (w BQWriter) Write(ctx context.Context, pixels ...PixelView) error {
+
+// ...
+
+if err := w.inserter.Put(ctx, queue); err != nil {
+
+multiErr, ok := err.(bigquery.PutMultiError)
+
+if !ok {
+
+return errors.Wrapf(err, "error when writing to Bigquery")
+
+}
+
+// ALL rows rejected (e.g., quota exceeded) → just log, don't return error
+
+for _, rowError := range multiErr {
+
+w.l.Errorm("error inserting to BigQuery:", "error", rowError)
+
+}
+
+}
+
+return nil // ← BUG: returns nil even when ALL rows were rejected!
+
+}
+
+```
+
+  
+
+When BigQuery quota was exceeded, `PutMultiError` contained rejections for **every** row in the batch. The code logged these errors but returned `nil`, causing the Kafka offset to be committed. Result: **entire batches silently dropped**.
+
+  
+
+---
+
+  
+
+## 5. Solution Design
+
+  
+
+### Core Principle: Separate Business Keys from Transport Keys
+
+  
+
+| Concept | Business Key | Transport Key |
+
+|---------|-------------|---------------|
+
+| **Identity** | `event_id` (UUID from Searcher) | `partition:offset` (from Kafka) |
+
+| **Uniqueness** | Per ad impression | Per Kafka delivery attempt |
+
+| **Duplicates mean** | Bot replay / fraud | Infrastructure retry |
+
+| **Should deduplicate?** | No (preserve for fraud measurement) | Yes (infrastructure artifact) |
+
+  
+
+### Dedup Token Strategy
+
+  
+
+Generate a deterministic token from the Kafka batch's partition and offset range:
 
   
 
 ```
 
-╔════════════════════════════════════════════════════════════════════════════╗
+Token = "p{partition}:o{first_offset}-{last_offset}"
 
-║ INTERVIEW PRESENTATION OUTLINE ║
+  
 
-║ (12 minutes total) ║
+Example: 3 messages from partition 5, offsets 10000-10002
 
-╠════════════════════════════════════════════════════════════════════════════╣
+Token = "p5:o10000-10002"
 
-║ ║
+```
 
-║ [0:00-1:30] PROBLEM STATEMENT ║
+  
 
-║ ─────────────────────────────────── ║
+**Properties:**
 
-║ • "We observed ~33,000 duplicate event_ids across ClickHouse & BigQuery" ║
+- **Deterministic**: Same Kafka messages always produce the same token
 
-║ • Created bimodal distribution query (show the data) ║
+- **Unique**: Different batches have different offset ranges
 
-║ • Found two different problems: 0s gap and 1h+ gap ║
+- **Idempotent**: On crash-recovery, the redelivered batch produces the identical token
 
-║ → Shows: investigative thinking, data-driven approach ║
+  
 
-║ ║
+### ClickHouse Solution: `insert_deduplication_token`
 
-├─────────────────────────────────────────────────────────────────────────────┤
+  
 
-║ ║
+ClickHouse's `ReplicatedMergeTree` supports session-level dedup tokens. When the same token appears twice, the second INSERT is silently skipped.
 
-║ [1:30-3:30] ROOT CAUSE ANALYSIS ║
+  
 
-║ ─────────────────────────────── ║
+### BigQuery Solution: `InsertID` = `partition:offset`
 
-║ • Kafka at-least-once retries (0s gap) ║
+  
 
-║ └─ Worker crashes mid-commit → batch redelivered ║
+BigQuery's streaming API deduplicates rows with the same `InsertID` within a ~1 minute window. Changing from `event_id` to `partition:offset` ensures Kafka retries (which happen within seconds) are deduplicated.
 
-║ ║
+  
 
-║ • Bot replay after Redis TTL expires (1h+ gap) ║
+---
 
-║ └─ Redis key expires → bot fires same event_id again ║
+  
 
-║ ║
+## 6. Implementation Deep Dive
 
-║ • Silent data loss in BigQuery ║
+  
 
-║ └─ PutMultiError logged but not returned → offset committed anyway ║
+### 6.1 Context-Based Token Propagation
 
-║ → Shows: deep understanding of distributed systems ║
+  
 
-║ ║
+The dedup token is computed at the processor level and propagated via Go's `context.Context` to the writer layer:
 
-├─────────────────────────────────────────────────────────────────────────────┤
+  
 
-║ ║
+```go
 
-║ [3:30-5:00] WHY event_id DOESN'T WORK ║
+// golang/pkg/db/writer/ — context helpers (new code)
 
-║ ──────────────────────────────────── ║
+type dedupTokenKey struct{}
 
-║ • event_id = business key (ad impression) ║
+  
 
-║ • Can be fired multiple times (bot, network retry, user re-engagement) ║
+func WithDedupToken(ctx context.Context, token string) context.Context {
 
-║ • Using it as dedup key → hides fraud, hides infrastructure bugs ║
+return context.WithValue(ctx, dedupTokenKey{}, token)
 
-║ • Need transport-level key: partition:offset (unique, deterministic) ║
+}
 
-║ → Shows: separation of concerns, system design thinking ║
+  
 
-║ ║
+func DedupTokenFromCtx(ctx context.Context) (string, bool) {
 
-├─────────────────────────────────────────────────────────────────────────────┤
+token, ok := ctx.Value(dedupTokenKey{}).(string)
 
-║ ║
+return token, ok && token != ""
 
-║ [5:00-7:30] CLICKHOUSE SOLUTION ║
+}
 
-║ ──────────────────────────────── ║
+```
 
-║ • ClickHouse has insert_deduplication_token (but session-level) ║
+  
 
-║ • Show code: context injection pattern ║
+### 6.2 Batch Token Generation
 
-║ • Show code: connection pinning (why needed!) ║
+  
 
-║ • Explain: SET and INSERT must share same session ║
+```go
 
-║ → Shows: hands-on implementation, SQL session semantics ║
+// processor.go — new function
 
-║ ║
+func batchDedupToken(messages []kafka.Message) string {
 
-├─────────────────────────────────────────────────────────────────────────────┤
+if len(messages) == 0 {
 
-║ ║
+return ""
 
-║ [7:30-9:00] BIGQUERY SOLUTION ║
+}
 
-║ ────────────────────────────── ║
+first := messages[0]
 
-║ • Changed InsertID from event_id to partition:offset ║
+last := messages[len(messages)-1]
 
-║ • Fixed error handling: distinguish all-fail vs. partial-fail ║
+return fmt.Sprintf("p%d:o%d-%d", first.Partition, first.Offset, last.Offset)
 
-║ • Show code: error handling before/after ║
+}
 
-║ • Explain: PutMultiError semantics ║
+```
 
-║ → Shows: attention to error handling, observability ║
+  
 
-║ ║
+### 6.3 Modified `writeToCH` (Processor Layer)
 
-├─────────────────────────────────────────────────────────────────────────────┤
+  
 
-║ ║
+```go
 
-║ [9:00-10:30] TESTING & VERIFICATION ║
+// processor.go — modified to inject dedup token into context
 
-║ ──────────────────────────────────── ║
+func (p *Processor) writeToCH(ctx context.Context, messages []kafka.Message) error {
 
-║ • Built local Docker Compose environment ║
+var queue []PixelView
 
-║ • Produce test events (6 events: 3 unique, 3 duplicates) ║
+for _, m := range messages {
 
-║ • Kill worker mid-batch, restart ║
+event := PixelView{}
 
-║ • Verify: row count unchanged (idempotent!) ║
+if err := (&event).UnmarshalFromJSON(m.Value); err != nil {
 
-║ → Shows: pragmatism, reproducible testing ║
+return errors.Wrapf(err, "error when unmarshal kafka message:%v", m)
 
-║ ║
+}
 
-├─────────────────────────────────────────────────────────────────────────────┤
+queue = append(queue, event)
 
-║ ║
+}
 
-║ [10:30-12:00] RESULTS & TRADEOFFS ║
+  
 
-║ ───────────────────────────────── ║
+// NEW: Compute and inject dedup token from Kafka offsets
 
-║ • 100% dedup of Kafka retries (4,243 event_ids) ║
+token := batchDedupToken(messages)
 
-║ • Bot replays preserved (29,021 event_ids, fraud measurement intact) ║
+if token != "" {
 
-║ • No silent data loss (error handling fixed) ║
+ctx = writer.WithDedupToken(ctx, token)
 
-║ • Deferred: ReplacingMergeTree (would dedupe bot replays too) ║
+}
 
-║ └─ But requires schema migration, adds complexity ║
+  
 
-║ → Shows: systems thinking, pragmatic tradeoffs ║
+start := time.Now()
 
-║ ║
+defer func() {
 
-╚════════════════════════════════════════════════════════════════════════════╝
+metric.Histogram(metric.GatewayResponseTimeName, "clickhouse", "bulk insert").
+
+Observe(time.Since(start).Seconds())
+
+}()
+
+if err := p.writer.Write(ctx, queue...); err != nil {
+
+return errors.Wrapf(err, "error when write %d rows to clickhouse", len(queue))
+
+}
+
+return nil
+
+}
+
+```
+
+  
+
+### 6.4 Modified `DBWriter.Write` (Writer Layer)
+
+  
+
+The key challenge: ClickHouse's `insert_deduplication_token` is a **session-level setting**. The `SET` command and the `INSERT` must execute on the **same connection** within the **same session**.
+
+  
+
+```go
+
+// golang/pkg/db/writer/db_writer.go — modified Write method
+
+func (w DBWriter[T]) Write(ctx context.Context, messages ...T) error {
+
+if len(messages) == 0 {
+
+return nil
+
+}
+
+  
+
+// Check if a dedup token was injected via context
+
+if token, ok := DedupTokenFromCtx(ctx); ok {
+
+return w.writeWithDedupToken(ctx, token, messages...)
+
+}
+
+return w.writePlain(ctx, messages...)
+
+}
+
+  
+
+func (w DBWriter[T]) writeWithDedupToken(ctx context.Context, token string, messages ...T) error {
+
+// CRITICAL: Pin a single connection to ensure SET and INSERT share the same session
+
+conn, err := w.db.Conn(ctx)
+
+if err != nil {
+
+return errors.Wrap(err, "error pinning connection for dedup")
+
+}
+
+defer conn.Close()
+
+  
+
+// Step 1: Set the dedup token on THIS connection's session
+
+setSQL := fmt.Sprintf("SET insert_deduplication_token='%s'", token)
+
+if _, err := conn.ExecContext(ctx, setSQL); err != nil {
+
+return errors.Wrapf(err, "error setting dedup token")
+
+}
+
+  
+
+// Step 2: Begin transaction on the SAME connection
+
+tx, err := conn.BeginTx(ctx, nil)
+
+if err != nil {
+
+return errors.Wrap(err, "error when begin bulk insert to CH")
+
+}
+
+defer func() {
+
+if err != nil {
+
+tx.Rollback()
+
+}
+
+}()
+
+  
+
+// Step 3: Prepare and execute INSERT (inherits SET from session)
+
+prepare, err := tx.Prepare(w.sqlQuery)
+
+if err != nil {
+
+return errors.Wrap(err, "error when prepare statement")
+
+}
+
+defer prepare.Close()
+
+  
+
+for _, record := range messages {
+
+values := GetValues(record)
+
+if _, err = prepare.Exec(values...); err != nil {
+
+return errors.Wrapf(err, "error when insert record: %v", record)
+
+}
+
+}
+
+  
+
+if err = tx.Commit(); err != nil {
+
+return errors.Wrapf(err, "error when commits %d records", len(messages))
+
+}
+
+return nil
+
+}
+
+```
+
+  
+
+**Why connection pinning matters**: Without `db.Conn(ctx)`, Go's `database/sql` pool may assign the `SET` and `INSERT` to different connections, making the dedup token ineffective. This is a subtle but critical detail of ClickHouse's session semantics.
+
+  
+
+### 6.5 Modified BigQuery Writer
+
+  
+
+```go
+
+// event_bigquery_writer.go — two changes
+
+  
+
+// Change 1: InsertID from partition:offset instead of event_id
+
+func (w BQWriter) Write(ctx context.Context, pixels ...PixelView) error {
+
+var queue = make([]*bigquery.StructSaver, 0, len(pixels))
+
+for _, pixel := range pixels {
+
+queue = append(queue, &bigquery.StructSaver{
+
+Struct: convert2BigQueryDTO(pixel),
+
+InsertID: pixel.InsertID, // NEW: set from partition:offset, not event_id
+
+})
+
+}
+
+// ... (see error handling fix below)
+
+}
+
+```
+
+  
+
+The `InsertID` field is populated at the processor level from Kafka message metadata:
+
+  
+
+```go
+
+// processor.go — writeToBQ modified
+
+func (p *Processor) writeToBQ(ctx context.Context, messages []kafka.Message) error {
+
+var queue = make([]PixelView, 0, len(messages))
+
+for _, m := range messages {
+
+event := PixelView{}
+
+if err := (&event).UnmarshalFromJSON(m.Value); err != nil {
+
+return errors.Wrapf(err, "error when unmarshal kafka message:%v", m)
+
+}
+
+event.InsertID = fmt.Sprintf("%d:%d", m.Partition, m.Offset) // NEW
+
+queue = append(queue, event)
+
+}
+
+// ...
+
+}
 
 ```
 
@@ -1158,95 +930,309 @@ of bad rows)
 
   
 
-## 8. Key Numbers to Memorize
+## 7. BigQuery Error Handling Fix
+
+  
+
+### The Bug: Silent Data Loss
+
+  
+
+```go
+
+// BEFORE: All PutMultiErrors are logged but swallowed
+
+if err := w.inserter.Put(ctx, queue); err != nil {
+
+multiErr, ok := err.(bigquery.PutMultiError)
+
+if !ok {
+
+return errors.Wrapf(err, "error when writing to Bigquery")
+
+}
+
+for _, rowError := range multiErr {
+
+w.l.Errorm("error inserting to BigQuery:", "error", rowError)
+
+}
+
+}
+
+return nil // Always returns nil for PutMultiError!
+
+```
+
+  
+
+### The Fix: Distinguish All-Fail vs. Partial-Fail
+
+  
+
+```go
+
+// AFTER: Return error when ALL rows are rejected
+
+if err := w.inserter.Put(ctx, queue); err != nil {
+
+multiErr, ok := err.(bigquery.PutMultiError)
+
+if !ok {
+
+return errors.Wrapf(err, "error when writing to Bigquery")
+
+}
+
+  
+
+// NEW: If ALL rows failed, return error → prevents Kafka offset commit
+
+if len(multiErr) == len(queue) {
+
+return fmt.Errorf("all %d rows rejected by BigQuery: %v", len(queue), multiErr[0])
+
+}
+
+  
+
+// Partial failure: log bad rows, continue (accept loss of invalid rows)
+
+for _, rowError := range multiErr {
+
+w.l.Errorm("error inserting to BigQuery:", "error", rowError)
+
+}
+
+}
+
+return nil
+
+```
+
+  
+
+**Impact**: When BigQuery quota is exhausted (RESOURCE_EXHAUSTED), the worker no longer commits the offset. On restart, the batch is retried and succeeds when quota recovers.
+
+  
+
+---
+
+  
+
+## 8. Testing Strategy
+
+  
+
+### Unit Tests (No External Dependencies)
+
+  
+
+**Processor-level dedup tests** (`processor_dedup_test.go`):
+
+  
+
+| Test | What It Verifies |
+
+|------|-----------------|
+
+| `Test_batchDedupToken` | Token format: `"p2:o50-50"` for single msg, `"p0:o100-199"` for batch |
+
+| `Test_writeToCH_setsDedupTokenOnContext` | Token propagated via `context.Context` to writer |
+
+| `Test_writeToCH_sameBatchProducesSameToken` | Crash-recovery: identical batch → identical token |
+
+| `Test_writeToCH_differentBatchesProduceDifferentTokens` | Different offsets → different tokens |
+
+  
+
+**DBWriter-level dedup tests** (`db_writer_dedup_test.go`):
+
+  
+
+| Test | What It Verifies |
+
+|------|-----------------|
+
+| `TestDBWriter_Write_WithDedupToken` | SQL contains `SETTINGS insert_deduplication_token='...'` |
+
+| `TestDBWriter_Write_WithoutDedupToken` | No SETTINGS clause when no token present |
+
+| `TestDBWriter_Write_EmptyDedupToken` | Empty token falls back to plain INSERT path |
+
+  
+
+**BigQuery dedup tests** (`bq_dedup_test.go`):
+
+  
+
+| Test | What It Verifies |
+
+|------|-----------------|
+
+| `Test_writeToBQ_setsInsertIDFromPartitionOffset` | InsertID = `"0:100"`, `"1:200"` etc. |
+
+| `Test_BQWriter_Write_allRowsFail_returnsError` | Quota exceeded → error returned → offset not committed |
+
+| `Test_BQWriter_Write_partialFailure_returnsNil` | Partial failure → nil returned → offset committed |
+
+  
+
+### Integration Test (Real ClickHouse)
+
+  
+
+```go
+
+// Requires INTEGRATION_TEST=1 and VPN access
+
+func Test_writeToCH_dedup_integration(t *testing.T) {
+
+// 1. Create temp table on dev ClickHouse
+
+// 2. Write batch of 3 messages
+
+// 3. Verify: count = 3
+
+// 4. Write SAME batch again (crash-recovery simulation)
+
+// 5. Verify: count still = 3 (on ReplicatedMergeTree)
+
+}
+
+```
+
+  
+
+### Local Test Environment
+
+  
+
+A Docker Compose setup (`testenv/`) provides:
+
+- Local ClickHouse with non-replicated MergeTree (for syntax validation)
+
+- Schema matching production (`testenv/init.sql`)
+
+  
+
+---
+
+  
+
+## 9. ClickHouse Schema & Materialized Views
+
+  
+
+### Materialized Views for Real-Time Aggregation
+
+  
+
+The pipeline powers real-time dashboards through ClickHouse's materialized views, which automatically aggregate data as it's inserted into `events_local`:
+
+  
+
+```sql
+
+-- Business-level spend summary (auto-updated on INSERT)
+
+CREATE MATERIALIZED VIEW tiki_ads.businesses_summary_mv_local
+
+ENGINE = ReplicatedSummingMergeTree(...)
+
+PARTITION BY toYYYYMMDD(received_date)
+
+ORDER BY (id, received_date, fraud_code)
+
+AS
+
+SELECT
+
+business_id AS id,
+
+received_date,
+
+fraud_code,
+
+sumIf(price, cash_type != 'TEST') AS spent,
+
+countIf(type = 'CLICK') AS clicks,
+
+countIf(type = 'SHOW') AS shows,
+
+countIf(type = 'VIEW') AS views
+
+FROM tiki_ads.events_local
+
+WHERE status = 'ACTIVE'
+
+GROUP BY business_id, fraud_code, received_date;
+
+```
+
+  
+
+**Three levels of aggregation**:
+
+- `businesses_summary_mv` → Business-level spend, clicks, shows, views
+
+- `campaigns_summary_mv` → Campaign-level (grouped by campaign_id + business_id)
+
+- `adgroups_summary_mv` → Ad group-level (grouped by ad_group_id + campaign_id)
+
+  
+
+**Why duplicates break these views**: `SummingMergeTree` **sums** values on merge. If a batch is inserted twice, the views count double spend, double clicks, etc. The dedup token fix ensures each batch is only materialized once.
+
+  
+
+### Attribution Pipeline
+
+  
+
+Orders flow through a separate Kafka consumer that looks up the original ad click/view:
 
   
 
 ```
 
-╔══════════════════════════════════════════════════════════════════════╗
+Order Event (Kafka) → Order Worker
 
-║ QUICK REFERENCE NUMBERS ║
+→ GetAttributedPixels (MySQL: click index, then view index)
 
-╠══════════════════════════════════════════════════════════════════════╣
+→ Write Attribution → ClickHouse attributions table
 
-║ ║
+```
 
-║ DUPLICATES BEFORE FIX: ║
+  
 
-║ • ClickHouse: ~33,264 event_ids ║
+The `attributions` table uses `ReplicatedMergeTree` with compression codecs:
 
-║ └─ 4,243 with 0s gap (Kafka retries) ║
+```sql
 
-║ └─ 25,713 with 1h-1d gap (bot replay) ║
+CREATE TABLE tiki_ads.attributions_local (
 
-║ └─ 3,308 with 1d-30d gap (bot replay older) ║
+received_date Date CODEC(DoubleDelta, LZ4),
 
-║ ║
+business_id UInt64 CODEC(Gorilla, LZ4),
 
-║ • BigQuery: ~26,494 event_ids ║
+order_id UInt64,
 
-║ └─ 2,795 with 0s gap ║
+order_code String,
 
-║ └─ 21,026 with 1h-1d gap ║
+price Float64,
 
-║ └─ 2,673 with 1d-30d gap ║
+qty Int64,
 
-║ ║
+total Float64,
 
-║ DEDUPLICATION AFTER FIX: ║
+event_id UUID,
 
-║ • 0s gap duplicates: 100% deduped (Kafka retries) ║
+type String, -- CLICK or VIEW
 
-║ • 1h+ gap duplicates: Preserved (fraud measurement) ║
+-- ...
 
-║ ║
-
-║ SYSTEM CHARACTERISTICS: ║
-
-║ • Throughput: ~120 events/sec sustained ║
-
-║ • Batch size: 2K messages (tunable) ║
-
-║ • Batch window: 60 seconds (tunable) ║
-
-║ • ClickHouse latency: < 100ms per batch ║
-
-║ • BigQuery latency: ~40 seconds per batch ║
-
-║ • Dedup overhead: < 1ms (negligible) ║
-
-║ ║
-
-║ REDIS TTL (CONTEXT): ║
-
-║ • Repetition detector TTL: 1 hour ║
-
-║ • After expiry: bot can fire same event_id again ║
-
-║ ║
-
-║ BIGQUERY InsertID WINDOW: ║
-
-║ • Dedup window: ~1 minute ║
-
-║ • Perfect for catching Kafka retries (within seconds) ║
-
-║ • Allows bot replays (after 1 min boundary) ║
-
-║ ║
-
-║ CODE CHANGES: ║
-
-║ • Total insertions: 84 lines ║
-
-║ • Total deletions: 7 lines ║
-
-║ • Files modified: 5 ║
-
-║ ║
-
-╚══════════════════════════════════════════════════════════════════════╝
+) ENGINE = ReplicatedMergeTree(...)
 
 ```
 
@@ -1256,105 +1242,63 @@ of bad rows)
 
   
 
-## 9. Potential Follow-Up Questions & Answers
+## 10. Results & Impact
 
   
 
-```
-
-Q: "Why not just use a dedup table / distributed cache?"
-
-A: "We could, but that adds latency (extra read before write) and
-
-complexity (distributed consistency). ClickHouse's built-in token
-
-is simpler, faster, and atomic."
+### Deduplication Effectiveness
 
   
 
-Q: "What about clock skew / timestamp ordering issues?"
+| Metric | Before | After |
 
-A: "We don't rely on timestamps for dedup—we use partition:offset,
+|--------|--------|-------|
 
-which is monotonic and issued by Kafka brokers. Timestamps only
+| 0s gap duplicates (Kafka retries) | ~4,243 event_ids | **0** (100% deduped) |
 
-matter for data columns (received_time), set by the pixel service."
+| 1h+ gap duplicates (bot replays) | ~29,021 event_ids | **Preserved** (correct behavior) |
 
-  
+| Silent BQ data loss | Entire days missing | **0** (error handling fixed) |
 
-Q: "Why is the INSERT happening, but later being skipped?"
-
-A: "The INSERT statement still runs, but ClickHouse silently skips it
-
-at commit time. This is ClickHouse's dedup mechanism—it checks the
-
-dedup table before committing, not before executing."
+| CH ↔ BQ consistency | Divergent | **Consistent** |
 
   
 
-Q: "What if same event_id gets different row data in the retry?"
-
-A: "Kafka message bytes are identical on retry (deterministic), so
-
-all columns will match. ClickHouse dedup is at block level
-
-(all rows in INSERT), so as long as the JSON is identical, dedup works."
+### Performance Characteristics
 
   
 
-Q: "How does this scale to multi-partition Kafka?"
+| Metric | Value |
 
-A: "Token is built from first + last message in batch. If batch spans
+|--------|-------|
 
-multiple partitions, token is 'p1:o1000-p2:o2000' or similar.
+| Throughput | ~120 events/sec sustained |
 
-Scaling is linear (more partitions = more workers)."
+| Batch size | 2,000 messages (configurable) |
 
-  
+| ClickHouse batch latency | < 100ms |
 
-Q: "What about the ReplacingMergeTree approach?"
+| BigQuery batch latency | ~6s per 1K rows (~40s for full batch) |
 
-A: "It would deduplicate on a key (event_id + zone_id + received_date),
-
-covering both Kafka retries AND bot replays. But it requires:
-
-- Schema migration (downtime)
-
-- FINAL keyword on all queries (slower)
-
-- Background merge timing (eventual consistency)
-
-Current solution is faster, simpler, and good enough for our use case."
+| Dedup overhead | < 1ms (one `SET` command per batch) |
 
   
 
-Q: "How do you know the offset wasn't committed?"
-
-A: "When worker restarts, it asks Kafka for the last committed offset.
-
-If crash happened before commit, Kafka returns the previous offset,
-
-not the new one. Consumer rewinds and redelivers same messages."
+### Code Change Scope
 
   
 
-Q: "What if BigQuery quota is temporarily exceeded, then recovered?"
+| Metric | Value |
 
-A: "Our fix returns an error when all rows fail, preventing offset commit.
+|--------|-------|
 
-Worker retries from Kafka. When BQ quota recovers, retry succeeds."
+| Files modified | 5 |
 
-  
+| Lines added | ~84 |
 
-Q: "Can you guarantee no duplicates at all?"
+| Lines removed | ~7 |
 
-A: "We guarantee idempotency for Kafka retries (0s gap). Bot replays
-
-(1h+ gap) are intentional—they represent separate measurement events.
-
-This is correct behavior for fraud detection."
-
-```
+| New test files | 3 |
 
   
 
@@ -1362,74 +1306,150 @@ This is correct behavior for fraud detection."
 
   
 
-## 10. One-Slide Summary (If Time is Short)
+## 11. Future Work & Tradeoffs
 
   
 
-```
+### Considered but Deferred: ReplacingMergeTree
 
-╔════════════════════════════════════════════════════════════════════════════╗
+  
 
-║ ║
+`ReplacingMergeTree` would deduplicate on a composite key (`event_id + zone_id + received_date`), covering both Kafka retries AND bot replays. However:
 
-║ ClickHouse Kafka Streaming Pipeline ║
+  
 
-║ ║
+- Requires schema migration with potential downtime
 
-║ PROBLEM: 33K duplicate events due to at-least-once Kafka retries ║
+- All queries need the `FINAL` keyword (slower reads)
 
-║ ║
+- Dedup happens on background merge (eventual consistency)
 
-║ ROOT CAUSE: ║
+- Current solution is simpler and sufficient
 
-║ • event_id (business key) ≠ partition:offset (transport key) ║
+  
 
-║ • Worker crash mid-commit → batch redelivered → duplicates ║
+### Considered but Deferred: ClickHouse Kafka Engine Tables
 
-║ • Silent data loss in BigQuery (PutMultiError not returned) ║
+  
 
-║ ║
+ClickHouse supports `ENGINE = Kafka` which lets ClickHouse natively consume from Kafka:
 
-║ SOLUTION: ║
+  
 
-║ 1. Use partition:offset as dedup token (deterministic, unique) ║
+```sql
 
-║ 2. ClickHouse: session-level insert_deduplication_token ║
+CREATE TABLE tiki_ads.events_kafka
 
-║ (with connection pinning to ensure SET + INSERT in same session) ║
+ENGINE = Kafka
 
-║ 3. BigQuery: InsertID = partition:offset (instead of event_id) ║
+SETTINGS kafka_broker_list = 'broker:9092',
 
-║ + fix error handling (all-fail → return error, partial → log) ║
+kafka_topic_list = 'ad_events',
 
-║ ║
+kafka_group_name = 'ch_consumer',
 
-║ RESULT: ║
+kafka_format = 'JSONEachRow';
 
-║ ✓ 100% idempotent (Kafka retries deduped, idempotency guaranteed) ║
+  
 
-║ ✓ Bot replays preserved (fraud measurement intact) ║
+CREATE MATERIALIZED VIEW tiki_ads.events_mv TO tiki_ads.events_local AS
 
-║ ✓ No silent data loss (error handling fixed) ║
-
-║ ✓ Minimal code changes (84 lines across 5 files) ║
-
-║ ✓ Fully testable locally (Docker Compose) ║
-
-║ ║
-
-║ IMPACT: ║
-
-║ • Attribution accuracy improved ║
-
-║ • Dashboard consistency (CH ≈ BQ) ║
-
-║ • Safe worker restarts ║
-
-║ • Observable, debuggable pipeline ║
-
-║ ║
-
-╚════════════════════════════════════════════════════════════════════════════╝
+SELECT * FROM tiki_ads.events_kafka;
 
 ```
+
+  
+
+**Pros**: Eliminates the Go worker entirely, lower latency, native ClickHouse dedup
+
+**Cons**: Loses the pre-processing flexibility (fraud enrichment, DTO conversion), harder to debug, less control over error handling and retry logic
+
+  
+
+### Redis TTL Increase
+
+  
+
+Increasing Redis repetition detector TTL from 1 hour to 24 hours would reduce the bot replay window but not eliminate it entirely. Also increases Redis memory usage.
+
+  
+
+---
+
+  
+
+## 12. Key Talking Points for Interview
+
+  
+
+### 1. Data-Driven Investigation
+
+- Started with a SQL query to classify duplicates by time gap
+
+- The bimodal distribution revealed two separate problems
+
+- "No duplicates between 1s-3599s" proved Redis was working correctly
+
+  
+
+### 2. Separation of Concerns (Business vs Transport Keys)
+
+- `event_id` = business key (ad impression identity)
+
+- `partition:offset` = transport key (Kafka delivery attempt)
+
+- Using business keys for transport-level dedup conflates fraud detection with infrastructure resilience
+
+  
+
+### 3. ClickHouse Session Semantics (Connection Pinning)
+
+- `insert_deduplication_token` is session-level, not query-level
+
+- `SET` and `INSERT` must execute on the same connection
+
+- Go's `database/sql` connection pool can assign them to different connections
+
+- Solution: `db.Conn(ctx)` pins a single connection for the entire operation
+
+  
+
+### 4. Error Handling Subtlety (BigQuery PutMultiError)
+
+- `PutMultiError` can mean "1 bad row" or "all 2000 rows rejected (quota)"
+
+- Original code treated both the same (log and continue)
+
+- Fix: `len(errors) == len(batch)` → return error → prevent offset commit → retry on restart
+
+  
+
+### 5. Idempotency Guarantee
+
+- Same Kafka batch → same partition:offset → same dedup token → same result
+
+- Achieves exactly-once semantics on top of at-least-once delivery
+
+- Zero data loss, zero duplicates from infrastructure retries
+
+  
+
+### 6. Minimal, Surgical Change
+
+- 84 lines added across 5 files
+
+- No schema changes required
+
+- Backward compatible (no token = legacy behavior)
+
+- Comprehensive test coverage for all paths
+
+  
+
+### 7. Understanding When NOT to Deduplicate
+
+- Bot replays after Redis TTL are intentional measurement events
+
+- Deduplicating them would hide fraud signals
+
+- Correct answer: deduplicate infrastructure artifacts, preserve business events
