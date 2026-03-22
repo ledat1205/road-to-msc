@@ -26,5 +26,7 @@ pattern:
 
 leisure (n): free time
 pattern:
-	leisure time:
-	
+	leisure time
+	ex: i read books in my leisure time
+	at leisure
+	ex: you can review this at your leisure
