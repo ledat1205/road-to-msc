@@ -225,3 +225,164 @@ When the interviewer probes, here are the technical anchors:
 
 
 
+### First, clarify what "waiting" actually means
+
+Flink does not literally pause and sleep. Instead, it uses **event time** (the timestamp embedded in the message itself, not the wall clock) and a **watermark** — a signal that says:
+
+> _"I am confident that no event with event_time < W will arrive on this stream anymore."_
+
+When a watermark W passes through the pipeline, Flink knows it is safe to **finalize any computation that depends on events with event_time ≤ W**.
+
+---
+
+### The concrete scenario from your system
+
+Three streams, all keyed by `customer_id`:
+
+```
+Click stream:  { event_time, customer_id, business_id, product_id, pixel_data }
+Login stream:  { event_time, trackity_id → customer_id }
+Order stream:  { event_time, customer_id, items[] }
+```
+
+---
+
+### Example: the race condition that currently causes data loss
+
+```
+Wall clock    Event                                    Arrives at Kafka consumer
+──────────────────────────────────────────────────────────────────────────────
+10:00:00      User clicks ad (logged out, trackity=T1)     → adevents worker
+10:01:00      User logs in (T1 → customer_id=42)           → trackity worker
+10:01:05      User places order (customer_id=42)           → order worker
+
+Kafka delivery (slightly out of order due to partition lag):
+10:01:06      order worker receives ORDER event (event_time=10:01:05)
+10:01:09      order worker receives LOGIN event (event_time=10:01:00)  ← 3s late
+```
+
+In the **current system**, the order worker processes the ORDER event at 10:01:06. At that moment, the pixel lookup for `customer_id=42` returns nothing — the login merge hasn't run yet. Attribution = lost. The LOGIN event arrives at 10:01:09 and updates the state, but the order is already committed to Kafka and to ClickHouse.
+
+---
+
+### How Flink handles this with event-time + watermarks
+
+**Step 1: Assign event timestamps and generate watermarks**
+
+When events enter Flink from Kafka, you assign a watermark strategy:
+
+```
+allowed_lateness = 5 minutes
+
+watermark(t) = max_event_time_seen_so_far - allowed_lateness
+```
+
+So if the latest event Flink has seen has `event_time = 10:05:00`, the current watermark is `10:00:00`. This means Flink guarantees: _"all events with event_time < 10:00:00 have already arrived."_
+
+**Step 2: The join operator holds events in state until the watermark advances**
+
+The attribution join operator is a **interval join** (or a custom process function with a timer):
+
+```
+Rule: join ORDER with LOGIN where LOGIN.event_time ∈ [ORDER.event_time - 5min, ORDER.event_time]
+```
+
+When an ORDER event with `event_time=10:01:05` arrives:
+
+- Flink stores it in a **keyed state buffer** (key = `customer_id=42`)
+- Flink registers a **timer** to fire when `watermark >= 10:01:05` (i.e., when the system is confident all events up to 10:01:05 have arrived)
+- The ORDER event **is not yet processed** — it sits in state
+
+```
+State for customer_id=42:
+  pending_orders:  [{ event_time=10:01:05, items=[...] }]
+  known_pixels:    { business_id=7: { click, event_time=10:00:00 } }   ← from click stream
+  timer:           fire when watermark >= 10:01:05
+```
+
+**Step 3: The login event arrives**
+
+At wall clock 10:01:09, the LOGIN event (`event_time=10:01:00`, `T1 → customer_id=42`) arrives. Flink processes it:
+
+- Pixel data previously stored under `trackity_id=T1` is merged into the state for `customer_id=42`
+
+```
+State for customer_id=42:
+  pending_orders:  [{ event_time=10:01:05, items=[...] }]
+  known_pixels:    { business_id=7: { click, event_time=10:00:00 } }   ← now under customer key
+  timer:           fire when watermark >= 10:01:05
+```
+
+**Step 4: Watermark advances past 10:01:05 — timer fires**
+
+A short time later (say 10:06:10 wall clock), the max event_time seen across all partitions reaches `10:06:05`. The watermark advances to `10:01:05`. The timer fires:
+
+- Flink picks up the pending ORDER event
+- Looks up `known_pixels` for `customer_id=42` → **finds the click pixel** (merged in step 3)
+- Computes attribution → emits to ClickHouse sink
+- Clears the order from the pending buffer
+
+**The login event arrived 3 seconds late in wall clock time, but within the 5-minute allowed lateness in event time — so the ORDER event waited in state long enough to see it.**
+
+---
+
+### Visualized as a timeline
+
+```
+Event time →    9:56  9:57  9:58  9:59  10:00  10:01  10:02  10:03
+                                               click  login  order
+
+Watermark at wall clock 10:01:06:  W = 9:56  (5min behind latest event 10:01:05)
+  → ORDER(10:01:05) buffered, timer set for W >= 10:01:05
+  → LOGIN(10:01:00) arrives, state updated
+
+Watermark at wall clock 10:06:10:  W = 10:01:05  (5min behind latest event 10:06:05)
+  → Timer fires for ORDER(10:01:05)
+  → Pixel lookup succeeds → attribution emitted ✓
+```
+
+---
+
+### What happens if the login event is MORE than 5 minutes late?
+
+```
+Wall clock    Event
+10:01:05      User places order    → order Kafka event published
+10:08:00      User logs in         → login Kafka event published (event_time=10:08:00... 
+                                     but the login HAPPENED at 10:07:00, 
+                                     which is > 5min after order at 10:01:05)
+```
+
+Here the login `event_time=10:07:00` is outside the join window `[10:01:05 - 5min, 10:01:05]`. When the watermark passes `10:01:05`, Flink fires the timer. The login state is not present yet. Two choices:
+
+**Option A: Emit with best available data (no attribution)**
+
+- Flink emits the order with `pixel = nil` → recorded as organic (no ad attribution)
+- The late LOGIN event goes to a **side output**
+
+**Option B: Side output → reprocessing**
+
+- Flink routes the ORDER event to a side output (a secondary Kafka topic: `late_orders`)
+- When the LOGIN event eventually arrives, a separate job joins `late_orders` with the now-populated pixel state and recomputes attribution
+- Emits a **corrective record** to ClickHouse (which, using `ReplacingMergeTree` on the attribution UUID, replaces the nil attribution with the correct one)
+
+Option B is zero data loss but adds operational complexity. In practice, for your system the 5-minute window covers the vast majority of cases — the login→order lag is usually seconds, not minutes.
+
+---
+
+### Why the current system cannot do any of this
+
+The current `order` worker is a **streaming processor with no state persistence between events**:
+
+```go
+// processing.go:148-170 — pure sequential, stateless per message
+for {
+    m := p.reader.FetchMessage(ctx)   // get one message
+    p.process(ctx, e)                  // look up current state, write, done
+    p.reader.CommitMessages(ctx, m)    // advance offset — no going back
+}
+```
+
+There is no concept of "buffer this event and come back to it later." Each message is processed once, immediately, against whatever state happens to be in Redis at that moment. There is no timer, no watermark, no way to express "wait until I'm confident the join partner has arrived."
+
+Flink's key contribution here is making **time-bounded waiting a first-class primitive** in the processing model, backed by durable state so that "waiting" survives process restarts.
