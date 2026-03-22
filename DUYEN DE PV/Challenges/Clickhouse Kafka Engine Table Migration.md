@@ -1,12 +1,4 @@
-# ClickHouse Kafka Migration - Visual Summary
 
-## Presentation-Ready Diagrams & Flowcharts
-
-  
-
----
-
-  
 
 ## 1. The Problem: Bimodal Duplicate Distribution
 
