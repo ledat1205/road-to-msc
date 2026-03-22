@@ -19,4 +19,7 @@ pattern:
 	commute by + transport 
 
 counsellor (n): a person who gives advice, guidance and support, especially for personal, psychological or professional issue 
-pattern 
+pattern:
+	counsellor for + purpose/group
+	counsellor at + place
+	
