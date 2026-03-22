@@ -18,4 +18,5 @@ pattern:
 	commute from A to B
 	commute by + transport 
 
-counsellor (n): a person who gives advice,  
+counsellor (n): a person who gives advice, guidance and support, especially for personal, psychological or professional issue 
+pattern 
