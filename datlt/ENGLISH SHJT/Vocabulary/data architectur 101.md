@@ -1,5 +1,5 @@
 
-emphasize
+emphasize 
 agile to 
 consolidate in 
 interoperability
