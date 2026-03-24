@@ -11,3 +11,4 @@ Useful when we don't care about keeping track of history
 
 Note: most used one
 
+Tracking records history by adding two 2 colunms: start_day and end_day. A 
