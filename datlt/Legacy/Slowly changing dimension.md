@@ -19,7 +19,7 @@ Tracking records history by adding two 2 colunms: start_day and end_day. A new r
 
 Track change state of a column.
 
-This type 
 ![[Pasted image 20260325112637.png]]
 
+# Type 4: Seperating
 
