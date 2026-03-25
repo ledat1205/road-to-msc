@@ -31,3 +31,4 @@ Split frequently changing columns into a separate dimension table.
 
 ## Approach B
 
+kinda similar to SCD2 but we will maintain latest state and historical changes 
