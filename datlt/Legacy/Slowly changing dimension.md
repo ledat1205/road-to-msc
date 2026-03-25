@@ -25,4 +25,9 @@ Track change state of a column.
 
 ## Approach A
 
-Split frequently changing columns into a separate dimension table 
+Split frequently changing columns into a separate dimension table.
+
+![[Pasted image 20260325112953.png]]
+
+## Approach B
+
