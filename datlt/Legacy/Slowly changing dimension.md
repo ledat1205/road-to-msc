@@ -23,3 +23,6 @@ Track change state of a column.
 
 # Type 4: Seperating
 
+## Approach A
+
+Split frequently changing columns into a separate dimension table 
