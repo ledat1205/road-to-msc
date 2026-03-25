@@ -15,4 +15,11 @@ Tracking records history by adding two 2 colunms: start_day and end_day. A new r
 
 ![[Pasted image 20260324225611.png]]
 
-# Type 3: 
+# Type 3: Adding new columns
+
+Track change state of a column.
+
+This type 
+![[Pasted image 20260325112637.png]]
+
+
