@@ -21,7 +21,7 @@ Track change state of a column.
 
 ![[Pasted image 20260325112637.png]]
 
-# Type 4: Seperating
+# Type 4: Separating
 
 ## Approach A
 
@@ -35,3 +35,8 @@ kinda similar to SCD2 but we will maintain latest state and historical changes i
 
 ![[Pasted image 20260325114544.png]]
 
+# Type 5: Mini-Dimension and Type Outringer
+
+Base dimension has a FK reference to mini-dimen
+
+![[Pasted image 20260325142611.png]]
