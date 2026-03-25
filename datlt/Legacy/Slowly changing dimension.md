@@ -41,3 +41,8 @@ Base dimension has a FK reference to mini-dimension (frequently update). Overwri
 
 ![[Pasted image 20260325142611.png]]
 
+# Type 6: Type 1 + Type 2 + Type 3
+
+![[Pasted image 20260325142845.png]]
+
+# Type 7: Dual Type 1 and Type 2 Dimensions
