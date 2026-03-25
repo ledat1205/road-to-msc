@@ -31,4 +31,7 @@ Split frequently changing columns into a separate dimension table.
 
 ## Approach B
 
-kinda similar to SCD2 but we will maintain latest state and historical changes 
+kinda similar to SCD2 but we will maintain latest state and historical changes in 2 separate tables. A flexibility approach allow you can use each table you want based on your demand
+
+![[Pasted image 20260325114544.png]]
+
