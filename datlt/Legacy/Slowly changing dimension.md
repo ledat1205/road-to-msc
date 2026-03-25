@@ -37,6 +37,7 @@ kinda similar to SCD2 but we will maintain latest state and historical changes i
 
 # Type 5: Mini-Dimension and Type Outringer
 
-Base dimension has a FK reference to mini-dimen
+Base dimension has a FK reference to mini-dimension (frequently update). Overwriting this FK to point to latest mini-dimension record
 
 ![[Pasted image 20260325142611.png]]
+
