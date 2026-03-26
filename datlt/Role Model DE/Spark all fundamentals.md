@@ -33,3 +33,5 @@ Data is unavailable or transformed immediately until an action or triggers the e
 
 ## Fault Tolerance
 
+Follow lineage to keep track RDDs dependencies and reconstruct on original RDD if have partition lost data.
+
