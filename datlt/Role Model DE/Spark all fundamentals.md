@@ -28,5 +28,8 @@ Why immutable:
 
 Data is unavailable or transformed immediately until an action or triggers the execution. This approach allows Spark to determine the most efficient way to execute the transformations.
 
-Transformations: define how data should be transformed (dont execute)
-Actions: 
+**Transformations**: define how data should be transformed (dont execute)
+**Actions**: produce output and store data
+
+## Fault Tolerance
+
