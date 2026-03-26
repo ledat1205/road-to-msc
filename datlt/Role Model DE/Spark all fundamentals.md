@@ -11,3 +11,6 @@ Why immutable:
 - functional programming
 
 ## Properties 
+
+**List of partitions**: An RDD is divided into partitions, Spark's parallelism units. Each partition is a logical data subset and can be processed independently with different executors
+
