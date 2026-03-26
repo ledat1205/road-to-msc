@@ -8,4 +8,6 @@ RDD represents an **immutable, partitioned collection of records** that can be o
 Why immutable:
 - concurrent processing: not allow update can avoid complex synchronization, race condions
 - lineage and fault tolerance: each transformation creates a new RDD, preserving the lineage and allowing spark recompute lost data reliably
-- 
+- functional programming
+
+## Properties 
