@@ -6,4 +6,5 @@ Spark relies on in-memory processing. Resilient Distributed Dataset (RDD) abstra
 RDD represents an **immutable, partitioned collection of records** that can be operated on in parallel. Data inside RDD is stored in memory for as long as possible.
 
 Why immutable:
-- concurrent processing: not allow update can avoid complex synchronizatin
+- concurrent processing: not allow update can avoid complex synchronization, race condions
+- lineage and fault tolerance: each transformation creates a new RDD 
