@@ -24,3 +24,5 @@ Why immutable:
 
 **Preferred Locations (Optional):** This property lists the preferred locations for computing each partition, such as the data block locations in the HDFS.
 
+## Lazy
+
