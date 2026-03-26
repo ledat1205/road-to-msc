@@ -12,5 +12,15 @@ Why immutable:
 
 ## Properties 
 
+![[Pasted image 20260326160816.png]]
+
 **List of partitions**: An RDD is divided into partitions, Spark's parallelism units. Each partition is a logical data subset and can be processed independently with different executors
+
+**Computation Function:** A function determines how to compute the data for each partition.
+
+**Dependencies:** The RDD tracks its dependencies on other RDDs, which describe how it was created.
+
+**Partitioner (Optional):** For key-value RDDs, a partitioner specifies how the data is partitioned, such as using a hash partitioner.
+
+**Preferred Locations (Optional):** This property lists the preferred locations for computing each partition, such as the data block locations in the HDFS.
 
