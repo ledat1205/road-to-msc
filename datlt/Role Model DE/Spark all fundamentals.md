@@ -26,4 +26,4 @@ Why immutable:
 
 ## Lazy
 
-Data is unavai
+Data is unavailable or transformed immediately until an action or triggers the execution
