@@ -35,5 +35,5 @@ Data is unavailable or transformed immediately until an action or triggers the e
 
 Follow lineage to keep track RDDs dependencies and reconstruct on original RDD due to issues.
 
-
+# Architect
 
