@@ -58,7 +58,7 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 ![[Pasted image 20260327161349.png]]
 
 - **Job**: a series of transformation steps 
-- **Stage**: a stage is a job segment executed 
+- **Stage**: a stage is a job segment executed without data shuffling. a job is split into different stage
 
 
 
