@@ -53,6 +53,11 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 - **Local Mode**: run entire spark on single machine, achieving parallelism through multiple threads.
 ![[Pasted image 20260327161248.png]]
 
+# Detail workload
+
+![[Pasted image 20260327161349.png]]
+
+- **Job**: 
 
 
 
