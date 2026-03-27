@@ -46,4 +46,5 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 
 - **Cluster Mode**: the driver process is launched on a worker node alongside the executor. The cluster manager handles all processes related to the Spark application
 - **Client Mode**: the driver remains on the client machine that submitted the application. The client machine have to maintain driver process throughout the application
+- **Local Mode**: run entire spark on single machine, achieving paral
 
