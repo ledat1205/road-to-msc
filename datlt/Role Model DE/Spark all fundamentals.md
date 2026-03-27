@@ -59,7 +59,8 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 
 - **Job**: a series of transformation steps 
 - **Stage**: a stage is a job segment executed without data shuffling. a job is split into different stages when a transformation requires shuffling data across partitions
-- **DAG**: 
+- **DAG**: RDD dependencies are used to build a DAG of stages of spark job
+- 
 
 
 
