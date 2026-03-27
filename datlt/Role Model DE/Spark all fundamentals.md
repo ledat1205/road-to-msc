@@ -67,5 +67,6 @@ Narrow transformation: Partitions depend on a single parent or specific subset o
 Wide transformation: A single partition of a parent RDD contributes to multiple partitions of child RDD which involve shuffle data across partitions. (eg: groupByKey, reduceByKey, join )
 
 
-
+# Journey
+![[Pasted image 20260327163758.png]]
 
