@@ -62,7 +62,8 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 - **DAG**: RDD dependencies are used to build a DAG of stages for a spark job
 - **Task**: smallest unit of execution. Stage is divided into multiple tasks, which execute processing in parallel across different partitions 
 
-Narrow transformation: 
+![[Pasted image 20260327162957.png]]
+Narrow transformation: operation 
 Wide transformation
 
 
