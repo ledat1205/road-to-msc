@@ -38,5 +38,6 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 # Architecture
 ![[Pasted image 20260327114753.png]]
 
-- **Driver**: manage spark cluster ha
+- **Driver**: manage spark app, handling user input to distribute to executor
+- **Cluster manager**: manage cluster running spark app
 
