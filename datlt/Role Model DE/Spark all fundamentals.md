@@ -40,5 +40,7 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 
 - **Driver**: JVM process manage spark app, handling user input to distribute to executor
 - **Cluster manager**: manage cluster running spark app
-- **Executors**: these processes execute tasks driver assigns and report th
+- **Executors**: these processes execute tasks driver assigns and report their status and result 
+
+
 
