@@ -63,8 +63,8 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 - **Task**: smallest unit of execution. Stage is divided into multiple tasks, which execute processing in parallel across different partitions 
 
 ![[Pasted image 20260327162957.png]]
-Narrow transformation: Partitions depend on a single parent or specific subset of 
-Wide transformation
+Narrow transformation: Partitions depend on a single parent or specific subset of parent partitions known beforehand (eg: map, coalesce)
+Wide transformation: 
 
 
 
