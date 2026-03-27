@@ -64,7 +64,7 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 
 ![[Pasted image 20260327162957.png]]
 Narrow transformation: Partitions depend on a single parent or specific subset of parent partitions known beforehand (eg: map, coalesce)
-Wide transformation: 
+Wide transformation: A single partition of a parent RDD contributes to multiple partition
 
 
 
