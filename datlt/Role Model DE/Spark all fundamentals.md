@@ -42,5 +42,6 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 - **Cluster manager**: manage cluster running spark app
 - **Executors**: these processes execute tasks driver assigns and report their status and result 
 
+# Mode
 
 
