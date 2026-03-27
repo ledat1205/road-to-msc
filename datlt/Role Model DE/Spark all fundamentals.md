@@ -44,5 +44,5 @@ Follow lineage to keep track RDDs dependencies and reconstruct on original RDD d
 
 # Mode
 
-- **Cluster Mode**: the driver process is   
+- **Cluster Mode**: the driver process is launched on a worker node alongside the executor. The cluster manager handles all processes related to the Spark appli  
 
