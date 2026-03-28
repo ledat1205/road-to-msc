@@ -1,5 +1,5 @@
 ![[Data_Quality_In_Depth_Shopee_Vietnam_2026.docx]]
-
+https://docs.google.com/document/d/1ydbV2ZqO7v0p1g2gshd5-X7pz5bYe1Bp/edit
 ---
 
 **The fraud landscape first — what you're actually detecting**
