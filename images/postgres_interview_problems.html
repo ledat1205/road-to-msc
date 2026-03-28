@@ -1,0 +1,654 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary)}
+.wrap{padding:1rem 0}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.25rem;align-items:center}
+.ftag{background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:99px;padding:4px 12px;font-size:12px;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.ftag:hover{background:var(--color-background-secondary)}
+.ftag.on{border-color:transparent;font-weight:500}
+.ftag[data-f="all"].on{background:#E1F5EE;color:#085041}
+.ftag[data-f="window"].on{background:#EEEDFE;color:#26215C}
+.ftag[data-f="cte"].on{background:#E6F1FB;color:#0C447C}
+.ftag[data-f="agg"].on{background:#FAEEDA;color:#633806}
+.ftag[data-f="gaps"].on{background:#FAECE7;color:#4A1B0C}
+.ftag[data-f="joins"].on{background:#EAF3DE;color:#27500A}
+.ftag[data-f="perf"].on{background:#FCEBEB;color:#791F1F}
+.prob{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:.85rem;overflow:hidden}
+.prob-head{padding:.85rem 1rem;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.prob-head:hover{background:var(--color-background-secondary)}
+.num{font-size:12px;font-weight:500;min-width:22px;color:var(--color-text-tertiary);padding-top:1px}
+.prob-title{font-size:14px;font-weight:500;flex:1;line-height:1.4}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tag{font-size:11px;padding:2px 7px;border-radius:99px;font-weight:500}
+.tag-window{background:#EEEDFE;color:#3C3489}
+.tag-cte{background:#E6F1FB;color:#0C447C}
+.tag-agg{background:#FAEEDA;color:#633806}
+.tag-gaps{background:#FAECE7;color:#712B13}
+.tag-joins{background:#EAF3DE;color:#3B6D11}
+.tag-perf{background:#FCEBEB;color:#A32D2D}
+@media(prefers-color-scheme:dark){
+.tag-window{background:#3C3489;color:#CECBF6}
+.tag-cte{background:#0C447C;color:#B5D4F4}
+.tag-agg{background:#633806;color:#FAC775}
+.tag-gaps{background:#712B13;color:#F5C4B3}
+.tag-joins{background:#27500A;color:#C0DD97}
+.tag-perf{background:#791F1F;color:#F7C1C1}
+.ftag[data-f="all"].on{background:#085041;color:#9FE1CB}
+.ftag[data-f="window"].on{background:#26215C;color:#CECBF6}
+.ftag[data-f="cte"].on{background:#0C447C;color:#B5D4F4}
+.ftag[data-f="agg"].on{background:#633806;color:#FAC775}
+.ftag[data-f="gaps"].on{background:#4A1B0C;color:#F5C4B3}
+.ftag[data-f="joins"].on{background:#27500A;color:#C0DD97}
+.ftag[data-f="perf"].on{background:#791F1F;color:#F7C1C1}
+}
+.diff{font-size:11px;font-weight:500;margin-left:auto;padding-top:1px;white-space:nowrap}
+.diff-med{color:#854F0B}
+.diff-hard{color:#A32D2D}
+.body{display:none;border-top:0.5px solid var(--color-border-tertiary);padding:1rem}
+.body.open{display:block}
+.schema-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+pre{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.7rem .9rem;font-family:var(--font-mono);font-size:12px;line-height:1.75;overflow-x:auto;border:0.5px solid var(--color-border-tertiary);white-space:pre}
+.q-box{background:var(--color-background-secondary);border-left:2px solid #378ADD;border-radius:0 var(--border-radius-md) var(--border-radius-md) 0;padding:.6rem .85rem;font-size:13px;color:var(--color-text-primary);margin:.85rem 0;line-height:1.6}
+.sol-btn{background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:5px 14px;font-size:12px;cursor:pointer;color:var(--color-text-secondary);margin-bottom:.65rem;transition:all .15s}
+.sol-btn:hover{background:var(--color-background-secondary)}
+.sol{display:none}
+.sol.open{display:block}
+.insight{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.6rem .85rem;font-size:12.5px;color:var(--color-text-secondary);margin-top:.65rem;line-height:1.6;border:0.5px solid var(--color-border-tertiary)}
+.kw{color:#185FA5;font-weight:500}
+@media(prefers-color-scheme:dark){.kw{color:#85B7EB}}
+.fn{color:#3B6D11}
+@media(prefers-color-scheme:dark){.fn{color:#97C459}}
+.cm{color:var(--color-text-tertiary);font-style:italic}
+.str{color:#993C1D}
+@media(prefers-color-scheme:dark){.str{color:#F0997B}}
+.num{color:#854F0B}
+@media(prefers-color-scheme:dark){.num{color:#FAC775}}
+.progress{font-size:12px;color:var(--color-text-tertiary);margin-left:auto}
+</style>
+
+<div class="wrap">
+<div class="filters">
+  <span style="font-size:12px;color:var(--color-text-tertiary);margin-right:2px">Filter:</span>
+  <button class="ftag on" data-f="all">All</button>
+  <button class="ftag" data-f="window">Window</button>
+  <button class="ftag" data-f="cte">CTE</button>
+  <button class="ftag" data-f="agg">Aggregation</button>
+  <button class="ftag" data-f="gaps">Gaps & Islands</button>
+  <button class="ftag" data-f="joins">Joins</button>
+  <button class="ftag" data-f="perf">Performance</button>
+  <span class="progress" id="prog">0 / 15 solved</span>
+</div>
+<div id="list"></div>
+</div>
+
+<script>
+const problems = [
+{
+  title:"Running total with reset on negative balance",
+  tags:["window","agg"],diff:"hard",
+  schema:`CREATE TABLE transactions (
+  id         SERIAL PRIMARY KEY,
+  account_id INT,
+  txn_date   DATE,
+  amount     NUMERIC
+);`,
+  q:`For each account, compute the running balance over time. If the balance ever goes negative, treat that point as a "reset" — the running total starts fresh from 0 at the next row. Return: account_id, txn_date, amount, running_balance.`,
+  sol:`<span class="kw">WITH</span> running <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    account_id, txn_date, amount,
+    <span class="fn">SUM</span>(amount) <span class="kw">OVER</span> (
+      <span class="kw">PARTITION BY</span> account_id
+      <span class="kw">ORDER BY</span> txn_date
+      <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>
+    ) <span class="kw">AS</span> cumulative
+  <span class="kw">FROM</span> transactions
+),
+flagged <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> *,
+    <span class="fn">SUM</span>(<span class="kw">CASE WHEN</span> cumulative &lt; <span class="num">0</span> <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span> <span class="kw">END</span>)
+      <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> account_id <span class="kw">ORDER BY</span> txn_date) <span class="kw">AS</span> reset_group
+  <span class="kw">FROM</span> running
+)
+<span class="kw">SELECT</span>
+  account_id, txn_date, amount,
+  <span class="fn">SUM</span>(amount) <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> account_id, reset_group
+    <span class="kw">ORDER BY</span> txn_date
+    <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>
+  ) <span class="kw">AS</span> running_balance
+<span class="kw">FROM</span> flagged
+<span class="kw">ORDER BY</span> account_id, txn_date;`,
+  insight:"The trick is a two-pass window: first accumulate to detect negatives, then use the negative-count as a group key to restart SUM inside each reset segment."
+},
+{
+  title:"Consecutive login streaks",
+  tags:["window","gaps"],diff:"hard",
+  schema:`CREATE TABLE logins (
+  user_id    INT,
+  login_date DATE
+);
+<span class="cm">-- one row per (user, day); no duplicate dates per user</span>`,
+  q:`Find the longest consecutive daily login streak for each user. Return user_id and max_streak.`,
+  sol:`<span class="kw">WITH</span> grp <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    user_id, login_date,
+    login_date - (<span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+      <span class="kw">PARTITION BY</span> user_id <span class="kw">ORDER BY</span> login_date
+    ) * <span class="kw">INTERVAL</span> <span class="str">'1 day'</span>)::date <span class="kw">AS</span> grp_key
+  <span class="kw">FROM</span> logins
+),
+streaks <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    user_id,
+    grp_key,
+    <span class="fn">COUNT</span>(*) <span class="kw">AS</span> streak_len
+  <span class="kw">FROM</span> grp
+  <span class="kw">GROUP BY</span> user_id, grp_key
+)
+<span class="kw">SELECT</span>
+  user_id,
+  <span class="fn">MAX</span>(streak_len) <span class="kw">AS</span> max_streak
+<span class="kw">FROM</span> streaks
+<span class="kw">GROUP BY</span> user_id
+<span class="kw">ORDER BY</span> max_streak <span class="kw">DESC</span>;`,
+  insight:"Classic gaps-and-islands: subtracting ROW_NUMBER (as an interval) from the date produces the same anchor date for all rows in a consecutive run. Group by that anchor to get streak lengths."
+},
+{
+  title:"Median salary per department without PERCENTILE_CONT",
+  tags:["window","agg"],diff:"med",
+  schema:`CREATE TABLE employees (
+  emp_id    INT PRIMARY KEY,
+  dept_id   INT,
+  salary    NUMERIC
+);`,
+  q:`Compute the median salary for each department. Do it two ways: (1) using PERCENTILE_CONT, (2) using ROW_NUMBER to show you understand the manual approach.`,
+  sol:`<span class="cm">-- Method 1: clean Postgres aggregate</span>
+<span class="kw">SELECT</span>
+  dept_id,
+  <span class="fn">PERCENTILE_CONT</span>(<span class="num">0.5</span>) <span class="kw">WITHIN GROUP</span> (<span class="kw">ORDER BY</span> salary) <span class="kw">AS</span> median_salary
+<span class="kw">FROM</span> employees
+<span class="kw">GROUP BY</span> dept_id;
+
+<span class="cm">-- Method 2: manual — shows interviewer you know the logic</span>
+<span class="kw">WITH</span> ranked <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    dept_id, salary,
+    <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> dept_id <span class="kw">ORDER BY</span> salary) <span class="kw">AS</span> rn,
+    <span class="fn">COUNT</span>(*) <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> dept_id) <span class="kw">AS</span> cnt
+  <span class="kw">FROM</span> employees
+)
+<span class="kw">SELECT</span>
+  dept_id,
+  <span class="fn">AVG</span>(salary) <span class="kw">AS</span> median_salary
+<span class="kw">FROM</span> ranked
+<span class="kw">WHERE</span> rn <span class="kw">IN</span> (
+  <span class="fn">FLOOR</span>((cnt + <span class="num">1</span>) / <span class="num">2.0</span>),
+  <span class="fn">CEIL</span>((cnt + <span class="num">1</span>) / <span class="num">2.0</span>)
+)
+<span class="kw">GROUP BY</span> dept_id;`,
+  insight:"PERCENTILE_CONT interpolates for even-count sets. The manual method selects the middle 1-2 rows and averages them — same result, shows deeper understanding."
+},
+{
+  title:"Sessionization — group events into sessions",
+  tags:["window","gaps"],diff:"hard",
+  schema:`CREATE TABLE events (
+  user_id    INT,
+  event_time TIMESTAMPTZ,
+  event_type TEXT
+);
+<span class="cm">-- A session ends when gap > 30 minutes</span>`,
+  q:`Assign a session_id to each event. A new session starts whenever the gap from the previous event (for the same user) exceeds 30 minutes. Return user_id, event_time, event_type, session_id.`,
+  sol:`<span class="kw">WITH</span> gaps <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    user_id, event_time, event_type,
+    <span class="kw">CASE WHEN</span>
+      event_time - <span class="fn">LAG</span>(event_time) <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> user_id <span class="kw">ORDER BY</span> event_time
+      ) > <span class="kw">INTERVAL</span> <span class="str">'30 minutes'</span>
+      <span class="kw">OR</span> <span class="fn">LAG</span>(event_time) <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> user_id <span class="kw">ORDER BY</span> event_time
+      ) <span class="kw">IS NULL</span>
+    <span class="kw">THEN</span> <span class="num">1</span> <span class="kw">ELSE</span> <span class="num">0</span>
+    <span class="kw">END</span> <span class="kw">AS</span> is_new_session
+  <span class="kw">FROM</span> events
+)
+<span class="kw">SELECT</span>
+  user_id, event_time, event_type,
+  <span class="fn">SUM</span>(is_new_session) <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> user_id
+    <span class="kw">ORDER BY</span> event_time
+    <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>
+  ) <span class="kw">AS</span> session_id
+<span class="kw">FROM</span> gaps
+<span class="kw">ORDER BY</span> user_id, event_time;`,
+  insight:"Flag each row that starts a new session (gap > threshold OR first row). A cumulative SUM of those flags gives a monotonically increasing session counter per user — a cornerstone pattern for any clickstream or event pipeline."
+},
+{
+  title:"Top-N rows per group (no LATERAL)",
+  tags:["window"],diff:"med",
+  schema:`CREATE TABLE sales (
+  rep_id     INT,
+  region     TEXT,
+  sale_amount NUMERIC,
+  sale_date  DATE
+);`,
+  q:`Return the top 3 sales reps by total revenue for each region. Include ties (if two reps tie for 3rd, return both).`,
+  sol:`<span class="kw">WITH</span> totals <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    region, rep_id,
+    <span class="fn">SUM</span>(sale_amount) <span class="kw">AS</span> total_revenue
+  <span class="kw">FROM</span> sales
+  <span class="kw">GROUP BY</span> region, rep_id
+),
+ranked <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    region, rep_id, total_revenue,
+    <span class="fn">DENSE_RANK</span>() <span class="kw">OVER</span> (
+      <span class="kw">PARTITION BY</span> region
+      <span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span>
+    ) <span class="kw">AS</span> rnk
+  <span class="kw">FROM</span> totals
+)
+<span class="kw">SELECT</span> region, rep_id, total_revenue, rnk
+<span class="kw">FROM</span> ranked
+<span class="kw">WHERE</span> rnk &lt;= <span class="num">3</span>
+<span class="kw">ORDER BY</span> region, rnk;`,
+  insight:"Use DENSE_RANK (not ROW_NUMBER or RANK) when ties should all be included. ROW_NUMBER would arbitrarily drop one tied rep; RANK would skip numbers. Always clarify tie-handling in the interview."
+},
+{
+  title:"Year-over-year growth rate",
+  tags:["window","agg"],diff:"med",
+  schema:`CREATE TABLE revenue (
+  year    INT,
+  month   INT,
+  revenue NUMERIC
+);`,
+  q:`Compute monthly revenue and its YoY % growth (compared to the same month last year). Return year, month, revenue, and yoy_growth_pct.`,
+  sol:`<span class="kw">WITH</span> monthly <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    year, month,
+    <span class="fn">SUM</span>(revenue) <span class="kw">AS</span> revenue
+  <span class="kw">FROM</span> revenue
+  <span class="kw">GROUP BY</span> year, month
+)
+<span class="kw">SELECT</span>
+  curr.year,
+  curr.month,
+  curr.revenue,
+  <span class="fn">ROUND</span>(
+    (curr.revenue - prev.revenue)
+    / <span class="fn">NULLIF</span>(prev.revenue, <span class="num">0</span>) * <span class="num">100</span>,
+  <span class="num">2</span>) <span class="kw">AS</span> yoy_growth_pct
+<span class="kw">FROM</span> monthly curr
+<span class="kw">LEFT JOIN</span> monthly prev
+  <span class="kw">ON</span> curr.month = prev.month
+ <span class="kw">AND</span> curr.year  = prev.year + <span class="num">1</span>
+<span class="kw">ORDER BY</span> curr.year, curr.month;`,
+  insight:"Self-join on same month, prior year is the cleanest approach. Always wrap the denominator in NULLIF(x, 0) to avoid division-by-zero on missing prior-year data. LAG with a fixed offset of 12 works too but is fragile if months are missing."
+},
+{
+  title:"Deduplicate keeping latest record",
+  tags:["window","perf"],diff:"med",
+  schema:`CREATE TABLE raw_events (
+  id         BIGINT,
+  user_id    INT,
+  event_type TEXT,
+  created_at TIMESTAMPTZ,
+  payload    JSONB
+);
+<span class="cm">-- duplicates exist on (user_id, event_type)</span>`,
+  q:`Deduplicate raw_events keeping only the most recent row per (user_id, event_type). Write it as a DELETE statement (not a SELECT) suitable for production use.`,
+  sol:`<span class="cm">-- Safe CTE-based DELETE (Postgres supports this)</span>
+<span class="kw">WITH</span> ranked <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    id,
+    <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (
+      <span class="kw">PARTITION BY</span> user_id, event_type
+      <span class="kw">ORDER BY</span> created_at <span class="kw">DESC</span>
+    ) <span class="kw">AS</span> rn
+  <span class="kw">FROM</span> raw_events
+)
+<span class="kw">DELETE FROM</span> raw_events
+<span class="kw">WHERE</span> id <span class="kw">IN</span> (
+  <span class="kw">SELECT</span> id <span class="kw">FROM</span> ranked <span class="kw">WHERE</span> rn > <span class="num">1</span>
+);
+
+<span class="cm">-- Alternative: CREATE TABLE ... AS SELECT for large tables</span>
+<span class="kw">CREATE TABLE</span> raw_events_clean <span class="kw">AS</span>
+<span class="kw">SELECT DISTINCT ON</span> (user_id, event_type) *
+<span class="kw">FROM</span> raw_events
+<span class="kw">ORDER BY</span> user_id, event_type, created_at <span class="kw">DESC</span>;`,
+  insight:"DISTINCT ON (Postgres-specific) is often faster for dedup reads. For large-table dedup writes, CREATE TABLE AS + swap is safer than in-place DELETE since it avoids table bloat and locks."
+},
+{
+  title:"Find gaps in a numeric sequence",
+  tags:["gaps","window"],diff:"med",
+  schema:`CREATE TABLE orders (
+  order_id BIGINT PRIMARY KEY,
+  <span class="cm">-- order_id should be sequential, but gaps exist</span>
+  created_at TIMESTAMPTZ
+);`,
+  q:`Find all missing order_id values (gaps in the sequence). Return gap_start and gap_end for each contiguous missing range.`,
+  sol:`<span class="kw">WITH</span> bounds <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    order_id,
+    <span class="fn">LEAD</span>(order_id) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> order_id) <span class="kw">AS</span> next_id
+  <span class="kw">FROM</span> orders
+)
+<span class="kw">SELECT</span>
+  order_id + <span class="num">1</span>  <span class="kw">AS</span> gap_start,
+  next_id - <span class="num">1</span>  <span class="kw">AS</span> gap_end,
+  next_id - order_id - <span class="num">1</span> <span class="kw">AS</span> gap_size
+<span class="kw">FROM</span> bounds
+<span class="kw">WHERE</span> next_id - order_id > <span class="num">1</span>
+<span class="kw">ORDER BY</span> gap_start;`,
+  insight:"LEAD gives the next row's value. When the difference > 1, there's a gap. The gap range is [current+1 .. next-1]. Common in data quality checks for pipelines that rely on sequential IDs."
+},
+{
+  title:"Cohort retention analysis",
+  tags:["cte","agg","joins"],diff:"hard",
+  schema:`CREATE TABLE user_activity (
+  user_id     INT,
+  activity_date DATE
+);`,
+  q:`Compute a monthly cohort retention table. The cohort is defined by a user's first activity month. For each cohort, show how many users were active in months 0, 1, 2, 3 after their first month. Express as percentage of cohort size.`,
+  sol:`<span class="kw">WITH</span> first_active <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    user_id,
+    <span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, <span class="fn">MIN</span>(activity_date)) <span class="kw">AS</span> cohort_month
+  <span class="kw">FROM</span> user_activity
+  <span class="kw">GROUP BY</span> user_id
+),
+activity_months <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    a.user_id,
+    f.cohort_month,
+    <span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, a.activity_date) <span class="kw">AS</span> active_month,
+    <span class="fn">EXTRACT</span>(<span class="str">'month'</span> <span class="kw">FROM</span>
+      <span class="fn">AGE</span>(<span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, a.activity_date), f.cohort_month)
+    ) +
+    <span class="fn">EXTRACT</span>(<span class="str">'year'</span> <span class="kw">FROM</span>
+      <span class="fn">AGE</span>(<span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, a.activity_date), f.cohort_month)
+    ) * <span class="num">12</span> <span class="kw">AS</span> month_offset
+  <span class="kw">FROM</span> user_activity a
+  <span class="kw">JOIN</span> first_active f <span class="kw">USING</span> (user_id)
+),
+cohort_size <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> cohort_month, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> size
+  <span class="kw">FROM</span> first_active
+  <span class="kw">GROUP BY</span> cohort_month
+)
+<span class="kw">SELECT</span>
+  a.cohort_month,
+  a.month_offset,
+  <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.user_id) <span class="kw">AS</span> retained_users,
+  <span class="fn">ROUND</span>(
+    <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> a.user_id) * <span class="num">100.0</span> / c.size,
+  <span class="num">1</span>) <span class="kw">AS</span> retention_pct
+<span class="kw">FROM</span> activity_months a
+<span class="kw">JOIN</span> cohort_size c <span class="kw">USING</span> (cohort_month)
+<span class="kw">WHERE</span> a.month_offset <span class="kw">BETWEEN</span> <span class="num">0</span> <span class="kw">AND</span> <span class="num">3</span>
+<span class="kw">GROUP BY</span> a.cohort_month, a.month_offset, c.size
+<span class="kw">ORDER BY</span> a.cohort_month, a.month_offset;`,
+  insight:"Cohort analysis is almost always a 3-step CTE: (1) assign cohort month per user, (2) compute month offset for every activity row, (3) aggregate. AGE() handles month arithmetic correctly across year boundaries."
+},
+{
+  title:"Slowly Changing Dimension Type 2 lookup",
+  tags:["joins","cte"],diff:"hard",
+  schema:`CREATE TABLE dim_product (
+  product_id  INT,
+  price       NUMERIC,
+  valid_from  DATE,
+  valid_to    DATE  <span class="cm">-- NULL means current</span>
+);
+CREATE TABLE fact_orders (
+  order_id   INT,
+  product_id INT,
+  order_date DATE,
+  quantity   INT
+);`,
+  q:`Calculate total revenue per product using the price that was valid at the time of each order (SCD Type 2 join). Return product_id, total_revenue.`,
+  sol:`<span class="kw">SELECT</span>
+  o.product_id,
+  <span class="fn">SUM</span>(o.quantity * p.price) <span class="kw">AS</span> total_revenue
+<span class="kw">FROM</span> fact_orders o
+<span class="kw">JOIN</span> dim_product p
+  <span class="kw">ON</span>  o.product_id = p.product_id
+  <span class="kw">AND</span> o.order_date >= p.valid_from
+  <span class="kw">AND</span> o.order_date &lt;  <span class="fn">COALESCE</span>(p.valid_to, <span class="str">'9999-12-31'</span>)
+<span class="kw">GROUP BY</span> o.product_id
+<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span>;`,
+  insight:"SCD2 joins always use a range condition: order_date BETWEEN valid_from AND valid_to. COALESCE(valid_to, 'infinity') handles open-ended current records. A composite index on (product_id, valid_from, valid_to) is critical at scale."
+},
+{
+  title:"Recursive CTE — org chart traversal",
+  tags:["cte"],diff:"hard",
+  schema:`CREATE TABLE employees (
+  emp_id    INT PRIMARY KEY,
+  name      TEXT,
+  manager_id INT  <span class="cm">-- NULL for CEO</span>
+);`,
+  q:`List every employee under a given manager (e.g. emp_id = 5), at any depth in the hierarchy. Return emp_id, name, depth, and the full path from the manager to that employee.`,
+  sol:`<span class="kw">WITH RECURSIVE</span> org <span class="kw">AS</span> (
+  <span class="cm">-- Anchor: the manager we start from</span>
+  <span class="kw">SELECT</span>
+    emp_id, name, manager_id,
+    <span class="num">0</span> <span class="kw">AS</span> depth,
+    <span class="fn">ARRAY</span>[name] <span class="kw">AS</span> path
+  <span class="kw">FROM</span> employees
+  <span class="kw">WHERE</span> emp_id = <span class="num">5</span>
+
+  <span class="kw">UNION ALL</span>
+
+  <span class="cm">-- Recursive: walk down to direct reports</span>
+  <span class="kw">SELECT</span>
+    e.emp_id, e.name, e.manager_id,
+    o.depth + <span class="num">1</span>,
+    o.path || e.name
+  <span class="kw">FROM</span> employees e
+  <span class="kw">JOIN</span> org o <span class="kw">ON</span> e.manager_id = o.emp_id
+)
+<span class="kw">SELECT</span>
+  emp_id, name, depth,
+  <span class="fn">ARRAY_TO_STRING</span>(path, <span class="str">' → '</span>) <span class="kw">AS</span> hierarchy_path
+<span class="kw">FROM</span> org
+<span class="kw">ORDER BY</span> path;`,
+  insight:"Recursive CTEs need an anchor (base case) + UNION ALL recursive term. The ARRAY accumulator builds the path — a common pattern. Add a depth guard (WHERE depth < 10) in production to prevent infinite loops from bad data."
+},
+{
+  title:"Pivoting rows to columns with crosstab",
+  tags:["agg"],diff:"med",
+  schema:`CREATE TABLE product_sales (
+  product TEXT,
+  quarter TEXT,  <span class="cm">-- 'Q1','Q2','Q3','Q4'</span>
+  revenue NUMERIC
+);`,
+  q:`Pivot the table so each quarter becomes a column. Return: product, Q1, Q2, Q3, Q4. Do it with both FILTER and the tablefunc crosstab extension.`,
+  sol:`<span class="cm">-- Method 1: conditional aggregation (no extension needed)</span>
+<span class="kw">SELECT</span>
+  product,
+  <span class="fn">SUM</span>(revenue) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> quarter = <span class="str">'Q1'</span>) <span class="kw">AS</span> q1,
+  <span class="fn">SUM</span>(revenue) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> quarter = <span class="str">'Q2'</span>) <span class="kw">AS</span> q2,
+  <span class="fn">SUM</span>(revenue) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> quarter = <span class="str">'Q3'</span>) <span class="kw">AS</span> q3,
+  <span class="fn">SUM</span>(revenue) <span class="kw">FILTER</span> (<span class="kw">WHERE</span> quarter = <span class="str">'Q4'</span>) <span class="kw">AS</span> q4
+<span class="kw">FROM</span> product_sales
+<span class="kw">GROUP BY</span> product;
+
+<span class="cm">-- Method 2: tablefunc crosstab (faster on large tables)</span>
+<span class="kw">CREATE EXTENSION IF NOT EXISTS</span> tablefunc;
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> <span class="fn">crosstab</span>(
+  <span class="str">$$SELECT product, quarter, SUM(revenue)
+    FROM product_sales
+    GROUP BY product, quarter
+    ORDER BY 1, 2$$</span>,
+  <span class="str">$$VALUES ('Q1'),('Q2'),('Q3'),('Q4')$$</span>
+) <span class="kw">AS</span> ct(product TEXT, q1 NUMERIC, q2 NUMERIC,
+        q3 NUMERIC, q4 NUMERIC);`,
+  insight:"FILTER (WHERE ...) is the modern idiomatic pivot. Crosstab is faster for large result sets but requires the tablefunc extension and is less portable. Interviewers expect you to know both."
+},
+{
+  title:"Last non-null value (forward fill)",
+  tags:["window","gaps"],diff:"hard",
+  schema:`CREATE TABLE sensor_readings (
+  sensor_id   INT,
+  read_time   TIMESTAMPTZ,
+  temperature NUMERIC  <span class="cm">-- NULLs when sensor dropped</span>
+);`,
+  q:`Forward-fill NULL temperature values with the most recent non-null reading for each sensor. Return all rows with the filled temperature.`,
+  sol:`<span class="kw">WITH</span> groups <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    sensor_id, read_time, temperature,
+    <span class="fn">COUNT</span>(temperature) <span class="kw">OVER</span> (
+      <span class="kw">PARTITION BY</span> sensor_id
+      <span class="kw">ORDER BY</span> read_time
+      <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>
+    ) <span class="kw">AS</span> grp
+  <span class="kw">FROM</span> sensor_readings
+)
+<span class="kw">SELECT</span>
+  sensor_id, read_time,
+  <span class="fn">FIRST_VALUE</span>(temperature) <span class="kw">OVER</span> (
+    <span class="kw">PARTITION BY</span> sensor_id, grp
+    <span class="kw">ORDER BY</span> read_time
+  ) <span class="kw">AS</span> temperature_filled
+<span class="kw">FROM</span> groups
+<span class="kw">ORDER BY</span> sensor_id, read_time;`,
+  insight:"COUNT ignores NULLs — so a cumulative COUNT(non-null-col) increments only on real values, creating a group identifier that stays constant across the NULL rows that follow. FIRST_VALUE within that group then pulls the last known value."
+},
+{
+  title:"N-tile bucketing + outlier detection",
+  tags:["window","agg"],diff:"med",
+  schema:`CREATE TABLE payments (
+  payment_id BIGINT,
+  user_id    INT,
+  amount     NUMERIC,
+  paid_at    TIMESTAMPTZ
+);`,
+  q:`Bucket payments into deciles (10 equal groups) by amount. Then flag payments that are more than 3 standard deviations above the mean as outliers. Return payment_id, amount, decile, is_outlier.`,
+  sol:`<span class="kw">WITH</span> stats <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    <span class="fn">AVG</span>(amount)    <span class="kw">AS</span> mean,
+    <span class="fn">STDDEV</span>(amount) <span class="kw">AS</span> sd
+  <span class="kw">FROM</span> payments
+)
+<span class="kw">SELECT</span>
+  p.payment_id,
+  p.amount,
+  <span class="fn">NTILE</span>(<span class="num">10</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> p.amount) <span class="kw">AS</span> decile,
+  <span class="kw">CASE WHEN</span> p.amount > s.mean + <span class="num">3</span> * s.sd
+       <span class="kw">THEN TRUE ELSE FALSE END</span> <span class="kw">AS</span> is_outlier
+<span class="kw">FROM</span> payments p
+<span class="kw">CROSS JOIN</span> stats s
+<span class="kw">ORDER BY</span> p.amount <span class="kw">DESC</span>;`,
+  insight:"NTILE(n) divides ordered rows into n approximately equal buckets. CROSS JOIN with a single-row stats CTE is the clean way to reference global aggregates alongside window functions — you can't mix them in the same SELECT."
+},
+{
+  title:"EXPLAIN plan reading — slow query diagnosis",
+  tags:["perf"],diff:"med",
+  schema:`<span class="cm">-- Given a table: orders(id, user_id, status, created_at)
+-- with ~50M rows and this query running slow:</span>
+
+<span class="kw">SELECT</span> user_id, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> cnt
+<span class="kw">FROM</span> orders
+<span class="kw">WHERE</span> status = <span class="str">'pending'</span>
+  <span class="kw">AND</span> created_at > <span class="fn">NOW</span>() - <span class="kw">INTERVAL</span> <span class="str">'7 days'</span>
+<span class="kw">GROUP BY</span> user_id;`,
+  q:`What EXPLAIN ANALYZE output signals tell you the query is doing a sequential scan? What index would you create, and what are the trade-offs? Write the CREATE INDEX statement.`,
+  sol:`<span class="cm">-- Run: EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) &lt;query&gt;
+-- Signals of a bad plan:
+--   Seq Scan on orders  (cost=... rows=50000000 ...)
+--   Buffers: shared hit=0  read=400000   &lt;-- lots of disk reads
+--   actual time=8000..12000 ms
+--   Planning time: 2ms  Execution time: 15000ms
+
+<span class="cm">-- Fix 1: composite index on filter columns</span>
+<span class="kw">CREATE INDEX CONCURRENTLY</span> idx_orders_status_created
+  <span class="kw">ON</span> orders (status, created_at <span class="kw">DESC</span>)
+  <span class="kw">INCLUDE</span> (user_id);
+<span class="cm">-- INCLUDE avoids heap fetch for the GROUP BY column</span>
+
+<span class="cm">-- Fix 2: partial index (best if 'pending' is a minority)</span>
+<span class="kw">CREATE INDEX CONCURRENTLY</span> idx_orders_pending_recent
+  <span class="kw">ON</span> orders (created_at <span class="kw">DESC</span>, user_id)
+  <span class="kw">WHERE</span> status = <span class="str">'pending'</span>;
+<span class="cm">-- Much smaller index; query must include WHERE status='pending'</span>
+
+<span class="cm">-- Trade-offs:
+--  CONCURRENTLY: no lock, but slower to build, can't run in txn
+--  Partial: tiny & fast, but only helps queries with same WHERE
+--  INCLUDE: covering index eliminates heap fetches (Pg 11+)</span>`,
+  insight:"Key EXPLAIN signals: Seq Scan with high row estimates, high 'Buffers: read' (disk I/O), rows estimate >> actual rows (stale stats — run ANALYZE). For time-range queries, put the equality column (status) first in the composite index, range column second."
+}
+];
+
+let solved = new Set();
+let activeFilter = 'all';
+
+function render() {
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  let shown = 0;
+  problems.forEach((p, i) => {
+    const cats = p.tags;
+    if (activeFilter !== 'all' && !cats.includes(activeFilter)) return;
+    shown++;
+    const div = document.createElement('div');
+    div.className = 'prob';
+    div.innerHTML = `
+      <div class="prob-head" onclick="toggle(${i})">
+        <span class="num">${i+1}</span>
+        <div style="flex:1">
+          <div class="prob-title">${p.title}</div>
+          <div class="tags">${p.tags.map(t=>`<span class="tag tag-${t}">${t}</span>`).join('')}</div>
+        </div>
+        <span class="diff diff-${p.diff==='hard'?'hard':'med'}">${p.diff==='hard'?'Hard':'Medium'}</span>
+        <span style="font-size:16px;margin-left:10px;color:var(--color-text-tertiary)" id="chk-${i}">${solved.has(i)?'✓':''}</span>
+      </div>
+      <div class="body" id="body-${i}">
+        <div class="schema-label">Schema</div>
+        <pre>${p.schema}</pre>
+        <div class="q-box">${p.q}</div>
+        <button class="sol-btn" onclick="showSol(${i})">Show solution</button>
+        <div class="sol" id="sol-${i}">
+          <pre>${p.sol}</pre>
+          <div class="insight">${p.insight}</div>
+          <button style="margin-top:.65rem;background:transparent;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:5px 14px;font-size:12px;cursor:pointer;color:var(--color-text-secondary)" onclick="markSolved(${i})">
+            ${solved.has(i)?'Marked solved':'Mark as solved'}
+          </button>
+        </div>
+      </div>`;
+    list.appendChild(div);
+  });
+  document.getElementById('prog').textContent = `${solved.size} / ${problems.length} solved`;
+}
+
+function toggle(i) {
+  const b = document.getElementById('body-'+i);
+  b.classList.toggle('open');
+}
+function showSol(i) {
+  const s = document.getElementById('sol-'+i);
+  s.classList.add('open');
+  const btn = s.previousElementSibling;
+  btn.style.display='none';
+}
+function markSolved(i) {
+  solved.add(i);
+  render();
+  const b = document.getElementById('body-'+i);
+  if(b) b.classList.add('open');
+}
+
+document.querySelectorAll('.ftag').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ftag').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    activeFilter = btn.dataset.f;
+    render();
+  });
+});
+
+render();
+</script>
