@@ -112,4 +112,10 @@ process assign tasks to executors
 - The TaskScheduler for task-oriented scheduling
 - The SchedulerBackend interacts with the cluster manager and provides resources to the TaskScheduler.
 
-DAGScheduler creates a TaskSet for each stage and sends TaskSet to TaskScheduler. The DAGScheduler also determines the preferred locations for each task based on cache status and sends to Task 
+DAGScheduler creates a TaskSet for each stage and sends TaskSet to TaskScheduler. The DAGScheduler also determines the preferred locations for each task based on cache status and sends to TaskScheduler
+
+TaskScheduler is responsible for scheduling tasks from TaskSet on available executors. It requests resource from
+
+
+
+![[Pasted image 20260329180102.png]]
