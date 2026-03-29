@@ -75,4 +75,8 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 - cluster manager accepts to submission and places driver to a worker node
 - the driver asks cluster manager to launch the executors. 
 - the cluster manager launches the executor processes and sends the information about their locations to the driver process
-- the driver formulates an execution plan to guide the physical execution. This process starts w
+- the driver formulates an execution plan to guide the physical execution. This process starts with the logical plan, which outlines intended transformations 
+- it generates the physical plan through several refinement steps, specifying the detailed execution strategy for processing the data.
+- The driver starts scheduling tasks on executors, and each executor responds to the driver with the status of those tasks.
+- Once the application finishes, the driver exits with either success or failure. The cluster manager then shuts down the application’s executors.
+- The client can check the status of the Spark application by asking the cluster manager.
