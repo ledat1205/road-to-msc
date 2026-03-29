@@ -83,4 +83,5 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 
 # Plan
 Catalyst Optimizer designed based on functional programming construct in scala. support rule-based and cost-based 
-- rule-based optimization: relies on predefined rules and heur
+- rule-based optimization: relies on predefined rules and heuristics to choose the execution plan for query 
+- cost-based optimization: uses statistical information about data - table size, index selectivity and data d
