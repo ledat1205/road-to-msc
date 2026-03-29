@@ -70,3 +70,5 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 # Journey
 ![[Pasted image 20260327163758.png]]
 
+user defines spark application. It must include SparkSession object 
+submit 
