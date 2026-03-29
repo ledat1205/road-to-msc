@@ -114,8 +114,18 @@ process assign tasks to executors
 
 DAGScheduler creates a TaskSet for each stage and sends TaskSet to TaskScheduler. The DAGScheduler also determines the preferred locations for each task based on cache status and sends to TaskScheduler
 
-TaskScheduler is responsible for scheduling tasks from TaskSet on available executors. It requests resource from
+TaskScheduler is responsible for scheduling tasks from TaskSet on available executors. It requests resources from TheschedulerBackend 
 
+The SchedulerBackend requests executors from the cluster manager, which then launches executors based on the application's requirements. Once started, the executors attempt to register with the SchedulerBackend through an RPC endpoint. If successful, the SchedulerBackend receives a list of the application's desired executors
 
 
 ![[Pasted image 20260329180102.png]]
+
+
+![[Pasted image 20260329180231.png]]
+
+When the TaskScheduler requests resources, the SchedulerBackend informs the TaskScheduler about the available resources on the executors.
+
+The TaskScheduler assigns tasks to these resources, resulting in a list of task descriptions. For each entry in this list, the SchedulerBackend serializes the task description and sends it to the executor.
+
+The executor deserializes the task description and begins launching the task.
