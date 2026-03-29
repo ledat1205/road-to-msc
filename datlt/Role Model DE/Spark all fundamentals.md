@@ -89,3 +89,10 @@ Catalyst Optimizer designed based on functional programming construct in scala. 
 logic go through an optimized process: analyze logical plan, optimize logical plan, physical plan and code generation.
 ![[Pasted image 20260329164659.png]]
 
+- **Analysis:** The optimizer uses the rules and the catalog to answer questions like “Is the column/table name valid?” or “What is the column’s type?”.
+
+> _The Catalog object enables interaction with metadata for databases, tables, and functions. It allows users to list, retrieve, and manage these entities and refresh table metadata to keep Spark's view in sync with underlying data sources._
+
+- **Logical Optimization:** Spark applies standard rule-based optimizations, such as predicate pushdown, projection pruning, null propagation, etc.
+- **Physical Planning:** Based on the logical plan, the optimizer generates one or more physical plans and selects the final one using a cost model.
+- **Code Generation:** The final query optimization phase generates Java bytecode for execution.
