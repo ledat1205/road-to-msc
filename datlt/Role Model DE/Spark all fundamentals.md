@@ -97,4 +97,6 @@ logic go through an optimized process: analyze logical plan, optimize logical pl
 - **Physical Planning:** Based on the logical plan, the optimizer generates one or more physical plans and selects the final one using a cost model.
 - **Code Generation:** The final query optimization phase generates Java bytecode for execution.
 
-cost model maybe 
+cost model maybe access to outdated or unavailable statistics
+
+Apache Spark 3 introduce Adaptive Query Execution to solv
