@@ -96,3 +96,5 @@ logic go through an optimized process: analyze logical plan, optimize logical pl
 - **Logical Optimization:** Spark applies standard rule-based optimizations, such as predicate pushdown, projection pruning, null propagation, etc.
 - **Physical Planning:** Based on the logical plan, the optimizer generates one or more physical plans and selects the final one using a cost model.
 - **Code Generation:** The final query optimization phase generates Java bytecode for execution.
+
+cost model maybe 
