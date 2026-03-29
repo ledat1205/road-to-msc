@@ -99,4 +99,4 @@ logic go through an optimized process: analyze logical plan, optimize logical pl
 
 cost model maybe access to outdated or unavailable statistics
 
-Apache Spark 3 introduce Adaptive Query Execution to solv
+Apache Spark 3 introduce Adaptive Query Execution to solve this problem. This allow query plans to be adjusted based on runtime statistics collected during execution
