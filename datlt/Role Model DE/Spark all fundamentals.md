@@ -72,4 +72,5 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 
 - user defines spark application. It must include SparkSession object 
 - submits a spark application to cluster manager and also requests driver resource
-- cluster manager accepts to submission and create 
+- cluster manager accepts to submission and places driver to a worker node
+- the driver asks cluster manager to luan
