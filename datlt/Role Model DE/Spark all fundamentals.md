@@ -80,3 +80,6 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 - The driver starts scheduling tasks on executors, and each executor responds to the driver with the status of those tasks.
 - Once the application finishes, the driver exits with either success or failure. The cluster manager then shuts down the application’s executors.
 - The client can check the status of the Spark application by asking the cluster manager.
+
+# Plan
+Catalyst Optimizer designed based on functional programming 
