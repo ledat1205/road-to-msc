@@ -101,4 +101,7 @@ cost model maybe access to outdated or unavailable statistics
 
 Apache Spark 3 introduce Adaptive Query Execution to solve this problem. This allow query plans to be adjusted based on runtime statistics collected during execution. 
 
-The next stage based on previous stage is complete. So data statistics can collect on previous 
+The next stage based on previous stage is complete. So data statistics can collect on previous stage and use for the following stage
+
+# Scheduling process
+
