@@ -105,3 +105,10 @@ The next stage based on previous stage is complete. So data statistics can colle
 
 # Scheduling process
 
+process assign tasks to executors
+![[Pasted image 20260329175804.png]]
+
+- The DAGScheduler for stage-oriented scheduling
+- The TaskScheduler for task-oriented scheduling
+- The SchedulerBackend interacts with the cluster manager and provides resources to the TaskScheduler.
+
