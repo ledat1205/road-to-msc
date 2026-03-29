@@ -74,4 +74,5 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 - submits a spark application to cluster manager and also requests driver resource
 - cluster manager accepts to submission and places driver to a worker node
 - the driver asks cluster manager to launch the executors. 
-- the cluster manager 
+- the cluster manager launches the executor processes and sends the information about their locations to the driver process
+- the driver formulates 
