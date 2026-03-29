@@ -70,5 +70,6 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 # Journey
 ![[Pasted image 20260327163758.png]]
 
-user defines spark application. It must include SparkSession object 
-submit 
+- user defines spark application. It must include SparkSession object 
+- submits a spark application to cluster manager and also requests driver resource
+- cluster manager accepts to submission and create 
