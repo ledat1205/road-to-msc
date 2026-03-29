@@ -75,4 +75,4 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 - cluster manager accepts to submission and places driver to a worker node
 - the driver asks cluster manager to launch the executors. 
 - the cluster manager launches the executor processes and sends the information about their locations to the driver process
-- the driver formulates 
+- the driver formulates an execution plan to guide the physical execution. This process starts w
