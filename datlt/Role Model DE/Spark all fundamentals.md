@@ -82,4 +82,5 @@ Wide transformation: A single partition of a parent RDD contributes to multiple 
 - The client can check the status of the Spark application by asking the cluster manager.
 
 # Plan
-Catalyst Optimizer designed based on functional programming 
+Catalyst Optimizer designed based on functional programming construct in scala. support rule-based and cost-based 
+- rule-based optimization: relies on predefined rules and heur
