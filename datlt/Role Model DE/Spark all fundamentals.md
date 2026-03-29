@@ -86,3 +86,4 @@ Catalyst Optimizer designed based on functional programming construct in scala. 
 - rule-based optimization: relies on predefined rules and heuristics to choose the execution plan for query 
 - cost-based optimization: uses statistical information about data - table size, index selectivity and data distribution to estimate various execution plans and chooses lowest estimated cost
 
+logic go through an optimized process: analyze logical plan, optimize logical plan, physical p
