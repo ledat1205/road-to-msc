@@ -140,4 +140,5 @@ How a job will be scheduled at the task level. Cluster has two or three jobs to 
 - **Fair**: Since spark 0.8, the user can configure fair scheduling between jobs. Spark assigns tasks between jobs in round-robin.
 ![[Pasted image 20260330164927.png]]
 
-The fair scheduler supports grouping jobs into pools and setting 
+The fair scheduler supports grouping jobs into pools and setting various scheduling options for each pool, such as the weight. This can help isolate workload so critical jobs can be executed on a larger resource pool. The user can configure which jobs can be run on which pools.
+![[Pasted image 20260330165106.png]]
