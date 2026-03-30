@@ -129,3 +129,5 @@ When the TaskScheduler requests resources, the SchedulerBackend informs the Task
 The TaskScheduler assigns tasks to these resources, resulting in a list of task descriptions. For each entry in this list, the SchedulerBackend serializes the task description and sends it to the executor.
 
 The executor deserializes the task description and begins launching the task.
+
+# Scheduling Mode
