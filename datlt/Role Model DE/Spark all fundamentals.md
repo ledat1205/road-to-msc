@@ -131,3 +131,5 @@ The TaskScheduler assigns tasks to these resources, resulting in a list of task 
 The executor deserializes the task description and begins launching the task.
 
 # Scheduling Mode
+
+How a job will be scheduled at the task level. 
