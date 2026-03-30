@@ -150,4 +150,11 @@ a Spark application gets an isolated set of executors (JVM processes)
 ![[Pasted image 20260330173301.png]]
 
 - Dynamic allocation (enable by setting `spark.dynamicAllocation.enabled` to `True`): Since version 1.2, Spark offers dynamic resource allocation. The application may return resources to the cluster if they are no longer used and can request them later when there is demand.
-- 
+![[Pasted image 20260330173410.png]]
+
+# Memory management
+
+The executor has three central regions for memory: on-heap, off-heap and overhead
+![[Pasted image 20260330173511.png]]
+
+## On heap
