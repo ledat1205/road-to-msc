@@ -144,3 +144,6 @@ The fair scheduler supports grouping jobs into pools and setting various schedul
 ![[Pasted image 20260330165106.png]]
 
 # Resource allocation
+a Spark application gets an isolated set of executors (JVM processes)
+2 ways of allocating resources: static allocation and dynamic allocation
+- Static allocation: 
