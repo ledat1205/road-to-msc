@@ -134,5 +134,6 @@ The executor deserializes the task description and begins launching the task.
 
 How a job will be scheduled at the task level. Cluster has two or three jobs to run
 2 modes:
-- First In First Out (FIFO): default mode
+- First In First Out (FIFO): default mode, very simple idea
 ![[Pasted image 20260330164018.png]]
+- 
