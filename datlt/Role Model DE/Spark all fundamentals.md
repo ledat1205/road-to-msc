@@ -158,3 +158,9 @@ The executor has three central regions for memory: on-heap, off-heap and overhea
 ![[Pasted image 20260330173511.png]]
 
 ## On heap
+use the `spark.executor.memory` setting to specify each executor's on-heap memory
+
+### The reserved memory
+Spark uses this region to store internal objects. It is [hardcoded and equal to 300 MB](https://github.com/apache/spark/blob/a9bfacb084e696265a9d1473efe5001d03700ee3/core/src/main/scala/org/apache/spark/memory/UnifiedMemoryManager.scala#L200).
+
+### The user memory
