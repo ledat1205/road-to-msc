@@ -136,4 +136,5 @@ How a job will be scheduled at the task level. Cluster has two or three jobs to 
 2 modes:
 - **First In First Out (FIFO)**: default mode, very simple idea
 ![[Pasted image 20260330164018.png]]
-- **Fair**: Since spark 0.8, the user can configure fair scheduling 
+
+- **Fair**: Since spark 0.8, the user can configure fair scheduling between jobs. Spark assigns tasks
