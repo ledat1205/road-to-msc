@@ -147,3 +147,7 @@ The fair scheduler supports grouping jobs into pools and setting various schedul
 a Spark application gets an isolated set of executors (JVM processes)
 2 ways of allocating resources: static allocation and dynamic allocation
 - Static allocation: resources for application is fixed and cannot change during runtime. User can define resource configuration
+![[Pasted image 20260330173301.png]]
+
+- Dynamic allocation (enable by setting `spark.dynamicAllocation.enabled` to `True`): Since version 1.2, Spark offers dynamic resource allocation. The application may return resources to the cluster if they are no longer used and can request them later when there is demand.
+- 
