@@ -194,3 +194,7 @@ Motivation:
 - The fixed fraction setting is not suitable for all workloads.
 - With applications that do not cache much data, the storage regions are wasted.
 
+There are rules for borrow memory:
+![[Pasted image 20260331172110.png]]
+
+If there is free space in 
