@@ -186,4 +186,11 @@ With 4 GBs mem, the `spark.memory.fraction` is 0.6 (default),  `spark.memory.sto
 
 ![[Pasted image 20260331171836.png]]
 
-from spark >= 1.6, ex
+from spark >= 1.6, execution can borrow memory if it need
+![[Pasted image 20260331171920.png]]
+
+Motivation: 
+- Tuning the fractions requires expertise in Spark internals.
+- The fixed fraction setting is not suitable for all workloads.
+- With applications that do not cache much data, the storage regions are wasted.
+
