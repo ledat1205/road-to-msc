@@ -197,4 +197,7 @@ Motivation:
 There are rules for borrow memory:
 ![[Pasted image 20260331172110.png]]
 
-If there is free space in 
+If there is free space in the execution, storage can borrow it. When execution needs the memory back, the storage is forced to evict data using the Least Recently Used (LRU) until storage space under R threshold 
+
+![[Pasted image 20260331172307.png]]
+
