@@ -181,4 +181,9 @@ This region is specified by the setting `spark.memory.fraction`. The unified me
 The boundary between execution and storage is defined by the `spark.memory.storageFraction`
 
 Example: 
-With 4 GBs 
+With 4 GBs mem, the `spark.memory.fraction` is 0.6 (default),  `spark.memory.storageFraction` is 0.5 (default)
+![[Pasted image 20260331171831.png]]
+
+![[Pasted image 20260331171836.png]]
+
+from spark >= 1.6, ex
