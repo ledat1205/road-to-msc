@@ -164,3 +164,4 @@ use the `spark.executor.memory` setting to specify each executor's on-heap mem
 Spark uses this region to store internal objects. It is [hardcoded and equal to 300 MB](https://github.com/apache/spark/blob/a9bfacb084e696265a9d1473efe5001d03700ee3/core/src/main/scala/org/apache/spark/memory/UnifiedMemoryManager.scala#L200).
 
 ### The user memory
+![[Pasted image 20260330174122.png]]
