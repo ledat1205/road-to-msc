@@ -167,3 +167,18 @@ Spark uses this region to store internal objects. It is [hardcoded and equal to
 ![[Pasted image 20260330174122.png]]
 
 memory for user data structures and spark's internal metadata and safeguards 
+
+### The unified memory
+![[Pasted image 20260331171605.png]]
+
+This region is specified by the setting `spark.memory.fraction`. The unified memory includes two parts: the execution and the storage region.
+
+![[Pasted image 20260331171619.png]]
+
+- The **execution** region is used for shuffling, joins, aggregations, and sorting. The memory is released as soon as the task completes.
+- For **storage,** it is used for [data caching](https://luminousmen.com/post/explaining-the-mechanics-of-spark-caching)
+
+The boundary between execution and storage is defined by the `spark.memory.storageFraction`
+
+Example: 
+With 4 GBs 
