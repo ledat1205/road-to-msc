@@ -165,3 +165,5 @@ Spark uses this region to store internal objects. It is [hardcoded and equal to
 
 ### The user memory
 ![[Pasted image 20260330174122.png]]
+
+memory for user data structures and spark's internal metadata and safeguards 
