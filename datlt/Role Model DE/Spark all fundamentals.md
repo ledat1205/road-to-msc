@@ -253,3 +253,4 @@ Also, with the AQE, the optimizer can dynamically change the join strategies at 
 
 ![[Pasted image 20260402172913.png]]
 
+you have to shuffle data in write process (increase write time), avoid shuffle when rea
