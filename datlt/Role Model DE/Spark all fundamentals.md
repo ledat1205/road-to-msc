@@ -253,4 +253,10 @@ Also, with the AQE, the optimizer can dynamically change the join strategies at 
 
 ![[Pasted image 20260402172913.png]]
 
-you have to shuffle data in write process (increase write time), avoid shuffle when rea
+you have to shuffle data in write process (increase write time), avoid shuffle when read data because all data already shuffled in physiccal
+
+Netflix usecase:
+https://www.youtube.com/watch?v=S78D8LsnR5Y&list=PLfXiENmg6yyXKICQiUNutmDyJKk84BVSP&index=9
+
+## Hints
+
