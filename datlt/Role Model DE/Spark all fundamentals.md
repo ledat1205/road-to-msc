@@ -236,4 +236,5 @@ Use suffix `_X` to specify the replication factor. Replication enables faster fa
 
 # Join in spark
 
-Use sort merge join and hash join but tr
+Use sort merge join and hash join but require shuffle data first
+shuffle data is rearrange data by join key to ensure data with the same key will end up in same place then apply join on 
