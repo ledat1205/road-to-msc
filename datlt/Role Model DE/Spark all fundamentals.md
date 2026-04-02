@@ -201,3 +201,6 @@ If there is free space in the execution, storage can borrow it. When execution n
 
 ![[Pasted image 20260331172307.png]]
 
+If there is free space in the storage, the execution can borrow it. However, when storage needs to take the space back, it can’t because the design prioritizes the execution. When new data needs to be cached, the storage is forced to evict data using the Least Recently Used (LRU) policy to make room for the new data in the remaining storage region.
+
+## Off heap
