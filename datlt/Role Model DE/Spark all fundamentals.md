@@ -222,4 +222,6 @@ cache like transformation, cache is lazy
 
 ![[Pasted image 20260402142802.png]]
 
-- MEMORY_ONLY: Spark stores unserialized  
+- MEMORY_ONLY: Spark stores unserialized cache data in memory 
+- MEOORY_AND_DISK: Spark stores unserialized cache data in memory. If memory is full, Spark writes the data to disk 
+- 
