@@ -241,4 +241,4 @@ shuffle data is rearrange data by join key to ensure data with the same key will
 
 ![[Pasted image 20260402171417.png]]
 
-Spark also leverages broadcast hash join to optimize the join performance 
+Spark also leverages broadcast hash join to optimize the join performance. Send hashed smaller table to all node through network when join without shuffle data. 
