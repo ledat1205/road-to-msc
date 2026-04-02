@@ -260,3 +260,14 @@ https://www.youtube.com/watch?v=S78D8LsnR5Y&list=PLfXiENmg6yyXKICQiUNutmDyJKk84B
 
 ## Hints
 
+Can give hint to optimized choose join strategy
+![[Pasted image 20260402174350.png]]
+
+When different join strategy hints are specified on both sides of a join, Spark prioritizes hints in the following order:
+
+- `BROADCAST`
+- `MERGE` (sort-merge join)
+    
+- `SHUFFLE_HASH` (hash join)
+    
+- `SHUFFLE_REPLICATE_NL` (nested loop join).
