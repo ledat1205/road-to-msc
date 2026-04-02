@@ -218,4 +218,4 @@ off-heap only has 2 memory regions: execution and storage
  The total execution region is the sum of the on-heap and off-heap execution regions; the same is true for the storage region.
 
 # Cache
-cache like transformation
+cache like transformation, cache is lazy
