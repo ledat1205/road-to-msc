@@ -226,3 +226,5 @@ cache like transformation, cache is lazy
 - MEOORY_AND_DISK: Spark stores unserialized cache data in memory. If memory is full, Spark writes the data to disk 
 - DISK_ONLY: Data is cached on disk only in a serialized format
 - OFF_HEAP: Spark stores cached data in the off-heap region
+
+Use suffix `_SER` for each option to cache serialized data. Save storage but adds m
