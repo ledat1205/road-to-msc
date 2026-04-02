@@ -251,3 +251,5 @@ Also, with the AQE, the optimizer can dynamically change the join strategies at 
 
 ## Bucket join
 
+![[Pasted image 20260402172913.png]]
+
