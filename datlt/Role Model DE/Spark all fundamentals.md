@@ -211,3 +211,7 @@ In addition, JVM's object has a significant memory overhead (wasted resource)
  [project Tungsten](https://www.databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html) introduces a memory manager that operates directly against binary data rather than Java objects to address above problems
  ![[Pasted image 20260402114729.png]]
 
+Tungsen can work with the off-heap memory, which directly manages data outside the JVM. The off-heap memory is turned off by default, but can be enabled by setting `spark.memory.offHeap.enabled` to True and specifying the `spark.memory.offHeap.size` to have a positive value.
+![[Pasted image 20260402114837.png]]
+
+off-heap only has 2 memory regions: 
