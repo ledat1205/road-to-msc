@@ -267,7 +267,7 @@ When different join strategy hints are specified on both sides of a join, Spark 
 
 - `BROADCAST`
 - `MERGE` (sort-merge join)
-    
 - `SHUFFLE_HASH` (hash join)
-    
 - `SHUFFLE_REPLICATE_NL` (nested loop join).
+
+Hint is just a hint, the optimizer will the final decision maker to decide to choo
