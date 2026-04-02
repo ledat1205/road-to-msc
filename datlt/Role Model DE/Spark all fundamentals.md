@@ -241,4 +241,11 @@ shuffle data is rearrange data by join key to ensure data with the same key will
 
 ![[Pasted image 20260402171417.png]]
 
-Spark also leverages broadcast hash join to optimize the join performance. Send hashed smaller table to all node through network when join without shuffle data. 
+Spark also leverages broadcast hash join to optimize the join performance. Send hashed smaller table to all node through network when join without shuffle data.
+
+It tries to detect if one of the tables is small enough (based on a configurable threshold: `spark.sql.autoBroadcastJoinThreshold`, default is 10MB). If yes, it will execute the broadcast join. [If no, the sort-merge approach is preferred before Spark 3.0 due to the risk of insufficient memory when building in-memory hash tables in shuffle hash join.](https://www.canadiandataguy.com/i/160917168/historical-perspective)
+
+[With the introduction of adaptive query execution (AQE) in Spark 3.0, Spark can dynamically choose the hash join when the smaller table is small enough after partitioning. This ensures sufficient memory when building the hash table on the executors.](https://www.canadiandataguy.com/i/160917168/historical-perspective)
+
+Also, with the AQE, the optimizer can dynamically change the join strategies at runtime. For example, it can convert a sort-merge join to a broadcast hash join when the runtime statistics of any join side are smaller than a threshold.
+
