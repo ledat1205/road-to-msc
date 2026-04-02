@@ -229,4 +229,7 @@ cache like transformation, cache is lazy
 
 Use suffix `_SER` for each option to cache serialized data. Save storage but adds more overhead to deserialize data
 
-Use suffix `_X` to specify the replication factor. Replication enbales 
+Use suffix `_X` to specify the replication factor. Replication enables faster fault tolerance 
+
+`cache()` always leverages the `MEMORY_AND_DISK` strategy,
+`persist()` gives you more flexibility in choosing the cache strategy.
