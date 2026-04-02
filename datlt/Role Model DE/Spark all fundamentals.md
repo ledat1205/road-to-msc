@@ -219,3 +219,7 @@ off-heap only has 2 memory regions: execution and storage
 
 # Cache
 cache like transformation, cache is lazy
+
+![[Pasted image 20260402142802.png]]
+
+- MEMORY_ONLY: Spark stores unserialized  
