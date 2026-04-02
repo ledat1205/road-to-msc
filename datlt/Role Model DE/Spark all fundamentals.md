@@ -214,4 +214,8 @@ In addition, JVM's object has a significant memory overhead (wasted resource)
 Tungsen can work with the off-heap memory, which directly manages data outside the JVM. The off-heap memory is turned off by default, but can be enabled by setting `spark.memory.offHeap.enabled` to True and specifying the `spark.memory.offHeap.size` to have a positive value.
 ![[Pasted image 20260402114837.png]]
 
-off-heap only has 2 memory regions: 
+off-heap only has 2 memory regions: execution and storage
+ The total execution region is the sum of the on-heap and off-heap execution regions; the same is true for the storage region.
+
+# Cache
+cache like transformation
