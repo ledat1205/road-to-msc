@@ -249,3 +249,5 @@ It tries to detect if one of the tables is small enough (based on a configurable
 
 Also, with the AQE, the optimizer can dynamically change the join strategies at runtime. For example, it can convert a sort-merge join to a broadcast hash join when the runtime statistics of any join side are smaller than a threshold.
 
+## Bucket join
+
