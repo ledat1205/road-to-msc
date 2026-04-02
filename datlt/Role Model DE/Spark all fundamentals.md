@@ -227,4 +227,6 @@ cache like transformation, cache is lazy
 - DISK_ONLY: Data is cached on disk only in a serialized format
 - OFF_HEAP: Spark stores cached data in the off-heap region
 
-Use suffix `_SER` for each option to cache serialized data. Save storage but adds m
+Use suffix `_SER` for each option to cache serialized data. Save storage but adds more overhead to deserialize data
+
+Use suffix `_X` to specify the replication factor. Replication enbales 
