@@ -208,4 +208,6 @@ The on-heap data is subject to the JVM garbage collection (GC) process. Sometime
 
 In addition, JVM's object has a significant memory overhead (wasted resource)
 
- [project Tungsten](https://www.databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html) introduces a memory manager that operates directly against binary data rather than Java objects to address
+ [project Tungsten](https://www.databricks.com/blog/2015/04/28/project-tungsten-bringing-spark-closer-to-bare-metal.html) introduces a memory manager that operates directly against binary data rather than Java objects to address above problems
+ ![[Pasted image 20260402114729.png]]
+
