@@ -274,7 +274,7 @@ Hint is just a hint, the optimizer will the final decision maker to decide to ch
 
 
 Detail topics:
-- Resource allocation
+- [[road-to-msc/datlt/Role Model DE/Spark/Resource Allocation|Resource Allocation]]
 - Scheduling process
 - Planning
 - Memory management
