@@ -274,8 +274,11 @@ Hint is just a hint, the optimizer will the final decision maker to decide to ch
 
 
 Detail topics:
-- Resource allocation 
+- Resource allocation
 - Scheduling process
 - Planning
 - Memory management
-- Databri
+- Databricks vs Spark OSS
+- Pyspark
+- Spark streaming
+- Spark connect
