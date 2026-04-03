@@ -270,7 +270,7 @@ When different join strategy hints are specified on both sides of a join, Spark 
 - `SHUFFLE_HASH` (hash join)
 - `SHUFFLE_REPLICATE_NL` (nested loop join).
 
-Hint is just a hint, the optimizer will the final decision maker to decide to choose which strategy to apply to join
+Hint is just a hint, the optimizer will be the final decision maker to decide totthoose which strategy to apply to join
 
 
 Detail topics:
