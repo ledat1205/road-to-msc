@@ -271,3 +271,11 @@ When different join strategy hints are specified on both sides of a join, Spark 
 - `SHUFFLE_REPLICATE_NL` (nested loop join).
 
 Hint is just a hint, the optimizer will the final decision maker to decide to choose which strategy to apply to join
+
+
+Detail topics:
+- Resource allocation 
+- Scheduling process
+- Planning
+- Memory management
+- Databri
