@@ -1,0 +1,4 @@
+
+# Static allocation
+# Dynamic allocation
+
