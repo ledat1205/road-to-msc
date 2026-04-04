@@ -88,6 +88,6 @@ Many workers are forced to migrate to urban centers where have more job opportun
 Individuals for whom the English is a second language probably have a struggle with academic writing 
 
 - Đó là một khám phá đã thay đổi một cách căn bản sự hiểu biết của chúng ta về sự tiến hóa của loài người.
-That is a discovery 
+That is a discovery which fundamentally changes 
 
 - Khung lý thuyết mà trong đó các nhà nghiên cứu vận hành được dựa trên xã hội học thế kỷ 20.
