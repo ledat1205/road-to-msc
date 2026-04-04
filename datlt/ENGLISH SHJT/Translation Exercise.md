@@ -73,7 +73,7 @@ Some places where climate change effect became
 
 - Vị CEO, người mà có tầm nhìn đã thay đổi cả công ty, đã quyết định nghỉ hưu ở đỉnh cao sự nghiệp của mình.
 
-The CEO, who is a visionary change the whole company, decided to retire at the peak of his career
+The CEO, who has a visionary that changed the whole company, decided to retire at the peak of his career
 
 - Đây là một tình huống mà trong đó những điểm bất lợi rõ ràng là vượt xa các ưu điểm.
 
