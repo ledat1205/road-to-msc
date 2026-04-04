@@ -81,6 +81,7 @@ This is a situation which
 
 - Nhiều công nhân bị buộc phải di cư đến các trung tâm đô thị, nơi mà các cơ hội việc làm dồi dào hơn.
 
+Many 
 
 - Những cá nhân người mà đối với họ tiếng Anh là ngôn ngữ thứ hai có thể thấy việc viết học thuật đặc biệt khó khăn.
 
