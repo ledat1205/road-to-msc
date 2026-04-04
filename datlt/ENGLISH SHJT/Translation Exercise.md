@@ -85,7 +85,7 @@ Many workers are forced to migrate to urban centers where have more job opportun
 
 - Những cá nhân người mà đối với họ tiếng Anh là ngôn ngữ thứ hai có thể thấy việc viết học thuật đặc biệt khó khăn.
 
-Individuals whom the english is a second language to, probably have a struggle in writing academic 
+Individuals for whom the English is a second language probably have a struggle with academic ư 
 
 - Đó là một khám phá đã thay đổi một cách căn bản sự hiểu biết của chúng ta về sự tiến hóa của loài người.
 
