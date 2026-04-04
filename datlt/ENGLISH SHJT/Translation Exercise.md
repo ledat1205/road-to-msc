@@ -91,4 +91,4 @@ Individuals for whom the English is a second language probably have a struggle w
 That is a discovery which fundamentally changes our knowledge about human evolution
 
 - Khung lý thuyết mà trong đó các nhà nghiên cứu vận hành được dựa trên xã hội học thế kỷ 20.
-The theorical framework which the researchers operated was based on 20th century sociology
+The theocratical framework which the researchers operated was based on 20th century sociology
