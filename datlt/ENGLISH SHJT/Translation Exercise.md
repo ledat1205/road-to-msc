@@ -69,7 +69,7 @@ The students participate in extracurricular activities who often improve time ma
 
 - Có một vài khu vực nơi mà những tác động của biến đổi khí hậu đã trở nên không thể đảo ngược.
 
-Some places where climate change effect became 
+Some places where climate change effect became no reversal 
 
 - Vị CEO, người mà có tầm nhìn đã thay đổi cả công ty, đã quyết định nghỉ hưu ở đỉnh cao sự nghiệp của mình.
 
