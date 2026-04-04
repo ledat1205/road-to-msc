@@ -1,3 +1,4 @@
+## 1. Subordinate Clauses
 - Mặc dù nhiều người tin rằng công nghệ làm con người cô lập, bằng chứng cho thấy nó thực sự thúc đẩy các cộng đồng toàn cầu.
 
 Although many people believe technology makes humans feel isolated/ isolates human, the evidence shows that it literally/ actually motivates global communities.
@@ -57,7 +58,7 @@ Even though/ Much as I understand the demand for improvement, I believe we have 
 Even if/ Whether we like it or not, AI is becoming an indispensable part of the modern labor force**
 
 
-
+## 2. Relative Clauses
 - Cái chính sách mà được thực thi vào tháng 6 năm ngoái đã cho thấy sự sụt giảm 10% lượng rác thải.
 
 
