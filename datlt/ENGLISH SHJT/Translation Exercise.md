@@ -65,7 +65,7 @@ The policy was enforced in June last year which decreased 10% garbage volume
 
 - Những sinh viên người mà tham gia vào các hoạt động ngoại khóa thường phát triển kỹ năng quản lý thời gian tốt hơn.
 
-
+The students participate into 
 
 - Có một vài khu vực nơi mà những tác động của biến đổi khí hậu đã trở nên không thể đảo ngược.
 
