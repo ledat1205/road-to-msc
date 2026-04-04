@@ -81,10 +81,10 @@ This is a situation which
 
 - Nhiều công nhân bị buộc phải di cư đến các trung tâm đô thị, nơi mà các cơ hội việc làm dồi dào hơn.
 
-Many workers are forced to migrate to urban centers where have so many job opportunities 
+Many workers are forced to migrate to urban centers where have more job opportunities 
 
 - Những cá nhân người mà đối với họ tiếng Anh là ngôn ngữ thứ hai có thể thấy việc viết học thuật đặc biệt khó khăn.
-
+I
 
 - Đó là một khám phá đã thay đổi một cách căn bản sự hiểu biết của chúng ta về sự tiến hóa của loài người.
 
