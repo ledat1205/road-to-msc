@@ -61,7 +61,7 @@ Even if/ Whether we like it or not, AI is becoming an indispensable part of the 
 ## 2. Relative Clauses
 - Cái chính sách mà được thực thi vào tháng 6 năm ngoái đã cho thấy sự sụt giảm 10% lượng rác thải.
 
-The policy was enforced in June last year which decrease 10% garbage 
+The policy was enforced in June last year which decreased 10% garbage volume
 
 - Những sinh viên người mà tham gia vào các hoạt động ngoại khóa thường phát triển kỹ năng quản lý thời gian tốt hơn.
 
