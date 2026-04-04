@@ -77,6 +77,7 @@ The CEO, who is a visionary change the whole company, decided to retire at the p
 
 - Đây là một tình huống mà trong đó những điểm bất lợi rõ ràng là vượt xa các ưu điểm.
 
+This is a situation which 
 
 - Nhiều công nhân bị buộc phải di cư đến các trung tâm đô thị, nơi mà các cơ hội việc làm dồi dào hơn.
 
