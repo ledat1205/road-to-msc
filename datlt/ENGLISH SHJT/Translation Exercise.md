@@ -91,4 +91,4 @@ Individuals for whom the English is a second language probably have a struggle w
 That is a discovery which fundamentally changes our knowledge about human evolution
 
 - Khung lý thuyết mà trong đó các nhà nghiên cứu vận hành được dựa trên xã hội học thế kỷ 20.
-Theorical framework whom the resea
+Theorical framework whom the researchers operated based on 
