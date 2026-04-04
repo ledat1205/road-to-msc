@@ -84,7 +84,8 @@ This is a situation which
 Many workers are forced to migrate to urban centers where have more job opportunities 
 
 - Những cá nhân người mà đối với họ tiếng Anh là ngôn ngữ thứ hai có thể thấy việc viết học thuật đặc biệt khó khăn.
-I
+
+Invididuals 
 
 - Đó là một khám phá đã thay đổi một cách căn bản sự hiểu biết của chúng ta về sự tiến hóa của loài người.
 
