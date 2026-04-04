@@ -1,4 +1,4 @@
-## 1. Subordinate Clauses
+## Subordinate Clauses
 - Mặc dù nhiều người tin rằng công nghệ làm con người cô lập, bằng chứng cho thấy nó thực sự thúc đẩy các cộng đồng toàn cầu.
 
 Although many people believe technology makes humans feel isolated/ isolates human, the evidence shows that it literally/ actually motivates global communities.
