@@ -560,7 +560,7 @@ The values from reconstruction won't be byte-identical to Redis at serving time,
 
   
 
-There is **no need to sync streaming features back to BigQuery for training**. The streaming pipeline writes to Redis for serving only. Raw Kafka events already land in BigQuery via existing `core_events` ingestion.
+There is **no need to sync streaming features back to BigQuery for training**. The streaming pipeline writes to Redis for serving only. Raw Kafka events already land in BigQuery via existing  ingestion.
 
   
 
