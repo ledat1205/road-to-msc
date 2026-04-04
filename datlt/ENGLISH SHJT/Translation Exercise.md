@@ -65,7 +65,7 @@ The policy which was enforced in June last year has shown a 10% decrease in garb
 
 - Những sinh viên người mà tham gia vào các hoạt động ngoại khóa thường phát triển kỹ năng quản lý thời gian tốt hơn.
 
-The students participate in extracurricular activities who often improve time management skill better
+The students who participate in extracurricular activities often improve time management skill better
 
 - Có một vài khu vực nơi mà những tác động của biến đổi khí hậu đã trở nên không thể đảo ngược.
 
