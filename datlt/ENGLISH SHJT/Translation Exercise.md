@@ -58,7 +58,7 @@ Even if/ Whether we like it or not, AI is becoming an indispensable part of the 
 
 
 
-- Chính sách cái mà được thực thi vào tháng 6 năm ngoái đã cho thấy sự sụt giảm 10% lượng rác thải.
+- Cái chính sách mà được thực thi vào tháng 6 năm ngoái đã cho thấy sự sụt giảm 10% lượng rác thải.
 
 
 - Những sinh viên người mà tham gia vào các hoạt động ngoại khóa thường phát triển kỹ năng quản lý thời gian tốt hơn.
@@ -77,12 +77,10 @@ Even if/ Whether we like it or not, AI is becoming an indispensable part of the 
 - Nhiều công nhân bị buộc phải di cư đến các trung tâm đô thị, nơi mà các cơ hội việc làm dồi dào hơn.
 
 
-- Dữ liệu, cái mà độ chính xác của nó đã bị nghi ngờ, cho thấy sự sụt giảm trong tỉ lệ biết chữ.
-
-
 - Những cá nhân người mà đối với họ tiếng Anh là ngôn ngữ thứ hai có thể thấy việc viết học thuật đặc biệt khó khăn.
 
 
-- Đó là một khám phá cái mà đã thay đổi một cách căn bản sự hiểu biết của chúng ta về sự tiến hóa của loài người.
-    
+- Đó là một khám phá đã thay đổi một cách căn bản sự hiểu biết của chúng ta về sự tiến hóa của loài người.
+
+
 - Khung lý thuyết mà trong đó các nhà nghiên cứu vận hành được dựa trên xã hội học thế kỷ 20.
