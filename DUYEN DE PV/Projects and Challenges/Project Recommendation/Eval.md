@@ -245,15 +245,6 @@ That framing shows MLOps maturity — you understand that the hard problem isn't
 
 
 
-
-
-
-
-
-Good — let me make each one concrete.
-
----
-
 ## 1. Compare session feature distributions between BigQuery reconstruction and Redis
 
 **What you're comparing:**
