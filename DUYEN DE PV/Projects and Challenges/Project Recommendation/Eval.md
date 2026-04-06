@@ -1,165 +1,238 @@
-**“Designed data pipelines and feature schemas supporting real-time model evaluation; defined canonical metric definitions (NDCG, CTR) used consistently across search and recommendation model iterations.”**
+Good framing — evaluation in MLOps is not a one-time step, it's a **gate system** that runs continuously across the model lifecycle. Let me rewrite it properly.
 
-This was one of the highest-leverage pieces of the entire recommendation platform re-architecture I owned. Before my work, model evaluation was a daily nightmare — different teams calculated CTR and NDCG differently, features were stale, and new model versions could only be tested the next day after the batch Airflow job finished.
+---
 
-### 1. The Problem I Inherited
+## Evaluation as a Gate System
 
-- Hundreds of scattered BigQuery SQL transformations inside 300+ Airflow DAGs.
-- CTR was defined 12+ different ways across search, recsys, and analytics teams.
-- NDCG precursors were computed inconsistently (some used position discounting, some didn’t).
-- All features were batch-only → models could only be evaluated offline the next morning.
-- During flash sales or Lunar New Year, models were trained and evaluated on 6–8-hour-old data → immediate online metric degradation.
-
-### 2. What I Designed: Canonical Metric Layer + Feature Schemas
-
-I built a **single source of truth** for both features and metrics using **dbt** (the same migration I mentioned in the first bullet).
-
-**Step-by-step what I delivered:**
-
-**A. Canonical Metric Definitions (the part I’m most proud of)** I created a central macros/metrics.sql file with reusable Jinja macros so **every** model iteration uses the exact same definitions.
-
-SQL
+The core MLOps principle: **no model reaches production without passing explicit gates**. Each gate is automated, logged in MLflow, and blocks promotion if thresholds aren't met.
 
 ```
--- macros/metric_definitions.sql (used everywhere)
-{% macro canonical_ctr_7d(device_filter=none) %}
-    SUM(CASE WHEN clicked THEN 1 ELSE 0 END) 
-    / NULLIF(SUM(CASE WHEN impression THEN 1 ELSE 0 END), 0)
-    OVER (PARTITION BY {{ device_filter or 'all' }} 
-          ORDER BY event_date 
-          ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)
-{% endmacro %}
-
-{% macro ndcg_precursor(position) %}
-    (clicked * (1 / LOG2({{ position }} + 1))) 
-    / NULLIF(SUM(impression * (1 / LOG2(position + 1))) OVER (...), 0)
-{% endmacro %}
+Training run
+     ↓
+Gate 1: Offline evaluation      ← blocks promotion to Staging
+     ↓
+Gate 2: Shadow mode             ← runs in production without serving results
+     ↓
+Gate 3: Canary deployment       ← serves small % of traffic
+     ↓
+Gate 4: Full A/B test           ← measures business impact
+     ↓
+Production
+     ↓
+Gate 5: Continuous monitoring   ← ongoing, triggers rollback or retrain
 ```
 
-These macros were referenced in **every** dbt model (fct_search_features, fct_rec_features, fct_real_time_evaluation).
+---
 
-Result: From that day forward, NDCG@10 and CTR were **identical** across search team, recsys team, A/B testing platform, and offline evaluation notebooks. No more “which CTR definition are we using?” discussions.
+## Gate 1 — Offline Evaluation (Staging Gate)
 
-**B. Feature Schemas for Real-Time Model Evaluation** I redesigned the entire feature mart layer in dbt with three layers:
+Runs automatically at the end of every training DAG in Airflow. Logged to MLflow. Blocks promotion if any threshold fails.
 
-1. **Staging** (stg_*): Raw Kafka + CDC data with polluted-click deduplication (Flink + dbt).
-2. **Intermediate** (int_*): All rolling windows (7d/30d/90d) computed once using the canonical macros.
-3. **Mart** (fct_*): Final feature tables + **real-time evaluation side outputs**.
+**What gets evaluated:**
 
-The key innovation: I added a new mart model fct_real_time_evaluation that computes:
+For Two-Tower (Home):
 
-- Live CTR, NDCG precursors, and predicted vs actual scores **in real time** (via Flink side outputs).
-- These are written to ScyllaDB and also backfilled nightly in dbt.
+- Retrieval quality — Recall@K, NDCG@K, MRR on time-based holdout
+- Segmented by user tier (new / casual / power) and item tier (head / torso / long tail)
+- Compared against current production model — must not regress
 
-This allowed the ML team to run **real-time model evaluation**:
+For LightFM + SBERT (PDP):
 
-- New model version deployed → immediate shadow inference on live traffic.
-- Compare predicted CTR vs actual CTR within minutes (not next day).
-- A/B test results visible in <30 minutes instead of 24 hours.
+- Retrieval quality on held-out co-view pairs
+- SBERT: proxy metric (automatic) + human evaluation sample (quarterly)
+- Coverage — % of catalog with >= 10 similar products in KVDal
+- Intra-list diversity — top-10 results shouldn't all be identical products
 
-### 3. How the Pipelines Support Real-Time Model Evaluation
+**Train/serve consistency check — always part of Gate 1:**
 
-The pipelines I designed are hybrid (Lambda style):
+This is the MLOps-specific addition most teams skip. Before any model ships, you verify that what the model trained on matches what it will see at serving time:
 
-- **Flink streaming layer** (the speed layer I re-architected):
-    - Consumes the same Kafka clickstream.
-    - Computes all canonical metrics and features in stateful windows.
-    - Outputs to ScyllaDB for <2-second freshness + side output to Druid for real-time monitoring.
-- **dbt + Airflow batch layer** (the serving + training layer):
-    - Nightly backfill of historical features using the exact same canonical macros.
-    - Data-quality gates (KS drift + polluted-click checks) run before training DAG starts.
-    - Training dataset is built from fct_* marts that are guaranteed to use canonical definitions.
+- Compare session feature distributions between BigQuery reconstruction and Redis
+- Compare batch feature distributions between Feast offline store and Feast online store
+- Flag any feature with null rate spike or distribution drift above threshold
 
-Because everything flows through the same dbt macros + schemas, the offline training data and online serving data are now perfectly aligned. Models can be evaluated in real time against production traffic with zero definition drift.
+If skew is detected here — before the model ships — you can fix the pipeline rather than debugging a live production issue.
 
-### 4. Challenges I Faced & How I Solved Them
-
-- **Challenge**: Legacy teams wanted to keep their hand-written SQL. **Solution**: Built dbt docs + lineage graphs showing “your old CTR is now this macro”. Ran knowledge-sharing sessions + showed revenue impact of consistent metrics.
-- **Challenge**: Real-time + batch consistency. **Solution**: Shared macros + dual-write pattern (Flink writes to ScyllaDB, dbt backfills the same tables).
-- **Challenge**: Performance at peak (5× traffic). **Solution**: Incremental dbt models + Flink state TTL + 10% stratified sampling for drift checks.
-- **Challenge**: Making NDCG precursors work in streaming. **Solution**: Implemented position-aware discounting inside Flink using event-time windows and watermarks.
-
-### 5. Impact & Why This Was Transformative
-
-- Model evaluation cycle: daily batch → real-time (minutes).
-- Metric consistency: 100% across all teams and iterations.
-- During 2025 seasonal peaks: zero definition-related bugs.
-- ML team feedback: “For the first time we can trust that the features and metrics we train on are exactly the same as what runs online.”
-- This directly enabled faster iteration (new model versions tested same-day) and protected revenue during high-traffic periods.
-
-### 1. High-Level Flow (Real-Time Eval → Amplitude)
-
-text
+**Promotion logic:**
 
 ```
-Flink (streaming feature computation)
-    ↓ (side outputs + shadow inference)
-Real-time Evaluation Events (predicted vs actual metrics)
-    ↓ (Kafka topic + direct SDK)
-Amplitude (A/B experiment tracking + metric monitoring)
+IF recall@50 >= production_model_recall@50 × 0.98   # allow 2% regression tolerance
+AND coverage >= 0.90
+AND no feature with KS p-value < 0.05
+AND human eval score >= 0.6 (quarterly check)
+THEN promote to Staging
+ELSE fail DAG, alert, block deployment
 ```
 
-### 2. What Data We Stream (the actual online eval payload)
+All thresholds and results logged to MLflow model registry with the model version.
 
-Every time a recommendation is served (or every 5 minutes in aggregate), the system emits a rich event to Amplitude with:
+---
 
-- **Experiment metadata**experiment_id, variant (e.g., “model_v2_high_decay”, “control”), user_id, session_id
-- **Canonical metrics (real-time)**
-    - predicted_ctr (from shadow model)
-    - actual_ctr (observed click/impression)
-    - ndcg_precursor (position-discounted)
-    - final_score vs base_score (intent boost applied)
-- **Feature values that drove the prediction**ctr_mobile_7d, is_sale_period, category_intent_score, etc. (sampled 1% for cost reasons)
-- **Business context**is_peak_season, device_type, master_id, position
+## Gate 2 — Shadow Mode
 
-These events are emitted **in real time** so Amplitude dashboards show live lift in NDCG@10 and CTR within 2–5 minutes of traffic.
+The new model runs **in parallel with production** for 3–5 days but its results are not served to users. You compare outputs silently.
 
-### 3. Technical Implementation (how I made it stream reliably)
+**What you're checking:**
 
-**A. Flink Side-Output for Shadow Evaluation** In the main Flink job (the same one that computes user intent and features), I added a **side output** stream:
+- Do the two models retrieve substantially different candidate sets? High divergence isn't necessarily bad but warrants investigation.
+- Does the new model's latency profile match expectations under real traffic? ONNX inference time, FAISS search time — offline benchmarks don't always reflect production load.
+- Does the new model produce any null or degenerate outputs (empty candidate sets, all identical items) on real requests that synthetic eval didn't surface?
+- Are the feature values arriving at the new model consistent with what it trained on? This is the live version of the train/serve skew check.
 
-Java
+**Why shadow mode before canary:**
+
+Gate 1 uses synthetic eval traffic. Shadow mode uses real production traffic — real user feature distributions, real session patterns, real edge cases. It catches issues that clean eval datasets miss: users with unusual browsing histories, products with missing features, cold-start edge cases.
+
+---
+
+## Gate 3 — Canary Deployment
+
+Route **5% of traffic** to the new model. Monitor for 24–48 hours before expanding.
+
+**What you're watching:**
+
+Hard guardrails — automatic rollback if breached:
+
+- Null recommendation rate (% requests returning < 5 items) increases > 2x
+- P95 serving latency exceeds budget (> 80ms Home, > 10ms PDP)
+- Error rate on model inference spikes
+
+Soft signals — human review required:
+
+- CTR on recommendations drops > 5% vs control
+- Add-to-cart rate drops
+
+**Why canary before full A/B:**
+
+Full A/B tests need 2+ weeks for statistical significance. Canary gives you fast feedback on catastrophic failures within hours. A model that crashes 5% of requests will show immediately in error rates — you don't need to wait for a two-week experiment to catch that.
+
+---
+
+## Gate 4 — Full A/B Test
+
+Now you're measuring **business impact**, not just system health.
+
+**Experiment design:**
+
+Traffic split at user level (not request level) so each user consistently sees one variant. Deterministic assignment by hashing customer_id.
 
 ```
-// Inside the main Flink ProcessFunction
-if (shouldRunShadowInference()) {
-    double predictedCTR = shadowModel.predict(features);   // lightweight XGBoost inference
-    double actualCTR = observedClick ? 1.0 : 0.0;
-    
-    EvaluationEvent event = new EvaluationEvent(
-        userId, experimentId, variant,
-        predictedCTR, actualCTR, ndcgPrecursor,
-        features  // map of key metrics
-    );
-    
-    ctx.output(shadowEvalSideOutput, event);
-}
+Control (10%):   current production model
+Variant A (10%): new model
+Holdout (80%):   not in experiment
 ```
 
-This side output is **non-blocking** — the main recommendation path continues at <2 ms latency.
+**Metric hierarchy:**
 
-**B. Routing to Amplitude** Two parallel paths (for reliability):
+Primary guardrail — conversion rate and GMV per session. This is what the business cares about. Everything else is diagnostic.
 
-1. **Real-time path** (low latency): Flink side output → Kafka topic real_time_eval_events → lightweight Go consumer (or Flink sink) that calls Amplitude’s HTTP SDK in batches of 100 events. Latency: <30 seconds from impression to Amplitude.
-2. **Batch fallback** (for high-volume safety): Every 5 minutes, a small Airflow task aggregates the Kafka topic and sends summarized events to Amplitude (prevents rate limits during peaks).
+Secondary — add-to-cart rate. Strong purchase intent signal, faster to accumulate than conversion.
 
-**C. A/B Bucketing Integration**
+Tertiary — CTR. Easy to move, easy to game. Never the primary decision metric.
 
-- Amplitude experiment variants are assigned in the Go serving layer (using the same bucketing logic as Amplitude’s own SDK).
-- The variant is attached to every recommendation request and flows through Flink → shadow model → eval event.
-- This lets PMs and ML engineers see live charts in Amplitude like:
-    - “Variant A vs Control: CTR lift +3.2%”
-    - “NDCG@10 delta over last 30 min”
+Quality guardrail — return rate and cancellation rate. These lag by 2–3 weeks. Run the experiment long enough to capture them. A model that improves CTR by misleading users about products will show up here.
 
-### 4. Why This Works So Well for Real-Time Model Evaluation
+**Segmentation that matters for your architecture:**
 
-- **Canonical metrics guarantee**: All events use the exact same dbt macros for CTR and NDCG precursors (no definition drift).
-- **Real-time vs offline alignment**: The shadow model uses the exact same feature schemas as production training.
-- **Seasonal & drift safety**: If covariate drift is detected, the eval events are automatically tagged with drift_flagged: true and filtered out of Amplitude experiment dashboards until the gate is cleared.
-- **Scale**: Handles 1,000+ QPS with <1% sampling on feature-heavy events.
+For Home — break results by session depth. Phase 2 (streaming session features) should outperform Phase 1 specifically in mid and late session (pageviews 5+). If there's no difference at session depth > 5, the streaming infrastructure isn't justified by the results.
 
-### 5. Real Impact I Saw
+For PDP — break results by catalog tier. SBERT's win over LightFM-only should be concentrated in long-tail products. If the improvement is uniform across head/torso/tail, something unexpected is happening.
 
-- Before: Model evaluation took 24 hours + manual Excel work.
-- After: New model versions could be A/B tested **live** in Amplitude. We went from 1–2 model iterations per week to 5–8 per week during peak seasons.
-- During Lunar New Year 2025, we caught a concept drift in <15 minutes via Amplitude’s live CTR divergence chart and rolled back the bad variant instantly.
+**Minimum experiment duration:** 2 weeks. Non-negotiable. Weekly seasonality (weekday vs weekend) in e-commerce is significant enough to invalidate shorter experiments. Don't call early even if early results look strong — novelty effect inflates early CTR for any new recommendation surface.
+
+**Decision criteria:**
+
+```
+Ship if:
+  primary metric (GMV/session) improvement is statistically significant
+  AND quality guardrail (return rate) does not degrade
+  AND latency guardrails hold
+
+Do not ship if:
+  primary metric is flat even if CTR improved
+    → model surfaces clickable but non-converting products
+  return rate increases
+    → model misleads users about product quality
+  long-tail metrics don't improve for SBERT variant
+    → SBERT not adding value beyond LightFM alone
+```
+
+---
+
+## Gate 5 — Continuous Monitoring (Post-Production)
+
+Evaluation doesn't end at deployment. This runs perpetually and triggers rollback or retraining automatically.
+
+**Three layers of monitoring:**
+
+**Data layer — pipeline health:**
+
+Runs daily as part of the dbt/Feast pipeline:
+
+- Null rate per feature in Feast online store
+- Feature distribution drift vs 30-day baseline (PSI — Population Stability Index)
+- Feast materialization lag — are batch features stale?
+- Redis session hit rate — are session features being written correctly?
+- KVDal coverage rate — what % of products have similarity lists?
+- Trending channel health — are Redis sorted sets being updated?
+
+PSI is preferred over KS test here because it gives a continuous score rather than a p-value, making it easier to set actionable thresholds:
+
+```
+PSI < 0.1   → no action needed
+PSI 0.1–0.2 → monitor closely
+PSI > 0.2   → alert, investigate, likely retrain needed
+```
+
+**Model layer — serving health:**
+
+Near-real-time, running on streaming metrics:
+
+- FAISS average similarity score — sudden drop suggests embedding quality regression
+- Recommendation null rate — % requests returning fewer than minimum items
+- P50/P95/P99 latency per API (Home and PDP separately)
+- ONNX inference time
+- Trending channel contribution rate — % of final recommendations coming from Redis vs FAISS
+
+**Business layer — outcome metrics:**
+
+Computed hourly from click and purchase event streams:
+
+- Recommendation CTR — 1-hour rolling window vs 7-day baseline
+- Add-to-cart rate from recommendations
+- Null recommendation exposure rate — % of users seeing incomplete widgets
+
+**Automated responses:**
+
+```
+Latency P95 > budget          → circuit breaker → fallback to popularity baseline
+Null recommendation rate > 2x → alert on-call
+Feature PSI > 0.2             → trigger unscheduled retrain
+Business metric drop > 10%    → alert, pause experiment if running
+Model inference error spike   → rollback to previous model version
+```
+
+**Retraining triggers:**
+
+Not just time-based. Retraining is triggered by signals:
+
+```
+Weekly schedule               → standard retrain (planned)
+Feature drift PSI > 0.2       → unscheduled retrain
+Online metric sustained drop  → retrain after investigation confirms model cause
+Catalog structure change       → retrain (new categories break existing embeddings)
+New products > 10% of catalog → re-encode item tower + rebuild FAISS
+                                 (no full retrain needed)
+```
+
+The distinction between full retrain and re-encode is important operationally — re-encoding new products into FAISS nightly is cheap and automated. Full retraining is expensive and should only trigger when the model itself is stale, not just the index.
+
+---
+
+## How to present this in the interview
+
+Frame it as a pipeline, not a checklist:
+
+> "Evaluation isn't a step that happens once before deployment. It's a gate system — offline evaluation gates promotion to staging, shadow mode catches real-traffic edge cases before users see them, canary catches catastrophic failures fast, A/B measures actual business impact over two weeks, and continuous monitoring detects when the production model starts to degrade so we retrain before users notice. The goal is that no human needs to manually decide whether a model is safe to ship — the gates make that decision automatically based on thresholds we've agreed on upfront."
+
+That framing shows MLOps maturity — you understand that the hard problem isn't training a good model, it's building a system that reliably ships good models repeatedly.
