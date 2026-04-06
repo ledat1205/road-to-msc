@@ -233,3 +233,283 @@ Frame it as a pipeline, not a checklist:
 > "Evaluation isn't a step that happens once before deployment. It's a gate system — offline evaluation gates promotion to staging, shadow mode catches real-traffic edge cases before users see them, canary catches catastrophic failures fast, A/B measures actual business impact over two weeks, and continuous monitoring detects when the production model starts to degrade so we retrain before users notice. The goal is that no human needs to manually decide whether a model is safe to ship — the gates make that decision automatically based on thresholds we've agreed on upfront."
 
 That framing shows MLOps maturity — you understand that the hard problem isn't training a good model, it's building a system that reliably ships good models repeatedly.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Good — let me make each one concrete.
+
+---
+
+## 1. Compare session feature distributions between BigQuery reconstruction and Redis
+
+**What you're comparing:**
+
+At training time, session features are reconstructed from BigQuery window functions. At serving time, they come from Redis. You need to verify these two sources produce the same statistical picture.
+
+**How to do it:**
+
+Sample from both sources on the same day:
+
+From BigQuery reconstruction:
+
+```sql
+SELECT
+  session_view_count,
+  session_atc_count,
+  session_top_cate,
+  last_session_view_count,
+  last_session_was_deep
+FROM recommendation.two_tower_training_data
+WHERE event_date = CURRENT_DATE - 1
+  AND split = 'train'
+LIMIT 100000
+```
+
+From Redis — scan a sample of active session keys:
+
+```
+SCAN cursor MATCH customer:*:session COUNT 1000
+HGETALL customer:{id}:session  → session_view_count, session_atc_count, ...
+```
+
+Then compare distributions on each feature:
+
+**session_view_count:**
+
+```
+BigQuery reconstruction:   mean=4.2, p50=3, p95=14, p99=28
+Redis serving:             mean=4.1, p50=3, p95=13, p99=27
+→ close enough, no action
+```
+
+**session_top_cate:**
+
+```
+BigQuery reconstruction:   top 5 cates cover 62% of rows
+Redis serving:             top 5 cates cover 61% of rows
+→ distribution consistent
+```
+
+**What drift looks like:**
+
+```
+session_view_count:
+  BigQuery: mean=4.2, p95=14
+  Redis:    mean=1.1, p95=3       ← Redis sessions resetting too aggressively
+                                     30min inactivity window may be misconfigured
+```
+
+**The specific checks:**
+
+```
+Metric                          Threshold to alert
+──────                          ──────────────────
+Mean difference                 > 20% relative difference
+P95 difference                  > 20% relative difference
+Null rate (Redis key missing)   > 5% of sampled users have no session key
+Top category distribution       KS test p-value < 0.05
+last_session_was_deep ratio     > 10% absolute difference
+```
+
+The most common failure mode: Redis TTL is set to 24h but the Spark Streaming job had a restart, wiping session state for active users. You'd see `session_view_count` suddenly averaging near zero in Redis while BigQuery reconstruction shows normal values. That means the model gets zeros at serving time for features it learned to rely on during training.
+
+---
+
+## 2. Compare batch feature distributions between Feast offline store and Feast online store
+
+**What you're comparing:**
+
+Feast offline store = BigQuery (what dbt computed, what training uses for point-in-time joins). Feast online store = Redis/key-value store (what serving reads at request time). These should be identical — the materialization job copies offline → online — but they can diverge.
+
+**How to do it:**
+
+Sample the same set of customer_ids from both stores:
+
+```python
+# from Feast offline store (BigQuery)
+offline_features = feast_client.get_historical_features(
+    entity_df=sample_customers,  # 10k random customer_ids
+    features=[
+        'customer_behavior_d30:num_pdp_views_d30',
+        'customer_behavior_d30:num_atc_d30',
+        'customer_category_affinity:primary_cate_id',
+        'customer_lifetime_value:value_segment',
+        'customer_lifetime_value:days_since_last_purchase',
+    ]
+).to_dataframe()
+
+# from Feast online store (what serving actually reads)
+online_features = feast_client.get_online_features(
+    features=[...same features...],
+    entity_rows=[{'customer_id': id} for id in sample_customer_ids]
+).to_dict()
+```
+
+**Specific checks per feature type:**
+
+**Numeric features** (`num_pdp_views_d30`, `days_since_last_purchase`):
+
+```
+Check:   mean, p50, p95 between offline and online
+Alert:   > 10% relative difference on mean or p95
+
+Common failure:
+  offline mean days_since_last_purchase = 12.3
+  online  mean days_since_last_purchase = 45.7
+  → materialization job hasn't run in 3 days
+     online store is serving stale values
+```
+
+**Categorical features** (`primary_cate_id`, `value_segment`):
+
+```
+Check:   value frequency distribution — does cate_id=1846 appear
+         at same rate in both stores?
+Alert:   any category with > 5% absolute frequency difference
+
+Common failure:
+  offline: value_segment='high_value' for 8% of customers
+  online:  value_segment='high_value' for 2% of customers
+  → schema mismatch — a dbt model changed the segment thresholds
+     but Feast materialization didn't pick up the new definition
+```
+
+**Null rates** (critical):
+
+```
+Check:   % of customer_ids with NULL for each feature
+Alert:   null rate increases > 2% absolute vs yesterday
+
+Common failure:
+  yesterday: num_atc_d30 null rate = 1.2%  (new customers, expected)
+  today:     num_atc_d30 null rate = 34%   → source table join broke
+                                              dbt model silently failed
+```
+
+**Staleness check** — this one is easy to miss:
+
+```
+Check:   max(feature_timestamp) in Feast online store
+Alert:   if timestamp > 26 hours old (materialization runs daily,
+         allow 2h buffer for pipeline delays)
+
+Common failure:
+  Feast materialization Airflow DAG failed silently at 2am
+  Online store serving yesterday's features all day
+  Model receiving stale customer_behavior_d30 values
+  → users who purchased yesterday still get recommendations
+     as if they haven't purchased
+```
+
+---
+
+## 3. Flag features with null rate spike or distribution drift
+
+**Two separate checks — don't conflate them:**
+
+**Null rate spike** — is data missing that shouldn't be missing?
+
+Run daily, compare against 7-day rolling baseline:
+
+```
+Feature                    Yesterday null%   7d avg null%   Spike?
+───────                    ───────────────   ────────────   ──────
+num_pdp_views_d30          1.1%              1.2%           No
+num_atc_d30                1.3%              1.2%           No
+primary_cate_id            0.2%              0.1%           No
+avg_rating_all             38%               39%            No    ← high but stable
+                                                                    (new products expected)
+customer_category_affinity 0.8%              0.9%           No
+days_since_last_purchase   67%               12%            YES ← alert
+                                                                   source join broke
+```
+
+`days_since_last_purchase` jumping from 12% to 67% null means the join to the orders table broke — probably a partition issue or upstream table schema change. Every customer who made their first purchase recently now looks like a brand new user to the model.
+
+**Distribution drift** — is the data present but shifted?
+
+Use **Population Stability Index (PSI)** — more actionable than KS test because it gives a continuous score:
+
+```
+PSI = Σ (actual% - expected%) × ln(actual% / expected%)
+
+PSI < 0.1    → stable, no action
+PSI 0.1–0.2  → monitor, investigate if trending up
+PSI > 0.2    → alert, likely retrain needed
+```
+
+Computed per feature against a 30-day baseline distribution:
+
+**Example — `num_pdp_views_d30` buckets:**
+
+```
+Bucket          Expected%   Actual%    Component PSI
+──────          ─────────   ───────    ─────────────
+0 views         15%         16%        0.001
+1-5 views       28%         27%        0.001
+6-20 views      32%         31%        0.001
+21-50 views     15%         14%        0.001
+50+ views       10%         12%        0.004
+                                       ─────
+                            Total PSI: 0.008  → stable
+```
+
+**Example — same feature during a major sale event (11.11):**
+
+```
+Bucket          Expected%   Actual%    Component PSI
+──────          ─────────   ───────    ─────────────
+0 views         15%         8%         0.041
+1-5 views       28%         18%        0.063
+6-20 views      32%         31%        0.001
+21-50 views     15%         24%        0.052
+50+ views       10%         19%        0.074
+                                       ─────
+                            Total PSI: 0.231  → alert
+```
+
+Everyone is browsing more than usual during 11.11. PSI > 0.2 fires an alert. **This doesn't necessarily mean retrain** — it means the model is receiving feature values outside the distribution it trained on. During a planned sale event you'd suppress the alert and annotate it. An unexpected PSI spike on a regular day warrants investigation.
+
+---
+
+## The six features worth monitoring daily for your architecture
+
+Given everything we've discussed, these are the highest-leverage features to watch:
+
+```
+Feature                   Why it matters
+───────                   ──────────────
+session_view_count        Core user tower input, comes from Redis
+                          Drift → Spark Streaming issue
+
+session_top_cate          Drives trending Redis query scoping
+                          Null → session state missing entirely
+
+num_pdp_views_d30         Dominant behavior signal in user tower
+                          Drift → dbt model or source table issue
+
+customer_category_affinity Primary cate used to scope trending retrieval
+                          Null → user has no history, fallback to global trending
+
+days_since_last_purchase  Strong recency signal, high expected null for new users
+                          Spike → orders table join broke
+
+trending_score_1h         Powers both Home and PDP trending channel
+                          Zero values → Spark Streaming job down
+```
+
+These six cover the three failure modes that actually hurt recommendations: streaming pipeline down, batch pipeline stale, and source table broken. Everything else is secondary.
