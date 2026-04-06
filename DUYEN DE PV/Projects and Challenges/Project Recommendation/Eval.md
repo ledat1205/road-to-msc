@@ -1,6 +1,3 @@
-Good framing — evaluation in MLOps is not a one-time step, it's a **gate system** that runs continuously across the model lifecycle. Let me rewrite it properly.
-
----
 
 ## Evaluation as a Gate System
 
