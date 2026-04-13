@@ -128,4 +128,4 @@ The theoretical framework within which the researchers operated was based on 20t
 - Child development experts have long recognized that early childhood education is crucial.
 	    It has long been recognized by child development experts that early ...
 - National utility providers are integrating renewable energy sources into the national grid at an accelerating pace.
-	 
+	 Renewable energy sources are being integrated by national u
