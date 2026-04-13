@@ -116,7 +116,7 @@ The theoretical framework within which the researchers operated was based on 20t
 - Medical practitioners have observed significant improvements in healthcare following the introduction of the new vaccine.
 	    Significant improvements have been observed ...
 - Government officials are currently drafting legislation to address the rising concerns regarding data privacy.
-	    
+	    The legislation is currently being drafted by ... to address ...
 - Sociologists can argue that social media has fundamentally changed the nature of interpersonal communication.
     
 - A series of independent studies conducted across Europe corroborated the findings.
