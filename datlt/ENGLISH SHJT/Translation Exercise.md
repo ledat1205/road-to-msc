@@ -92,3 +92,11 @@ That is a discovery which fundamentally changed our knowledge about human evolut
 
 - Khung lý thuyết mà trong đó các nhà nghiên cứu vận hành được dựa trên xã hội học thế kỷ 20.
 The theoretical framework within which the researchers operated was based on 20th century sociology
+
+- **Something that/which:** "There is **something** in his argument **that** I find compelling."
+    
+- **Someone who/that:** "He is **someone who** consistently demonstrates leadership qualities."
+    
+- **Nothing that:** "There is **nothing** in the report **that** explains the sudden budget deficit."
+    
+- **Anyone who:** "**Anyone who** wishes to apply must submit their documents by Friday."
