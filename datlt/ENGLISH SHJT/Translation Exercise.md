@@ -69,7 +69,7 @@ The students who participate in extracurricular activities often improve time ma
 
 - Có một vài khu vực nơi mà những tác động của biến đổi khí hậu đã trở nên không thể đảo ngược.
 
-There are some regions where the climate change effect has become irreversable.
+There are some regions where the climate change effect has become irreversible.
 
 - Vị CEO, người mà có tầm nhìn đã thay đổi cả công ty, đã quyết định nghỉ hưu ở đỉnh cao sự nghiệp của mình.
 
@@ -77,7 +77,7 @@ The CEO, who has a visionary that changed the whole company, decided to retire a
 
 - Đây là một tình huống mà trong đó những điểm bất lợi rõ ràng là vượt xa các ưu điểm.
 
-This is a situation which 
+This is a situation in which the disadvantages has outweigh the advantages.
 
 - Nhiều công nhân bị buộc phải di cư đến các trung tâm đô thị, nơi mà các cơ hội việc làm dồi dào hơn.
 
