@@ -100,3 +100,9 @@ The theoretical framework within which the researchers operated was based on 20t
 - **Nothing that:** "There is **nothing** in the report **that** explains the sudden budget deficit."
     
 - **Anyone who:** "**Anyone who** wishes to apply must submit their documents by Friday."
+
+|**Informal Usage**|**Academic/Formal Usage (Band 7.5+)**|
+|---|---|
+|There is something that is wrong.|There is **something in the methodology that** appears flawed.|
+|He is someone who helps others.|He is **someone who is committed to** fostering community development.|
+|We need to find somewhere where we can build.|We must identify **somewhere where** sustainable urban development is feasible.|
