@@ -122,9 +122,9 @@ The theoretical framework within which the researchers operated was based on 20t
 - A series of independent studies conducted across Europe corroborated the findings.
 	    The findings was corroborated by a series of ... 
 - The management team must adopt new strategies if the company is to remain competitive.
-    
+	    New strategies must be adopted
 - The lead scientists divided the participants into two groups to ensure a fair comparison.
-    
+	    The participants were divided into .. by .. to ensure ...
 - Child development experts have long recognized that early childhood education is crucial.
     
 - National utility providers are integrating renewable energy sources into the national grid at an accelerating pace.
