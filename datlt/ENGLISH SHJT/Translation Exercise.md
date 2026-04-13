@@ -101,8 +101,30 @@ The theoretical framework within which the researchers operated was based on 20t
     
 - **Anyone who:** "**Anyone who** wishes to apply must submit their documents by Friday."
 
-|**Informal Usage**|**Academic/Formal Usage (Band 7.5+)**|
-|---|---|
-|There is something that is wrong.|There is **something in the methodology that** appears flawed.|
-|He is someone who helps others.|He is **someone who is committed to** fostering community development.|
-|We need to find somewhere where we can build.|We must identify **somewhere where** sustainable urban development is feasible.|
+| **Informal Usage**                            | **Academic/Formal Usage (Band 7.5+)**                                           |
+| --------------------------------------------- | ------------------------------------------------------------------------------- |
+| There is something that is wrong.             | There is **something in the methodology that** appears flawed.                  |
+| He is someone who helps others.               | He is **someone who is committed to** fostering community development.          |
+| We need to find somewhere where we can build. | We must identify **somewhere where** sustainable urban development is feasible. |
+
+
+## 3. Passive
+- Global demographics experts widely estimate that over 70% of the world's population will live in cities by 2050.
+    
+- The research team conducted the experiment under strictly controlled laboratory conditions.
+    
+- Medical practitioners have observed significant improvements in healthcare following the introduction of the new vaccine.
+    
+- Government officials are currently drafting legislation to address the rising concerns regarding data privacy.
+    
+- Sociologists can argue that social media has fundamentally changed the nature of interpersonal communication.
+    
+- A series of independent studies conducted across Europe corroborated the findings.
+    
+- The management team must adopt new strategies if the company is to remain competitive.
+    
+- The lead scientists divided the participants into two groups to ensure a fair comparison.
+    
+- Child development experts have long recognized that early childhood education is crucial.
+    
+- National utility providers are integrating renewable energy sources into the national grid at an accelerating pace.
