@@ -108,11 +108,11 @@ The theoretical framework within which the researchers operated was based on 20t
 | We need to find somewhere where we can build. | We must identify **somewhere where** sustainable urban development is feasible. |
 
 
-## 3. Passive
+## 3. Passive Tenses
 - Global demographics experts widely estimate that over 70% of the world's population will live in cities by 2050.
-    
+     It is widely estimated by ... that ...
 - The research team conducted the experiment under strictly controlled laboratory conditions.
-    
+    The experiment was conducted 
 - Medical practitioners have observed significant improvements in healthcare following the introduction of the new vaccine.
     
 - Government officials are currently drafting legislation to address the rising concerns regarding data privacy.
