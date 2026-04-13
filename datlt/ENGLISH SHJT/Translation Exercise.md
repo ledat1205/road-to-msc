@@ -112,9 +112,9 @@ The theoretical framework within which the researchers operated was based on 20t
 - Global demographics experts widely estimate that over 70% of the world's population will live in cities by 2050.
      It is widely estimated by ... that ...
 - The research team conducted the experiment under strictly controlled laboratory conditions.
-    The experiment was conducted 
+    The experiment was conducted by the .. under ...
 - Medical practitioners have observed significant improvements in healthcare following the introduction of the new vaccine.
-    
+	    
 - Government officials are currently drafting legislation to address the rising concerns regarding data privacy.
     
 - Sociologists can argue that social media has fundamentally changed the nature of interpersonal communication.
