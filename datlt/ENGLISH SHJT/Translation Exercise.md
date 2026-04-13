@@ -118,7 +118,7 @@ The theoretical framework within which the researchers operated was based on 20t
 - Government officials are currently drafting legislation to address the rising concerns regarding data privacy.
 	    The legislation is currently being drafted by ... to address ...
 - Sociologists can argue that social media has fundamentally changed the nature of interpersonal communication.
-    
+	    It can be argued that ... 
 - A series of independent studies conducted across Europe corroborated the findings.
     
 - The management team must adopt new strategies if the company is to remain competitive.
