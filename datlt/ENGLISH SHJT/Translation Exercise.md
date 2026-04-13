@@ -120,7 +120,7 @@ The theoretical framework within which the researchers operated was based on 20t
 - Sociologists can argue that social media has fundamentally changed the nature of interpersonal communication.
 	    It can be argued that ... 
 - A series of independent studies conducted across Europe corroborated the findings.
-    
+	    The findings was corroborated by a series of ... 
 - The management team must adopt new strategies if the company is to remain competitive.
     
 - The lead scientists divided the participants into two groups to ensure a fair comparison.
