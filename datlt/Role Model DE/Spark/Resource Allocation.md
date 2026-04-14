@@ -51,4 +51,4 @@ Here are some pool properties that user can configure:
 
 - **Scheduling Mode (default is FIFO)**: This option controls the scheduling behavior in a specific pool. This can be FIFO or FAIR.![[Pasted image 20260414160707.png]]
 - **Weight (default is 1):** This controls the pool’s cluster share relative to other pools. By default, all pools have a weight of 1, which means they will have the same amount of resources. However, if a pool has a weight of 2, it will have double the resources of other pools.![[Pasted image 20260414160800.png]]
-- **minShare (default is 0)**: Each pool can be given a minimum share (e.g., minimum number of CPU cores). The scheduler always tries to meet all active pools’ minimum shares before redistributing extra resources according to the weights.
+- **minShare (default is 0)**: Each pool can be given a minimum share (e.g., minimum number of CPU cores). The scheduler always tries to meet all active pools’ minimum shares before redistributing extra resources according to the weights.![[Pasted image 20260414160851.png]]
