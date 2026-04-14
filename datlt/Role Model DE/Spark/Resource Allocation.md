@@ -42,3 +42,5 @@ Executors also can cache data in executor memory, user can configure executors c
 ## Fair 
 ![[Pasted image 20260414160515.png]]
 
+
+User can use Pool and Weight 
