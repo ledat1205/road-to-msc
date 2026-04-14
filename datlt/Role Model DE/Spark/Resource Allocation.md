@@ -17,3 +17,7 @@ Reason:
 
 ## Remove policy
 
+Spark application removes an executor when idle for a predefined interval  (_**spark.dynamicAllocation.executorIdleTime**_).
+
+![[Pasted image 20260414151414.png]]
+
