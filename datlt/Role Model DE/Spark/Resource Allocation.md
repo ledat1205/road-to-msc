@@ -25,4 +25,6 @@ Spark application removes an executor when idle for a predefined interval  (_**
 
 In static resource allocation, executor is safely discarded (exist until application complete)
 
-In dynamic resource allocation, executor can be removed in app running process
+In dynamic resource allocation, executor can be removed in app running process. So we need a mechanism to store data in that executor to avoid recompute
+
+During shuffle 
