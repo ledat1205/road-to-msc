@@ -21,3 +21,6 @@ Spark application removes an executor when idle for a predefined interval  (_**
 
 ![[Pasted image 20260414151414.png]]
 
+## Graceful Decommission of executor
+
+In static resource allocation 
