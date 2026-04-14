@@ -33,3 +33,12 @@ Solution is use external shuffle service. This service runs as a long-running pr
 ![[Pasted image 20260414160226.png]]
 
 Executors also can cache data in executor memory, user can configure executors containing cache data.
+
+# Schedule Mode
+## First in first out (FIFO)
+
+![[Pasted image 20260414160441.png]]
+
+## Fair 
+![[Pasted image 20260414160515.png]]
+
