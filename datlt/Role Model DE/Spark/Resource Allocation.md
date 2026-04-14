@@ -43,4 +43,13 @@ Executors also can cache data in executor memory, user can configure executors c
 ![[Pasted image 20260414160515.png]]
 
 
-User can use Pool and Weight 
+User can use Pool and Weight to manage resource for job across cluster 
+
+![[Pasted image 20260414160652.png]]
+
+![[Pasted image 20260414160707.png]]
+
+ere are some pool properties that user can configure:
+
+- **Scheduling Mode (default is FIFO)**: This option controls the scheduling behavior in a specific pool. This can be FIFO or FAIR.
+- 
