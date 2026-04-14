@@ -32,3 +32,4 @@ During shuffle, the executors write its map outputs locally to disk then serves 
 Solution is use external shuffle service. This service runs as a long-running process on each cluster node, independently of Spark applications and their executors.
 ![[Pasted image 20260414160226.png]]
 
+Executors also can cache data in executor memory, user can configure executors containing cache data.
