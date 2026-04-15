@@ -30,4 +30,5 @@ Synchronous replication require replicas to acknowledge WAL entries before commi
 
 ### Logical replication
 
-Logical replication decodes WAL records into logical change events like SQL-level operations 
+Logical replication decodes WAL records into logical change events like SQL-level operations. These changes are replicated to subscribers more flexibility
+
