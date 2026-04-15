@@ -28,4 +28,5 @@ WAL segments are streamed directly from primary node to the replica nodes. This 
 
 Synchronous replication require replicas to acknowledge WAL entries before commited
 
-### Logi
+### Logical replication
+
