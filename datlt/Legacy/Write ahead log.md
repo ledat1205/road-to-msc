@@ -24,3 +24,4 @@ PostgreSQL also supports **archiving WAL segments** for disaster recovery and�
 Leverages its WAL for 2 primary types of replication: Physical and Logical
 
 ### Physical replication
+WAL segments are streamed directly from primary node to the replica nodes.
