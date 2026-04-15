@@ -18,3 +18,9 @@ The WAL is divided into **16 MB segment files**, which are stored in the `pg_w
 - **Commit Markers**: Flags indicating the end of a transaction.
 
 PostgreSQL also supports **archiving WAL segments** for disaster recovery and **point-in-time recovery (PITR)**, where the database can be restored to a specific state by replaying archived WAL files.
+
+## Replication
+
+Leverages its WAL for 2 primary types of replication: Physical and Logical
+
+### Physical replication
