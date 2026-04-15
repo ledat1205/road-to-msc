@@ -34,4 +34,7 @@ Logical replication decodes WAL records into logical change events like SQL-leve
 
 PostgreSQL creates a **logical replication slot**, which decodes WAL records into logical operations. These operations are streamed to **subscribers** that can apply them selectively or transform them as needed.
 
-Logical replication allows partial replication, such as
+Logical replication allows partial replication, such as replicating only specific table or rows. You can replicate between databases with different schemas or PostgreSQL versions.
+
+**Most importantly, it can enable integration with other systems like Kafka, event processors, or analytical platforms,** which can simplify data migration and real-time change data capture (CDC)
+
