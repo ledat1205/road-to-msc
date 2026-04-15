@@ -14,10 +14,7 @@ Workflow:
 The WAL is divided into **16 MB segment files**, which are stored in the `pg_wal` directory. PostgreSQL rotates and archives old WAL files to manage storage efficiently. Key components of the WAL include:
 
 - **Redo Records**: Detailed operations describing changes to be replayed.
-    
 - **Transaction IDs**: Unique identifiers to group WAL entries belonging to the same transaction.
-    
 - **Commit Markers**: Flags indicating the end of a transaction.
-    
 
 PostgreSQL also supports **archiving WAL segments** for disaster recovery and **point-in-time recovery (PITR)**, where the database can be restored to a specific state by replaying archived WAL files.
