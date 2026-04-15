@@ -32,4 +32,6 @@ Synchronous replication require replicas to acknowledge WAL entries before commi
 
 Logical replication decodes WAL records into logical change events like SQL-level operations. These changes are replicated to subscribers more flexibility
 
-postgresql creates a logical replication slot, which decodes WAL records into logical operations. 
+PostgreSQL creates a **logical replication slot**, which decodes WAL records into logical operations. These operations are streamed to **subscribers** that can apply them selectively or transform them as needed.
+
+Logical replication allows partial replication, such as
