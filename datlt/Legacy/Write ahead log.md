@@ -38,3 +38,4 @@ Logical replication allows partial replication, such as replicating only specifi
 
 **Most importantly, it can enable integration with other systems like Kafka, event processors, or analytical platforms,** which can simplify data migration and real-time change data capture (CDC)
 
+# Kafka: Log as the system
